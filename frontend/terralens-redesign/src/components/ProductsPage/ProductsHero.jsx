@@ -39,20 +39,20 @@ export default function ProductsHero() {
           height: "100%",
           objectFit: "cover",
           objectPosition: "center",
-          opacity: 0.65,
+          opacity: 0.92,
           zIndex: 0,
         }}
       >
         <source src={productsVideo} type="video/mp4" />
       </video>
 
-      {/* Dark Gradient Overlay */}
+      {/* White Readability Overlay */}
 
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "linear-gradient(rgba(5,5,5,0.25), rgba(5,5,5,0.4))",
+            "linear-gradient(rgba(255,255,255,0.08), rgba(255,255,255,0.16))",
           zIndex: 1,
         }}
       />
@@ -60,11 +60,11 @@ export default function ProductsHero() {
       {/* Background Glow */}
 
       <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 2 }}>
-        <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-sky-500/10 blur-[170px]" />
+        <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-white/[0.08] blur-[170px]" />
 
-        <div className="absolute bottom-0 left-0 h-80 w-80 rounded-full bg-sky-500/5 blur-[140px]" />
+        <div className="absolute bottom-0 left-0 h-80 w-80 rounded-full bg-white/[0.05] blur-[140px]" />
 
-        <div className="absolute top-20 right-[-10%] h-96 w-96 rounded-full bg-blue-500/10 blur-[170px]" />
+        <div className="absolute top-20 right-[-10%] h-96 w-96 rounded-full bg-white/[0.07] blur-[170px]" />
       </div>
 
       {/* Grid Pattern */}

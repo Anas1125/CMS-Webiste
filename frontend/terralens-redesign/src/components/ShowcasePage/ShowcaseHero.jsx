@@ -23,6 +23,26 @@ export default function ShowcaseHero() {
     ? `http://127.0.0.1:8000${settings.showcase_video}`
     : null;
 
+  const hasVideo = Boolean(backgroundVideo);
+
+  /* =======================================================
+     THEME — white section when there's no video, the
+     original dark/video theme when there is
+     ======================================================= */
+
+  const theme = {
+    sectionBg: hasVideo ? "#050505" : "#ffffff",
+    label: hasVideo ? "#38bdf8" : "#0ea5e9",
+    heading: hasVideo ? "#ffffff" : "#0f172a",
+    body: hasVideo ? "#d1d5db" : "#475569",
+    gridLine: hasVideo
+      ? "rgba(255,255,255,.2)"
+      : "rgba(15,23,42,0.07)",
+    bottomFade: hasVideo
+      ? "linear-gradient(to bottom, transparent 0%, rgba(5,5,5,0.3) 35%, rgba(5,5,5,0.8) 70%, #050505 90%, #ffffff 100%)"
+      : "linear-gradient(to bottom, rgba(255,255,255,0), #ffffff)",
+  };
+
   const scrollToPortfolio = () => {
     document
       .getElementById("portfolio-section")
@@ -33,11 +53,11 @@ export default function ShowcaseHero() {
 
   return (
     <section
-      className="relative w-full overflow-hidden w-full bg-white pb-40 mb-20"
+      className="relative w-full overflow-hidden pb-40 mb-20"
       style={{
         minHeight: "100vh",
         width: "100%",
-        backgroundColor: "#050505",
+        backgroundColor: theme.sectionBg,
         position: "relative",
         display: "flex",
         alignItems: "center",
@@ -49,7 +69,7 @@ export default function ShowcaseHero() {
           BACKGROUND VIDEO
       ===================================================== */}
 
-      {backgroundVideo && (
+      {hasVideo && (
         <video
           autoPlay
           muted
@@ -64,7 +84,7 @@ export default function ShowcaseHero() {
             height: "100%",
             objectFit: "cover",
             objectPosition: "center",
-            opacity: 0.65,
+            opacity: 0.92,
             zIndex: 0,
           }}
         >
@@ -76,70 +96,87 @@ export default function ShowcaseHero() {
       )}
 
       {/* =====================================================
-          DARK VIDEO OVERLAY
+          READABILITY SCRIM
+
+          Was a flat white wash over the whole video — brightening
+          it worked against the white heading text (less contrast,
+          not more) and milked out the footage everywhere, not just
+          behind the copy. This is a dark, centered vignette instead:
+          it only darkens where the text actually sits, and leaves
+          the edges of the frame clear so the video reads at full
+          strength.
       ===================================================== */}
 
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "linear-gradient(rgba(5,5,5,0.25), rgba(5,5,5,0.4))",
-          zIndex: 1,
-          pointerEvents: "none",
-        }}
-      />
+      {hasVideo && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(2,6,23,0.45) 0%, rgba(2,6,23,0.2) 45%, rgba(2,6,23,0) 75%)",
+            zIndex: 1,
+            pointerEvents: "none",
+          }}
+        />
+      )}
 
       {/* =====================================================
-          BLUE GLOW
+          WHITE GLOW
+
+          Only for the plain (no-video) white section now — on the
+          video path this was a third layer of white haze stacked
+          on top of the overlay above, compounding the washed-out
+          look.
       ===================================================== */}
 
-      <div
-        className="absolute inset-0 overflow-hidden pointer-events-none"
-        style={{
-          zIndex: 2,
-        }}
-      >
+      {!hasVideo && (
         <div
-          className="
-            absolute
-            left-1/2
-            top-0
-            h-[500px]
-            w-[500px]
-            -translate-x-1/2
-            rounded-full
-            bg-sky-500/[0.08]
-            blur-[140px]
-          "
-        />
+          className="absolute inset-0 overflow-hidden pointer-events-none"
+          style={{
+            zIndex: 2,
+          }}
+        >
+          <div
+            className="
+              absolute
+              left-1/2
+              top-0
+              h-[500px]
+              w-[500px]
+              -translate-x-1/2
+              rounded-full
+              bg-white/[0.08]
+              blur-[140px]
+            "
+          />
 
-        <div
-          className="
-            absolute
-            bottom-0
-            left-0
-            h-72
-            w-72
-            rounded-full
-            bg-sky-500/[0.05]
-            blur-[120px]
-          "
-        />
+          <div
+            className="
+              absolute
+              bottom-0
+              left-0
+              h-72
+              w-72
+              rounded-full
+              bg-white/[0.05]
+              blur-[120px]
+            "
+          />
 
-        <div
-          className="
-            absolute
-            top-20
-            right-[-10%]
-            h-96
-            w-96
-            rounded-full
-            bg-blue-500/[0.08]
-            blur-[140px]
-          "
-        />
-      </div>
+          <div
+            className="
+              absolute
+              top-20
+              right-[-10%]
+              h-96
+              w-96
+              rounded-full
+              bg-white/[0.07]
+              blur-[140px]
+            "
+          />
+        </div>
+      )}
 
       {/* =====================================================
           GRID
@@ -154,8 +191,7 @@ export default function ShowcaseHero() {
         "
         style={{
           zIndex: 3,
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.2) 1px, transparent 1px)",
+          backgroundImage: `linear-gradient(${theme.gridLine} 1px, transparent 1px), linear-gradient(90deg, ${theme.gridLine} 1px, transparent 1px)`,
           backgroundSize: "60px 60px",
         }}
       />
@@ -194,12 +230,13 @@ export default function ShowcaseHero() {
           className="
             uppercase
             tracking-[6px]
-            text-sky-400
             text-sm
             font-bold
             mb-6
             w-full
+            pt-38
           "
+          style={{ color: theme.label }}
         >
           OUR SHOWCASE
         </motion.p>
@@ -222,12 +259,12 @@ export default function ShowcaseHero() {
             md:text-6xl
             lg:text-7xl
             font-extrabold
-            text-white
             leading-tight
             mb-8
             w-full
             tracking-tight
           "
+          style={{ color: theme.heading }}
         >
           Featured Projects
         </motion.h1>
@@ -248,13 +285,13 @@ export default function ShowcaseHero() {
           className="
             text-lg
             md:text-xl
-            text-gray-300
             max-w-3xl
             mx-auto
             leading-relaxed
             mb-12
             w-full
           "
+          style={{ color: theme.body }}
         >
           Explore our latest work across GIS, IT, Artificial Intelligence,
           IoT, Cloud Computing and Cybersecurity solutions delivered for
@@ -323,8 +360,7 @@ export default function ShowcaseHero() {
           left: 0,
           width: "100%",
           height: "220px",
-          background:
-            "linear-gradient(to bottom, transparent 0%, rgba(5,5,5,0.3) 35%, rgba(5,5,5,0.8) 70%, #050505 90%, #ffffff 100%)",
+          background: theme.bottomFade,
           pointerEvents: "none",
           zIndex: 20,
         }}

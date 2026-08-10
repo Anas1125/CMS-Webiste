@@ -7,7 +7,6 @@ import {
 } from "lucide-react";
 
 import Button from "../ui/Button";
-import LiquidGlassButton from "../ui/LiquidGlassButton";
 
 import { getSettings } from "../../api/settings";
 import { getMedia } from "../../api/media";
@@ -187,9 +186,43 @@ function Hero() {
     labelClass: hasVideo ? "text-white/80" : "text-slate-500",
     headingClass: hasVideo ? "text-white" : "text-slate-900",
     headingShadow: hasVideo
-      ? "0 4px 24px rgba(0,0,0,0.45), 0 1px 4px rgba(0,0,0,0.5)"
+      ? "0 4px 30px rgba(0,0,0,0.35)"
       : "none",
     subtitleClass: hasVideo ? "text-gray-100" : "text-slate-600",
+    primaryBtnClass: hasVideo
+      ? `
+        inline-flex items-center justify-center rounded-full
+        border border-white/20 bg-white/[0.10]
+        px-10 py-4 text-[17px] font-bold text-white
+        backdrop-blur-2xl transition-all duration-300
+        hover:scale-105 hover:border-white/40 hover:bg-white/[0.18]
+        hover:shadow-[0_0_35px_rgba(255,255,255,0.12)]
+      `
+      : `
+        inline-flex items-center justify-center rounded-full
+        border border-slate-300 bg-slate-900/[0.04]
+        px-10 py-4 text-[17px] font-bold text-slate-900
+        backdrop-blur-2xl transition-all duration-300
+        hover:scale-105 hover:border-slate-400 hover:bg-slate-900/[0.08]
+        hover:shadow-[0_0_25px_rgba(15,23,42,0.08)]
+      `,
+    secondaryBtnClass: hasVideo
+      ? `
+        inline-flex items-center justify-center rounded-full
+        border border-white/20 bg-white/[0.08]
+        px-10 py-4 text-[17px] font-bold text-white
+        backdrop-blur-2xl transition-all duration-300
+        hover:scale-105 hover:border-white/40 hover:bg-white/[0.16]
+        hover:shadow-[0_0_35px_rgba(255,255,255,0.10)]
+      `
+      : `
+        inline-flex items-center justify-center rounded-full
+        border border-slate-300 bg-slate-900/[0.02]
+        px-10 py-4 text-[17px] font-bold text-slate-900
+        backdrop-blur-2xl transition-all duration-300
+        hover:scale-105 hover:border-slate-400 hover:bg-slate-900/[0.06]
+        hover:shadow-[0_0_25px_rgba(15,23,42,0.06)]
+      `,
   };
 
   // =====================================================
@@ -267,8 +300,7 @@ function Hero() {
           LIGHT READABILITY OVERLAY
 
           Only rendered when there's a video underneath it —
-          kept very faint now, just enough to lift text
-          contrast without milk-washing the footage.
+          otherwise it just washed out the white background.
           ================================================= */}
 
       {hasVideo && (
@@ -277,30 +309,26 @@ function Hero() {
             absolute
             inset-0
             z-[1]
-            bg-black/[0.05]
+            bg-white/[0.10]
           "
         />
       )}
 
-      {/* SUBTLE DEPTH OVERLAY — barely-there vignette instead of a
-          flat white wash, so the video keeps its own brightness */}
-          {hasVideo && (
-            <div
-              className="
-                pointer-events-none
-                absolute
-                inset-0
-                z-[2]
-                bg-gradient-to-b
-                from-black/[0.10]
-                via-transparent
-                to-black/[0.15]
-              "
-            />
-          )}
+      {/* SUBTLE WHITE GLASS OVERLAY */}
+          <div
+            className="
+              pointer-events-none
+              absolute
+              inset-0
+              z-[2]
+              bg-gradient-to-br
+              from-white/[0.06]
+              via-transparent
+              to-white/[0.05]
+            "
+          />
 
-          {/* BOTTOM GRADIENT — fades video into white, kept short
-              and only visible right at the very bottom edge */}
+          {/* BOTTOM GRADIENT — fades video into white */}
           <div
             className="
               pointer-events-none
@@ -308,9 +336,10 @@ function Hero() {
               inset-x-0
               bottom-0
               z-[3]
-              h-10
+              h-13
               bg-gradient-to-b
               from-transparent
+              via-white/20
               to-white
             "
           />
@@ -320,25 +349,35 @@ function Hero() {
           ================================================= */}
 
       {videos.length > 1 && (
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "2rem",
-            transform: "translateY(-50%)",
-            zIndex: 20,
-          }}
+        <button
+          onClick={prevVideo}
+          aria-label="Previous video"
+          className="
+            absolute
+            left-8
+            top-1/2
+            z-20
+            flex
+            h-14
+            w-14
+            -translate-y-1/2
+            items-center
+            justify-center
+            rounded-full
+            border
+            border-white/20
+            bg-white/[0.08]
+            text-white
+            backdrop-blur-xl
+            transition-all
+            duration-300
+            hover:scale-110
+            hover:border-white/40
+            hover:bg-white/[0.18]
+          "
         >
-          <LiquidGlassButton
-            tone="dark"
-            variant="secondary"
-            shape="circle"
-            ariaLabel="Previous video"
-            onClick={prevVideo}
-          >
-            <ChevronLeft size={26} />
-          </LiquidGlassButton>
-        </div>
+          <ChevronLeft size={30} />
+        </button>
       )}
 
       {/* =================================================
@@ -346,25 +385,35 @@ function Hero() {
           ================================================= */}
 
       {videos.length > 1 && (
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            right: "2rem",
-            transform: "translateY(-50%)",
-            zIndex: 20,
-          }}
+        <button
+          onClick={nextVideo}
+          aria-label="Next video"
+          className="
+            absolute
+            right-8
+            top-1/2
+            z-20
+            flex
+            h-14
+            w-14
+            -translate-y-1/2
+            items-center
+            justify-center
+            rounded-full
+            border
+            border-white/20
+            bg-white/[0.08]
+            text-white
+            backdrop-blur-xl
+            transition-all
+            duration-300
+            hover:scale-110
+            hover:border-white/40
+            hover:bg-white/[0.18]
+          "
         >
-          <LiquidGlassButton
-            tone="dark"
-            variant="secondary"
-            shape="circle"
-            ariaLabel="Next video"
-            onClick={nextVideo}
-          >
-            <ChevronRight size={26} />
-          </LiquidGlassButton>
-        </div>
+          <ChevronRight size={30} />
+        </button>
       )}
 
       {/* =================================================
@@ -464,31 +513,29 @@ function Hero() {
 
             {/* EXPLORE SOLUTIONS */}
 
-            <LiquidGlassButton
-              tone={hasVideo ? "dark" : "light"}
-              variant="primary"
+            <Button
               onClick={() =>
                 navigate(
                   settings?.hero_button_link ||
                     "/services"
                 )
               }
+              className={theme.primaryBtnClass}
             >
               {settings?.hero_button_text ||
                 "Explore Solutions"}
-            </LiquidGlassButton>
+            </Button>
 
             {/* VIEW PROJECTS */}
 
-            <LiquidGlassButton
-              tone={hasVideo ? "dark" : "light"}
-              variant="secondary"
+            <Button
               onClick={() =>
                 navigate("/showcase")
               }
+              className={theme.secondaryBtnClass}
             >
               View Projects
-            </LiquidGlassButton>
+            </Button>
 
           </div>
 

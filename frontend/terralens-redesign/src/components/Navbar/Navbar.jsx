@@ -353,7 +353,7 @@ function Navbar() {
         <div
           className="lg:hidden"
           style={{
-            background: "rgba(10, 10, 12, 0.92)",
+            background: "rgba(255, 255, 255, 0.92)",
             backdropFilter: "blur(22px) saturate(180%)",
             WebkitBackdropFilter: "blur(22px) saturate(180%)",
             borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
@@ -373,7 +373,7 @@ function Navbar() {
                 position: "relative",
                 padding: "8px 0",
                 textDecoration: "none",
-                color: "#ffffff",
+                color: "#111010",
                 fontSize: "16px",
                 fontWeight: "800",
                 letterSpacing: isActive ? "0.04em" : "0em",

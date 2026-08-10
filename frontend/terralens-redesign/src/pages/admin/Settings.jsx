@@ -86,6 +86,19 @@ export default function Settings() {
     }));
   };
 
+  // =====================================================
+  // REMOVE MEDIA FIELD (single-value fields like logo,
+  // favicon, hero_video, statement_image, and each page's
+  // background video)
+  // =====================================================
+
+  const removeMediaField = (field) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: "",
+    }));
+  };
+
 
   const addAboutVideo = (file) => {
     setForm((prev) => ({
@@ -106,6 +119,57 @@ export default function Settings() {
       ),
     }));
   };
+
+  // =====================================================
+  // RENDER HELPER: single-video field with change + remove
+  // =====================================================
+
+  const renderSingleVideoField = (field, folder, label) => (
+    <div style={videoFieldStyle}>
+
+      <label style={labelStyle}>
+        {label}
+      </label>
+
+      <p style={selectedVideoStyle}>
+        {form[field] || "No video selected"}
+      </p>
+
+      <div
+        style={{
+          display: "flex",
+          gap: "10px",
+          flexWrap: "wrap",
+        }}
+      >
+
+        <FileUploader
+          folder={folder}
+          label={
+            form[field]
+              ? "Change Video"
+              : "Choose Video"
+          }
+          accept="video/*"
+          onUploaded={(file) =>
+            updateMediaField(field, file)
+          }
+        />
+
+        {form[field] && (
+          <button
+            type="button"
+            onClick={() => removeMediaField(field)}
+            style={removeButtonStyle}
+          >
+            Remove
+          </button>
+        )}
+
+      </div>
+
+    </div>
+  );
 
   // =====================================================
   // RENDER
@@ -292,18 +356,38 @@ export default function Settings() {
               />
             )}
 
-            <FileUploader
-              folder="logo"
-              label={
-                form.logo
-                  ? "Change Logo"
-                  : "Choose Logo"
-              }
-              accept="image/*"
-              onUploaded={(file) =>
-                updateMediaField("logo", file)
-              }
-            />
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                flexWrap: "wrap",
+              }}
+            >
+
+              <FileUploader
+                folder="logo"
+                label={
+                  form.logo
+                    ? "Change Logo"
+                    : "Choose Logo"
+                }
+                accept="image/*"
+                onUploaded={(file) =>
+                  updateMediaField("logo", file)
+                }
+              />
+
+              {form.logo && (
+                <button
+                  type="button"
+                  onClick={() => removeMediaField("logo")}
+                  style={removeButtonStyle}
+                >
+                  Remove
+                </button>
+              )}
+
+            </div>
 
           </div>
 
@@ -343,18 +427,38 @@ export default function Settings() {
               />
             )}
 
-            <FileUploader
-              folder="logo"
-              label={
-                form.favicon
-                  ? "Change Favicon"
-                  : "Choose Favicon"
-              }
-              accept="image/*"
-              onUploaded={(file) =>
-                updateMediaField("favicon", file)
-              }
-            />
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                flexWrap: "wrap",
+              }}
+            >
+
+              <FileUploader
+                folder="logo"
+                label={
+                  form.favicon
+                    ? "Change Favicon"
+                    : "Choose Favicon"
+                }
+                accept="image/*"
+                onUploaded={(file) =>
+                  updateMediaField("favicon", file)
+                }
+              />
+
+              {form.favicon && (
+                <button
+                  type="button"
+                  onClick={() => removeMediaField("favicon")}
+                  style={removeButtonStyle}
+                >
+                  Remove
+                </button>
+              )}
+
+            </div>
 
           </div>
 
@@ -576,18 +680,38 @@ export default function Settings() {
               </div>
             )}
 
-            <FileUploader
-              folder="hero"
-              label={
-                form.hero_video
-                  ? "Change Video"
-                  : "Choose Hero Video"
-              }
-              accept="video/*"
-              onUploaded={(file) =>
-                updateMediaField("hero_video", file)
-              }
-            />
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                flexWrap: "wrap",
+              }}
+            >
+
+              <FileUploader
+                folder="hero"
+                label={
+                  form.hero_video
+                    ? "Change Video"
+                    : "Choose Hero Video"
+                }
+                accept="video/*"
+                onUploaded={(file) =>
+                  updateMediaField("hero_video", file)
+                }
+              />
+
+              {form.hero_video && (
+                <button
+                  type="button"
+                  onClick={() => removeMediaField("hero_video")}
+                  style={removeButtonStyle}
+                >
+                  Remove
+                </button>
+              )}
+
+            </div>
 
           </div>
 
@@ -629,21 +753,43 @@ export default function Settings() {
               />
             )}
 
-            <FileUploader
-              folder="statement"
-              label={
-                form.statement_image
-                  ? "Change Statement Image"
-                  : "Choose Statement Image"
-              }
-              accept="image/*"
-              onUploaded={(file) =>
-                updateMediaField(
-                  "statement_image",
-                  file
-                )
-              }
-            />
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                flexWrap: "wrap",
+              }}
+            >
+
+              <FileUploader
+                folder="statement"
+                label={
+                  form.statement_image
+                    ? "Change Statement Image"
+                    : "Choose Statement Image"
+                }
+                accept="image/*"
+                onUploaded={(file) =>
+                  updateMediaField(
+                    "statement_image",
+                    file
+                  )
+                }
+              />
+
+              {form.statement_image && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    removeMediaField("statement_image")
+                  }
+                  style={removeButtonStyle}
+                >
+                  Remove
+                </button>
+              )}
+
+            </div>
 
           </div>
 
@@ -764,17 +910,7 @@ export default function Settings() {
                     <button
                       type="button"
                       onClick={() => removeAboutVideo(index)}
-                      style={{
-                        padding: "7px 12px",
-                        background: "#fef2f2",
-                        color: "#dc2626",
-                        border: "1px solid #fecaca",
-                        borderRadius: "8px",
-                        cursor: "pointer",
-                        fontSize: "12px",
-                        fontWeight: "600",
-                        flexShrink: 0,
-                      }}
+                      style={removeButtonStyle}
                     >
                       Remove
                     </button>
@@ -816,157 +952,47 @@ export default function Settings() {
 
           {/* SERVICES */}
 
-          <div style={videoFieldStyle}>
-
-            <label style={labelStyle}>
-              Services Page
-            </label>
-
-            <p style={selectedVideoStyle}>
-              {form.services_video || "No video selected"}
-            </p>
-
-            <FileUploader
-              folder="services"
-              label={
-                form.services_video
-                  ? "Change Video"
-                  : "Choose Video"
-              }
-              accept="video/*"
-              onUploaded={(file) =>
-                updateMediaField(
-                  "services_video",
-                  file
-                )
-              }
-            />
-
-          </div>
+          {renderSingleVideoField(
+            "services_video",
+            "services",
+            "Services Page"
+          )}
 
 
           {/* PRODUCTS */}
 
-          <div style={videoFieldStyle}>
-
-            <label style={labelStyle}>
-              Products Page
-            </label>
-
-            <p style={selectedVideoStyle}>
-              {form.products_video || "No video selected"}
-            </p>
-
-            <FileUploader
-              folder="products"
-              label={
-                form.products_video
-                  ? "Change Video"
-                  : "Choose Video"
-              }
-              accept="video/*"
-              onUploaded={(file) =>
-                updateMediaField(
-                  "products_video",
-                  file
-                )
-              }
-            />
-
-          </div>
+          {renderSingleVideoField(
+            "products_video",
+            "products",
+            "Products Page"
+          )}
 
 
           {/* SHOWCASE */}
 
-          <div style={videoFieldStyle}>
-
-            <label style={labelStyle}>
-              Showcase Page
-            </label>
-
-            <p style={selectedVideoStyle}>
-              {form.showcase_video || "No video selected"}
-            </p>
-
-            <FileUploader
-              folder="showcase"
-              label={
-                form.showcase_video
-                  ? "Change Video"
-                  : "Choose Video"
-              }
-              accept="video/*"
-              onUploaded={(file) =>
-                updateMediaField(
-                  "showcase_video",
-                  file
-                )
-              }
-            />
-
-          </div>
+          {renderSingleVideoField(
+            "showcase_video",
+            "showcase",
+            "Showcase Page"
+          )}
 
 
           {/* CAREERS */}
 
-          <div style={videoFieldStyle}>
-
-            <label style={labelStyle}>
-              Careers Page
-            </label>
-
-            <p style={selectedVideoStyle}>
-              {form.careers_video || "No video selected"}
-            </p>
-
-            <FileUploader
-              folder="careers"
-              label={
-                form.careers_video
-                  ? "Change Video"
-                  : "Choose Video"
-              }
-              accept="video/*"
-              onUploaded={(file) =>
-                updateMediaField(
-                  "careers_video",
-                  file
-                )
-              }
-            />
-
-          </div>
+          {renderSingleVideoField(
+            "careers_video",
+            "careers",
+            "Careers Page"
+          )}
 
 
           {/* CONTACT */}
 
-          <div style={videoFieldStyle}>
-
-            <label style={labelStyle}>
-              Contact Page
-            </label>
-
-            <p style={selectedVideoStyle}>
-              {form.contact_video || "No video selected"}
-            </p>
-
-            <FileUploader
-              folder="contact"
-              label={
-                form.contact_video
-                  ? "Change Video"
-                  : "Choose Video"
-              }
-              accept="video/*"
-              onUploaded={(file) =>
-                updateMediaField(
-                  "contact_video",
-                  file
-                )
-              }
-            />
-
-          </div>
+          {renderSingleVideoField(
+            "contact_video",
+            "contact",
+            "Contact Page"
+          )}
 
         </div>
 
@@ -1193,4 +1219,16 @@ const selectedVideoStyle = {
   margin: "10px 0 16px",
   wordBreak: "break-all",
   minHeight: "38px",
+};
+
+const removeButtonStyle = {
+  padding: "7px 12px",
+  background: "#fef2f2",
+  color: "#dc2626",
+  border: "1px solid #fecaca",
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontSize: "12px",
+  fontWeight: "600",
+  flexShrink: 0,
 };

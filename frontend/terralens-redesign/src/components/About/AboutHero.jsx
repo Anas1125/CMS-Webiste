@@ -16,8 +16,6 @@ import { getSettings } from "../../api/settings";
 
 /* =========================================================
    SMOOTH BACKGROUND VIDEO
-   Crossfades between MULTIPLE video sources in sequence.
-   Pass an array of URLs via `sources`.
    ========================================================= */
 
 function SmoothBackgroundVideo({ sources }) {
@@ -26,32 +24,38 @@ function SmoothBackgroundVideo({ sources }) {
 
   const [activeVideo, setActiveVideo] = useState("a");
 
-  // Which clip (index into `sources`) each <video> layer currently holds
   const [indexA, setIndexA] = useState(0);
+
   const [indexB, setIndexB] = useState(
-    sources.length > 1 ? 1 % sources.length : 0
+    sources.length > 1 ? 1 : 0
   );
 
   const transitioning = useRef(false);
-
-  // Index of the clip that's actually playing right now
   const currentIndex = useRef(0);
 
+  // Only one clip: let the browser loop it natively.
+  const singleSource = sources.length <= 1;
+
   /* -------------------------------------------------------
-     Start / reset when the source LIST changes
+     RESET WHEN VIDEO SOURCES CHANGE
      ------------------------------------------------------- */
 
   useEffect(() => {
     const first = videoA.current;
     const second = videoB.current;
 
-    if (!first || !second || sources.length === 0) return;
+    if (!first || !second || sources.length === 0) {
+      return;
+    }
 
     transitioning.current = false;
     currentIndex.current = 0;
 
     setIndexA(0);
-    setIndexB(sources.length > 1 ? 1 % sources.length : 0);
+    setIndexB(
+      sources.length > 1 ? 1 % sources.length : 0
+    );
+
     setActiveVideo("a");
 
     first.pause();
@@ -60,20 +64,14 @@ function SmoothBackgroundVideo({ sources }) {
     first.currentTime = 0;
     second.currentTime = 0;
 
-    first
-      .play()
-      .catch((error) => {
-        // React StrictMode double-invokes this effect in dev
-        // (mount -> unmount -> mount), so the first play() call
-        // often gets interrupted by the phantom cleanup's pause().
-        // That specific case is harmless - only log real failures.
-        if (error.name !== "AbortError") {
-          console.error(
-            "Background video playback failed:",
-            error
-          );
-        }
-      });
+    first.play().catch((error) => {
+      if (error.name !== "AbortError") {
+        console.error(
+          "Background video playback failed:",
+          error
+        );
+      }
+    });
 
     return () => {
       first.pause();
@@ -82,14 +80,26 @@ function SmoothBackgroundVideo({ sources }) {
   }, [sources]);
 
   /* -------------------------------------------------------
-     Crossfade to the NEXT video in the list
+     CROSSFADE TO NEXT VIDEO
      ------------------------------------------------------- */
 
   const crossfade = () => {
     if (transitioning.current) return;
-    if (sources.length < 2) return; // nothing to crossfade to
 
-    const goingToA = activeVideo === "b";
+    // Nothing to crossfade to — just restart this clip so it loops.
+    if (sources.length < 2) {
+      const current =
+        activeVideo === "a" ? videoA.current : videoB.current;
+
+      if (current) {
+        current.currentTime = 0;
+        current.play().catch(() => {});
+      }
+      return;
+    }
+
+    const nextIndex =
+      (currentIndex.current + 1) % sources.length;
 
     const current =
       activeVideo === "a"
@@ -105,52 +115,30 @@ function SmoothBackgroundVideo({ sources }) {
 
     transitioning.current = true;
 
-    const nextIndex =
-      (currentIndex.current + 1) % sources.length;
-
-    /* Load the upcoming clip into the hidden layer */
-
-    if (goingToA) {
-      setIndexA(nextIndex);
-    } else {
+    if (activeVideo === "a") {
       setIndexB(nextIndex);
+    } else {
+      setIndexA(nextIndex);
     }
-
-    /*
-      Wait a tick so React flushes the new `src` to the
-      DOM before we try to play it — otherwise we can
-      briefly play the previous clip instead of the new one.
-    */
 
     requestAnimationFrame(() => {
       next.currentTime = 0;
 
-      next
-        .play()
-        .catch((error) => {
-          if (error.name !== "AbortError") {
-            console.error(
-              "Next background video playback failed:",
-              error
-            );
-          }
-        });
+      next.play().catch((error) => {
+        if (error.name !== "AbortError") {
+          console.error(
+            "Next background video playback failed:",
+            error
+          );
+        }
+      });
     });
 
-    /* Switch visible layer */
-
     setActiveVideo(
-      activeVideo === "a"
-        ? "b"
-        : "a"
+      activeVideo === "a" ? "b" : "a"
     );
 
     currentIndex.current = nextIndex;
-
-    /*
-      Allow the transition to finish before
-      resetting the old video.
-    */
 
     setTimeout(() => {
       current.pause();
@@ -161,7 +149,7 @@ function SmoothBackgroundVideo({ sources }) {
   };
 
   /* -------------------------------------------------------
-     Watch current video duration
+     WATCH VIDEO END
      ------------------------------------------------------- */
 
   const handleTimeUpdate = (event) => {
@@ -174,17 +162,22 @@ function SmoothBackgroundVideo({ sources }) {
     const remaining =
       video.duration - video.currentTime;
 
-    /*
-      Start crossfade 1.4 seconds before
-      the video reaches the end.
-    */
-
     if (remaining <= 1.4) {
       crossfade();
     }
   };
 
-  if (sources.length === 0) return null;
+  // Fallback safety net: if `ended` fires before the timeupdate
+  // threshold catches it (e.g. tab was backgrounded), force a restart.
+  const handleEnded = (event) => {
+    const video = event.currentTarget;
+    video.currentTime = 0;
+    video.play().catch(() => {});
+  };
+
+  if (!sources.length) {
+    return null;
+  }
 
   return (
     <div
@@ -192,7 +185,8 @@ function SmoothBackgroundVideo({ sources }) {
         position: "absolute",
         inset: 0,
         overflow: "hidden",
-        zIndex: 0,
+        zIndex: 1,
+        pointerEvents: "none",
       }}
     >
       {/* =====================================================
@@ -201,27 +195,22 @@ function SmoothBackgroundVideo({ sources }) {
 
       <video
         ref={videoA}
-        src={sources[indexA]} 
+        src={sources[indexA]}
         muted
         playsInline
-        loop
+        autoPlay
+        loop={singleSource}
         preload="auto"
         onTimeUpdate={handleTimeUpdate}
+        onEnded={handleEnded}
         style={{
           position: "absolute",
           inset: 0,
           width: "100%",
           height: "100%",
           objectFit: "cover",
-
-          opacity:
-            activeVideo === "a"
-              ? 0.68
-              : 0,
-
-          transition:
-            "opacity 1.4s ease-in-out",
-
+          opacity: activeVideo === "a" ? 1 : 0,
+          transition: "opacity 1.4s ease-in-out",
           zIndex: 1,
         }}
       />
@@ -235,41 +224,54 @@ function SmoothBackgroundVideo({ sources }) {
         src={sources[indexB]}
         muted
         playsInline
+        loop={singleSource}
         preload="auto"
         onTimeUpdate={handleTimeUpdate}
+        onEnded={handleEnded}
         style={{
           position: "absolute",
           inset: 0,
           width: "100%",
           height: "100%",
           objectFit: "cover",
-
-          opacity:
-            activeVideo === "b"
-              ? 0.68
-              : 0,
-
-          transition:
-            "opacity 1.4s ease-in-out",
-
+          opacity: activeVideo === "b" ? 1 : 0,
+          transition: "opacity 1.4s ease-in-out",
           zIndex: 2,
         }}
       />
 
       {/* =====================================================
-          DARK GLASS OVERLAY
+          READABILITY SCRIM
+
+          The video is the star here — this should barely be
+          visible. A dark (not white) scrim, weighted to the left
+          where the heading/body copy sit, gives just enough
+          contrast for the white text without milking out the
+          footage. The right side, behind the glass card, is left
+          almost untouched so the video reads clearly through it.
           ===================================================== */}
 
       <div
         style={{
           position: "absolute",
           inset: 0,
-
           background:
-            "linear-gradient(to bottom, rgba(5,5,5,0.18), rgba(5,5,5,0.48))",
-
+            "linear-gradient(90deg, rgba(2,6,23,0.5) 0%, rgba(2,6,23,0.26) 30%, rgba(2,6,23,0.06) 55%, rgba(2,6,23,0) 70%)",
           zIndex: 3,
+          pointerEvents: "none",
+        }}
+      />
 
+      {/* thin dark scrim at the very bottom only, so the section's
+          bottom fade has something to blend from without touching
+          the rest of the video */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(180deg, rgba(2,6,23,0) 78%, rgba(2,6,23,0.3) 100%)",
+          zIndex: 3,
           pointerEvents: "none",
         }}
       />
@@ -295,8 +297,7 @@ export default function AboutHero() {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const data =
-          await getSettings();
+        const data = await getSettings();
 
         setSettings(data);
       } catch (error) {
@@ -311,13 +312,7 @@ export default function AboutHero() {
   }, []);
 
   /* =======================================================
-     VIDEO URLS
-     =======================================================
-
-     Expects `settings.about_videos` to be an array of paths
-     or full URLs. Falls back to the old single-video field
-     (`settings.about_video`) if present, so this keeps
-     working even if the CMS hasn't been updated yet.
+     VIDEO URL
      ======================================================= */
 
   const getVideoUrl = (path) => {
@@ -330,8 +325,13 @@ export default function AboutHero() {
     return `http://127.0.0.1:8000${path}`;
   };
 
+  /* =======================================================
+     GET ABOUT VIDEOS
+     ======================================================= */
+
   const rawVideoList =
-    settings?.about_videos && Array.isArray(settings.about_videos)
+    settings?.about_videos &&
+    Array.isArray(settings.about_videos)
       ? settings.about_videos
       : settings?.about_video
       ? [settings.about_video]
@@ -345,9 +345,52 @@ export default function AboutHero() {
     [settings]
   );
 
-  if (process.env.NODE_ENV === "development") {
-    console.log("ABOUT VIDEOS:", backgroundVideos);
-  }
+  const hasVideo = backgroundVideos.length > 0;
+
+  /* =======================================================
+     THEME — light section when there's no video, dark/video
+     theme when there is
+     ======================================================= */
+
+  const theme = {
+    sectionBg: hasVideo ? "#0f172a" : "#ffffff",
+    label: hasVideo ? "#38bdf8" : "#0ea5e9",
+    heading: hasVideo ? "#ffffff" : "#0f172a",
+    headingShadow: hasVideo
+      ? "0 2px 24px rgba(0,0,0,0.35)"
+      : "none",
+    body: hasVideo ? "rgba(255,255,255,0.82)" : "#475569",
+    gridLine: hasVideo
+      ? "rgba(255,255,255,0.15)"
+      : "rgba(15,23,42,0.07)",
+    bottomFade: hasVideo
+      ? "linear-gradient(to bottom, rgba(15,23,42,0), rgba(15,23,42,0.5))"
+      : "linear-gradient(to bottom, rgba(255,255,255,0), #ffffff)",
+    contactBg: hasVideo ? "rgba(255,255,255,0.06)" : "rgba(15,23,42,0.03)",
+    contactBorder: hasVideo
+      ? "rgba(255,255,255,0.45)"
+      : "rgba(15,23,42,0.3)",
+    contactText: hasVideo ? "#ffffff" : "#0f172a",
+    contactHoverClass: hasVideo
+      ? "hover:bg-white/15 hover:border-white/70 hover:-translate-y-0.5 group"
+      : "hover:bg-slate-900/5 hover:border-slate-500 hover:-translate-y-0.5 group",
+    cardBg: hasVideo ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.6)",
+    cardBorder: hasVideo
+      ? "1px solid rgba(255,255,255,0.25)"
+      : "1px solid rgba(15,23,42,0.10)",
+    cardShadow: hasVideo
+      ? "0 20px 60px rgba(0,0,0,0.25)"
+      : "0 20px 60px rgba(15,23,42,0.08)",
+    cardTopHighlight: hasVideo
+      ? "rgba(255,255,255,0.5)"
+      : "rgba(255,255,255,0.9)",
+    cardHeading: hasVideo ? "#ffffff" : "#0f172a",
+    cardBody: hasVideo ? "rgba(255,255,255,0.78)" : "#334155",
+    cardDivider: hasVideo
+      ? "rgba(255,255,255,0.18)"
+      : "rgba(15,23,42,0.12)",
+    statLabel: hasVideo ? "rgba(255,255,255,0.65)" : "#64748b",
+  };
 
   /* =======================================================
      PAGE
@@ -359,294 +402,190 @@ export default function AboutHero() {
         position: "relative",
         overflow: "hidden",
 
-        backgroundColor:
-          "#0B0B0D",
-
-        padding:
-          "128px 0px 96px 0px",
+        /*
+          Fallback base so the section never looks broken while
+          the video loads or if it fails — this reads as a dark
+          navy, not white, so text stays legible either way.
+        */
+        backgroundColor: theme.sectionBg,
 
         width: "100%",
-
+        minHeight: "760px",
+        padding: "128px 0 96px 0",
         display: "flex",
         alignItems: "center",
-
         boxSizing: "border-box",
-
-        minHeight: "760px",
       }}
     >
+      {/* =================================================
+          VIDEO
+          ================================================= */}
 
-      {/* ===================================================
-          BACKGROUND VIDEO(S)
-          =================================================== */}
-
-      {backgroundVideos.length > 0 && (
+      {hasVideo && (
         <SmoothBackgroundVideo
           sources={backgroundVideos}
         />
       )}
 
 
-      {/* ===================================================
-          BACKGROUND GLOWS
-          =================================================== */}
+      {/* =================================================
+          WHITE ATMOSPHERIC GLOW
+
+          Only for the plain (no-video) light section — on the
+          video path these two large blurred blobs were spreading
+          a soft white haze across most of the footage and were
+          the main reason it looked washed out.
+          ================================================= */}
+
+      {!hasVideo && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            pointerEvents: "none",
+            zIndex: 4,
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: "-180px",
+              left: "50%",
+              width: "420px",
+              height: "420px",
+              transform: "translateX(-50%)",
+              borderRadius: "9999px",
+              background: "rgba(255,255,255,0.20)",
+              filter: "blur(120px)",
+            }}
+          />
+
+          <div
+            style={{
+              position: "absolute",
+              right: "-120px",
+              top: "35%",
+              width: "380px",
+              height: "380px",
+              borderRadius: "9999px",
+              background: "rgba(255,255,255,0.14)",
+              filter: "blur(130px)",
+            }}
+          />
+        </div>
+      )}
+
+
+      {/* =================================================
+          VERY LIGHT GRID
+          ================================================= */}
 
       <div
         style={{
           position: "absolute",
           inset: 0,
-
-          overflow: "hidden",
-
+          opacity: 0.05,
           pointerEvents: "none",
-
-          zIndex: 4,
+          backgroundImage: `linear-gradient(${theme.gridLine} 1px, transparent 1px), linear-gradient(90deg, ${theme.gridLine} 1px, transparent 1px)`,
+          backgroundSize: "60px 60px",
+          zIndex: 5,
         }}
-      >
-
-        {/* Top glow */}
-
-        <div
-          style={{
-            position: "absolute",
-
-            top: "-160px",
-            left: "50%",
-
-            height: "400px",
-            width: "400px",
-
-            transform:
-              "translateX(-50%)",
-
-            borderRadius:
-              "9999px",
-
-            backgroundColor:
-              "rgba(56,189,248,0.06)",
-
-            filter:
-              "blur(120px)",
-          }}
-        />
-
-        {/* Bottom left glow */}
-
-        <div
-          style={{
-            position: "absolute",
-
-            bottom: 0,
-            left: 0,
-
-            height: "288px",
-            width: "288px",
-
-            borderRadius:
-              "9999px",
-
-            backgroundColor:
-              "rgba(56,189,248,0.04)",
-
-            filter:
-              "blur(100px)",
-          }}
-        />
-
-        {/* Right glow */}
-
-        <div
-          style={{
-            position: "absolute",
-
-            top: "160px",
-            right: "-10%",
-
-            height: "384px",
-            width: "384px",
-
-            borderRadius:
-              "9999px",
-
-            backgroundColor:
-              "rgba(59,130,246,0.06)",
-
-            filter:
-              "blur(150px)",
-          }}
-        />
-
-      </div>
+      />
 
 
-      {/* ===================================================
-                  GRID PATTERN
-        =================================================== */}
+      {/* =================================================
+          BOTTOM FADE
+          ================================================= */}
 
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            opacity: 0.025,
-            pointerEvents: "none",
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.2) 1px, transparent 1px)",
-            backgroundSize: "60px 60px",
-            zIndex: 5,
-          }}
-        />
-
-        {/* ===================================================
-            BOTTOM FADE — blends into WhoWeAre's white bg
-            =================================================== */}
-
-        <div
-          className="
-            pointer-events-none
-            absolute
-            inset-x-0
-            bottom-0
-            z-[6]
-            h-[13px]
-            bg-gradient-to-b
-            from-transparent
-            to-white
-          "
-        />
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: "24px",
+          background: theme.bottomFade,
+          pointerEvents: "none",
+          zIndex: 6,
+        }}
+      />
 
 
-      {/* ===================================================
+      {/* =================================================
           MAIN CONTENT
-          =================================================== */}
+          ================================================= */}
 
       <div
         style={{
           position: "relative",
-
           zIndex: 10,
-
-          margin: "0 auto",
-
           width: "100%",
-
           maxWidth: "85rem",
-
+          margin: "0 auto",
           padding: "0 24px",
-
           display: "grid",
-
-          gridTemplateColumns:
-            "repeat(auto-fit, minmax(320px, 1fr))",
-
+          gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
           alignItems: "center",
-
           gap: "64px",
-
           boxSizing: "border-box",
         }}
       >
-
         {/* =================================================
-            LEFT COLUMN
+            LEFT SIDE
             ================================================= */}
 
         <div
           style={{
+            minWidth: 0,
             display: "flex",
-
-            flexDirection:
-              "column",
-
-            justifyContent:
-              "center",
-
-            boxSizing:
-              "border-box",
+            flexDirection: "column",
+            justifyContent: "center",
           }}
         >
-
-          {/* Label */}
+          {/* LABEL */}
 
           <motion.p
-            initial={{
-              opacity: 0,
-              y: 20,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              duration: 0.6,
-            }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
             style={{
-              textTransform:
-                "uppercase",
-
-              letterSpacing:
-                "5px",
-
-              color:
-                "#38bdf8",
-
-              fontSize:
-                "0.75rem",
-
-              fontWeight:
-                "700",
-
-              marginBottom:
-                "20px",
+              margin: 0,
+              marginBottom: "20px",
+              textTransform: "uppercase",
+              letterSpacing: "5px",
+              fontSize: "0.75rem",
+              fontWeight: "700",
+              color: theme.label,
             }}
           >
             ABOUT TERRALENS
           </motion.p>
 
 
-          {/* Heading */}
+          {/* HEADING */}
 
           <motion.h1
-            initial={{
-              opacity: 0,
-              y: 30,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              delay: 0.15,
-            }}
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.6 }}
             style={{
-              fontSize:
-                "clamp(2.5rem, 4vw, 3.75rem)",
-
-              fontWeight:
-                "800",
-
-              color:
-                "#ffffff",
-
-              lineHeight:
-                "1.15",
-
-              letterSpacing:
-                "-0.025em",
+              margin: 0,
+              fontSize: "clamp(2.7rem, 4.2vw, 4.2rem)",
+              lineHeight: "1.08",
+              fontWeight: "800",
+              letterSpacing: "-0.04em",
+              color: theme.heading,
+              textShadow: theme.headingShadow,
             }}
           >
-
             Bridging
 
             <span
               style={{
-                display:
-                  "block",
-
-                color:
-                  "#38bdf8",
-
-                margin:
-                  "4px 0",
+                display: "block",
+                color: theme.label,
+                marginTop: "4px",
               }}
             >
               Geospatial
@@ -656,46 +595,29 @@ export default function AboutHero() {
 
             <span
               style={{
-                display:
-                  "block",
-
-                marginTop:
-                  "4px",
+                display: "block",
+                marginTop: "4px",
               }}
             >
               Digital Innovation
             </span>
-
           </motion.h1>
 
 
-          {/* Description */}
+          {/* DESCRIPTION */}
 
           <motion.p
-            initial={{
-              opacity: 0,
-            }}
-            animate={{
-              opacity: 1,
-            }}
-            transition={{
-              delay: 0.3,
-            }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25, duration: 0.6 }}
             style={{
-              marginTop:
-                "32px",
-
-              maxWidth:
-                "38rem",
-
-              fontSize:
-                "1rem",
-
-              lineHeight:
-                "1.7",
-
-              color:
-                "#d1d5db",
+              margin: 0,
+              marginTop: "32px",
+              maxWidth: "650px",
+              fontSize: "1rem",
+              lineHeight: "1.75",
+              fontWeight: "500",
+              color: theme.body,
             }}
           >
             Terralens Innovations
@@ -716,524 +638,290 @@ export default function AboutHero() {
               ================================================= */}
 
           <motion.div
-            initial={{
-              opacity: 0,
-              y: 20,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              delay: 0.4,
-            }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
             style={{
-              marginTop:
-                "48px",
-
-              display:
-                "flex",
-
-              flexWrap:
-                "wrap",
-
-              alignItems:
-                "center",
-
-              gap:
-                "20px",
-
-              boxSizing:
-                "border-box",
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "20px",
+              marginTop: "44px",
             }}
           >
-
-            {/* Explore Services */}
+            {/* =================================================
+                EXPLORE - SOLID BLUE
+                ================================================= */}
 
             <button
-              onClick={() =>
-                navigate("/services")
-              }
+              onClick={() => navigate("/services")}
               style={{
-                display:
-                  "inline-flex",
-
-                alignItems:
-                  "center",
-
-                justifyContent:
-                  "center",
-
-                borderRadius:
-                  "9999px",
-
-                background:
-                  "rgba(255,255,255,0.10)",
-
-                border:
-                  "1px solid rgba(255,255,255,0.22)",
-
-                backdropFilter:
-                  "blur(18px)",
-
-                WebkitBackdropFilter:
-                  "blur(18px)",
-
-                padding:
-                  "16px 36px",
-
-                fontSize:
-                  "1rem",
-
-                fontWeight:
-                  "700",
-
-                color:
-                  "#ffffff",
-
-                cursor:
-                  "pointer",
-
-                transition:
-                  "all 0.3s ease",
-
-                boxSizing:
-                  "border-box",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                padding: "16px 34px",
+                borderRadius: "9999px",
+                background: "#0ea5e9",
+                border: "1px solid #0ea5e9",
+                color: "#ffffff",
+                fontSize: "1rem",
+                fontWeight: "700",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                boxShadow: "0 10px 30px rgba(14,165,233,0.35)",
               }}
-
               className="
-                hover:bg-white/20
-                hover:border-white/40
+                hover:bg-sky-400
+                hover:border-sky-400
                 hover:-translate-y-0.5
-                hover:shadow-[0_0_30px_rgba(255,255,255,0.12)]
+                hover:shadow-[0_15px_35px_rgba(14,165,233,0.45)]
                 group
               "
             >
-
               Explore Our Services
 
               <ArrowRight
-                style={{
-                  marginLeft:
-                    "12px",
-
-                  transition:
-                    "transform 0.3s ease",
-                }}
+                size={18}
                 className="
+                  transition-transform
+                  duration-300
                   group-hover:translate-x-1
                 "
-                size={18}
               />
-
             </button>
 
 
-            {/* Contact */}
+            {/* =================================================
+                CONTACT - TRANSPARENT
+                ================================================= */}
 
             <button
-              onClick={() =>
-                navigate("/contact")
-              }
+              onClick={() => navigate("/contact")}
               style={{
-                display:
-                  "inline-flex",
-
-                alignItems:
-                  "center",
-
-                justifyContent:
-                  "center",
-
-                borderRadius:
-                  "9999px",
-
-                background:
-                  "rgba(255,255,255,0.06)",
-
-                border:
-                  "1px solid rgba(255,255,255,0.18)",
-
-                backdropFilter:
-                  "blur(18px)",
-
-                WebkitBackdropFilter:
-                  "blur(18px)",
-
-                padding:
-                  "16px 36px",
-
-                fontSize:
-                  "1rem",
-
-                fontWeight:
-                  "600",
-
-                color:
-                  "#ffffff",
-
-                cursor:
-                  "pointer",
-
-                transition:
-                  "all 0.3s ease",
-
-                boxSizing:
-                  "border-box",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                padding: "16px 34px",
+                borderRadius: "9999px",
+                background: theme.contactBg,
+                border: `1px solid ${theme.contactBorder}`,
+                backdropFilter: "blur(4px)",
+                WebkitBackdropFilter: "blur(4px)",
+                color: theme.contactText,
+                fontSize: "1rem",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
               }}
-
-              className="
-                hover:bg-white/15
-                hover:border-white/35
-                hover:-translate-y-0.5
-                group
-              "
+              className={theme.contactHoverClass}
             >
-
               Contact Us
 
               <ArrowRight
-                style={{
-                  marginLeft:
-                    "12px",
-
-                  transition:
-                    "transform 0.3s ease",
-                }}
+                size={18}
                 className="
+                  transition-transform
+                  duration-300
                   group-hover:translate-x-1
                 "
-                size={18}
               />
-
             </button>
-
           </motion.div>
-
         </div>
 
 
         {/* =================================================
-            RIGHT COLUMN - GLASS CARD
+            RIGHT GLASS CARD
             ================================================= */}
 
         <motion.div
-          initial={{
-            opacity: 0,
-            x: 30,
-          }}
-          animate={{
-            opacity: 1,
-            x: 0,
-          }}
-          transition={{
-            delay: 0.3,
-            duration: 0.6,
-          }}
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.25, duration: 0.7 }}
           style={{
             position: "relative",
             width: "100%",
-            borderRadius: "2.5rem",
-            border: "1px solid rgba(255,255,255,0.18)",
-            backgroundColor: "rgba(255,255,255,0.10)",
-            backdropFilter: "blur(14px)",
-            WebkitBackdropFilter: "blur(14px)",
-            boxShadow: "0 20px 80px -20px rgba(14,165,233,0.15)",
-            overflow: "hidden",
-            padding: "40px",
+            minHeight: "500px",
+            padding: "42px",
+            borderRadius: "40px",
+
+            /*
+              Genuinely transparent glass: low-alpha white fill,
+              thin light border, small blur so the video reads
+              clearly through it instead of washing it out.
+            */
+            background: theme.cardBg,
+            border: theme.cardBorder,
+            backdropFilter: "blur(2px)",
+            WebkitBackdropFilter: "blur(2px)",
+            boxShadow: theme.cardShadow,
             boxSizing: "border-box",
+            overflow: "hidden",
           }}
         >
-
-          {/* =================================================
-              GLASS HIGHLIGHT
-              ================================================= */}
+          {/* CARD TOP HIGHLIGHT */}
 
           <div
             style={{
-              position:
-                "absolute",
-
+              position: "absolute",
               top: 0,
-              left: 0,
-              right: 0,
-
-              height:
-                "1px",
-
-              background:
-                "linear-gradient(to right, transparent, rgba(255,255,255,0.35), transparent)",
-
-              pointerEvents:
-                "none",
+              left: "8%",
+              right: "8%",
+              height: "1px",
+              background: theme.cardTopHighlight,
+              pointerEvents: "none",
             }}
           />
 
 
-          {/* =================================================
-              EXPERTISE
-              ================================================= */}
+          {/* ICON */}
 
-          <div>
-
-            {/* Icon */}
-
-            <div
-              style={{
-                width:
-                  "56px",
-
-                height:
-                  "56px",
-
-                borderRadius:
-                  "16px",
-
-                backgroundColor:
-                  "rgba(56,189,248,0.10)",
-
-                border:
-                  "1px solid rgba(56,189,248,0.20)",
-
-                display:
-                  "flex",
-
-                alignItems:
-                  "center",
-
-                justifyContent:
-                  "center",
-
-                marginBottom:
-                  "28px",
-              }}
-            >
-
-              <Globe
-                className=
-                  "text-sky-400"
-                size={24}
-              />
-
-            </div>
-
-
-            {/* Small heading */}
-
-            <p
-              style={{
-                textTransform:
-                  "uppercase",
-
-                letterSpacing:
-                  "4px",
-
-                color:
-                  "#38bdf8",
-
-                fontSize:
-                  "0.75rem",
-
-                fontWeight:
-                  "700",
-
-                marginBottom:
-                  "12px",
-              }}
-            >
-              Expertise
-            </p>
-
-
-            {/* Main heading */}
-
-            <h3
-              style={{
-                fontSize:
-                  "clamp(2rem, 3vw, 2.75rem)",
-
-                fontWeight:
-                  "800",
-
-                color: "#ffffff",
-
-                marginBottom:
-                  "20px",
-
-                letterSpacing:
-                  "-0.025em",
-              }}
-            >
-              GIS + IT
-            </h3>
-
-
-            {/* Description */}
-
-            <p
-              style={{
-                
-                color: "#e2e8f0",
-
-                fontSize:
-                  "1rem",
-
-                lineHeight:
-                  "1.7",
-
-                fontWeight:
-                  "500",
-              }}
-            >
-              Remote Sensing,
-              Artificial Intelligence,
-              Enterprise Software,
-              Cloud Infrastructure,
-              Spatial Analytics &
-              Web Platforms.
-            </p>
-
+          <div
+            style={{
+              width: "60px",
+              height: "60px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "18px",
+              background: "rgba(14,165,233,0.15)",
+              border: "1px solid rgba(56,189,248,0.35)",
+              marginBottom: "28px",
+            }}
+          >
+            <Globe size={26} className="text-sky-400" />
           </div>
 
 
-          {/* =================================================
-              DIVIDER
-              ================================================= */}
+          {/* EXPERTISE */}
+
+          <p
+            style={{
+              margin: 0,
+              marginBottom: "14px",
+              textTransform: "uppercase",
+              letterSpacing: "5px",
+              color: theme.label,
+              fontSize: "0.75rem",
+              fontWeight: "700",
+            }}
+          >
+            EXPERTISE
+          </p>
+
+
+          {/* GIS + IT */}
+
+          <h2
+            style={{
+              margin: 0,
+              fontSize: "clamp(2.2rem, 3vw, 3rem)",
+              fontWeight: "800",
+              letterSpacing: "-0.04em",
+              color: theme.cardHeading,
+            }}
+          >
+            GIS + IT
+          </h2>
+
+
+          {/* DESCRIPTION */}
+
+          <p
+            style={{
+              margin: 0,
+              marginTop: "26px",
+              maxWidth: "620px",
+              color: theme.cardBody,
+              fontSize: "1rem",
+              lineHeight: "1.75",
+              fontWeight: "500",
+            }}
+          >
+            Remote Sensing,
+            Artificial Intelligence,
+            Enterprise Software,
+            Cloud Infrastructure,
+            Spatial Analytics &
+            Web Platforms.
+          </p>
+
+
+          {/* DIVIDER */}
 
           <div
             style={{
-              margin:
-                "36px 0",
-
-              height:
-                "1px",
-
-              width:
-                "100%",
-
-              background:
-                "linear-gradient(to right, transparent, rgba(255,255,255,0.12), transparent)",
+              width: "100%",
+              height: "1px",
+              margin: "42px 0",
+              background: theme.cardDivider,
             }}
           />
 
 
-          {/* =================================================
-              STATS
-              ================================================= */}
+          {/* STATS */}
 
           <div
             style={{
-              display:
-                "grid",
-
-              gridTemplateColumns:
-                "repeat(auto-fit, minmax(180px, 1fr))",
-
-              gap:
-                "24px",
-
-              boxSizing:
-                "border-box",
+              display: "grid",
+              gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+              gap: "30px",
             }}
           >
-
             {/* PROJECTS */}
 
             <div
               style={{
-                display:
-                  "flex",
-
-                alignItems:
-                  "center",
-
-                gap:
-                  "20px",
+                display: "flex",
+                alignItems: "center",
+                gap: "18px",
               }}
             >
-
               <div
                 style={{
-                  width:
-                    "52px",
-
-                  height:
-                    "52px",
-
-                  flexShrink:
-                    0,
-
-                  borderRadius:
-                    "16px",
-
-                  backgroundColor:
-                    "rgba(56,189,248,0.05)",
-
-                  border:
-                    "1px solid rgba(255,255,255,0.08)",
-
-                  display:
-                    "flex",
-
-                  alignItems:
-                    "center",
-
-                  justifyContent:
-                    "center",
+                  width: "54px",
+                  height: "54px",
+                  flexShrink: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "17px",
+                  background: "rgba(14,165,233,0.15)",
+                  border: "1px solid rgba(56,189,248,0.35)",
                 }}
               >
-
-                <MapPinned
-                  className=
-                    "text-sky-400"
-                  size={22}
-                />
-
+                <MapPinned size={23} className="text-sky-400" />
               </div>
 
-
               <div>
-
-                <h2
+                <h3
                   style={{
-                    fontSize:
-                      "1.75rem",
-
-                    fontWeight:
-                      "700",
-
-                    color: "#ffffff",
-
-                    marginBottom:
-                      "4px",
+                    margin: 0,
+                    color: theme.cardHeading,
+                    fontSize: "1.75rem",
+                    lineHeight: "1",
+                    fontWeight: "800",
                   }}
                 >
                   500+
-                </h2>
+                </h3>
 
                 <p
                   style={{
-
-                    color: "#cbd5e1",
-
-                    fontSize:
-                      "0.75rem",
-
-                    fontWeight:
-                      "600",
-
-                    textTransform:
-                      "uppercase",
-
-                    letterSpacing:
-                      "0.05em",
+                    margin: 0,
+                    marginTop: "8px",
+                    color: theme.statLabel,
+                    fontSize: "0.75rem",
+                    fontWeight: "700",
+                    textTransform: "uppercase",
+                    letterSpacing: "1px",
                   }}
                 >
-                  Projects
+                  PROJECTS
                 </p>
-
               </div>
-
             </div>
 
 
@@ -1241,108 +929,58 @@ export default function AboutHero() {
 
             <div
               style={{
-                display:
-                  "flex",
-
-                alignItems:
-                  "center",
-
-                gap:
-                  "20px",
+                display: "flex",
+                alignItems: "center",
+                gap: "18px",
               }}
             >
-
               <div
                 style={{
-                  width:
-                    "52px",
-
-                  height:
-                    "52px",
-
-                  flexShrink:
-                    0,
-
-                  borderRadius:
-                    "16px",
-
-                  backgroundColor:
-                    "rgba(56,189,248,0.05)",
-
-                  border:
-                    "1px solid rgba(255,255,255,0.08)",
-
-                  display:
-                    "flex",
-
-                  alignItems:
-                    "center",
-
-                  justifyContent:
-                    "center",
+                  width: "54px",
+                  height: "54px",
+                  flexShrink: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "17px",
+                  background: "rgba(14,165,233,0.15)",
+                  border: "1px solid rgba(56,189,248,0.35)",
                 }}
               >
-
-                <Globe
-                  className=
-                    "text-sky-400"
-                  size={22}
-                />
-
+                <Globe size={23} className="text-sky-400" />
               </div>
 
-
               <div>
-
-                <h2
+                <h3
                   style={{
-                    fontSize:
-                      "1.75rem",
-
-                    fontWeight:
-                      "700",
-
-                    color:
-                      "#ffffff",
-
-                    marginBottom:
-                      "4px",
+                    margin: 0,
+                    color: theme.cardHeading,
+                    fontSize: "1.75rem",
+                    lineHeight: "1",
+                    fontWeight: "800",
                   }}
                 >
                   100+
-                </h2>
+                </h3>
 
                 <p
                   style={{
-                    color:
-                      "#9ca3af",
-
-                    fontSize:
-                      "0.75rem",
-
-                    fontWeight:
-                      "600",
-
-                    textTransform:
-                      "uppercase",
-
-                    letterSpacing:
-                      "0.05em",
+                    margin: 0,
+                    marginTop: "8px",
+                    color: theme.statLabel,
+                    fontSize: "0.75rem",
+                    fontWeight: "700",
+                    textTransform: "uppercase",
+                    letterSpacing: "1px",
                   }}
                 >
-                  Clients
+                  CLIENTS
                 </p>
-
               </div>
-
             </div>
-
           </div>
-
         </motion.div>
-
       </div>
-
     </section>
   );
 }

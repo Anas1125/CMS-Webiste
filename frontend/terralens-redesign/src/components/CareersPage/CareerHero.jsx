@@ -29,17 +29,71 @@ export default function CareerHero() {
     ? `http://127.0.0.1:8000${settings.careers_video}`
     : null;
 
+  const hasVideo = Boolean(backgroundVideo);
+
+  /* =======================================================
+     THEME — white section when there's no video, the
+     original dark/video theme when there is
+     ======================================================= */
+
+  const theme = {
+    sectionBg: hasVideo ? "#050505" : "#ffffff",
+    label: hasVideo ? "#38bdf8" : "#0ea5e9",
+    heading: hasVideo ? "#ffffff" : "#0f172a",
+    body: hasVideo ? "#d1d5db" : "#475569",
+    gridLine: hasVideo
+      ? "rgba(255,255,255,.2)"
+      : "rgba(15,23,42,0.07)",
+    cardBg: hasVideo
+      ? "rgba(17,17,19,0.12)"
+      : "rgba(255,255,255,0.5)",
+    cardBorder: hasVideo
+      ? "1px solid rgba(255,255,255,0.15)"
+      : "1px solid rgba(15,23,42,0.10)",
+    cardShadow: hasVideo
+      ? "0 20px 80px -20px rgba(14,165,233,0.15)"
+      : "0 20px 60px rgba(15,23,42,0.08)",
+    cardHeading: hasVideo ? "#ffffff" : "#0f172a",
+    cardBody: hasVideo ? "#d1d5db" : "#475569",
+    bottomFade: hasVideo
+      ? "linear-gradient(to bottom, transparent 0%, rgba(5,5,5,0.3) 35%, rgba(5,5,5,0.8) 70%, #050505 90%, #ffffff 100%)"
+      : "linear-gradient(to bottom, rgba(255,255,255,0), #ffffff)",
+  };
+
   const scrollToWhyJoin = () => {
     document.getElementById("why-join")?.scrollIntoView({
       behavior: "smooth",
     });
   };
 
+  const roles = [
+    {
+      Icon: Code2,
+      title: "Software Engineers",
+      blurb: "Build scalable applications",
+    },
+    {
+      Icon: MapPinned,
+      title: "GIS Specialists",
+      blurb: "Mapping & Spatial Intelligence",
+    },
+    {
+      Icon: BrainCircuit,
+      title: "AI Engineers",
+      blurb: "Machine Learning & Computer Vision",
+    },
+    {
+      Icon: Users,
+      title: "Collaborative Culture",
+      blurb: "Learn, innovate and grow together",
+    },
+  ];
+
   return (
     <section
       className="relative w-full overflow-hidden"
       style={{
-        backgroundColor: "#050505",
+        backgroundColor: theme.sectionBg,
         minHeight: "100vh",
         padding: "128px 0px 128px 0px",
         boxSizing: "border-box",
@@ -49,7 +103,7 @@ export default function CareerHero() {
           BACKGROUND VIDEO
       ===================================================== */}
 
-      {backgroundVideo && (
+      {hasVideo && (
         <video
           autoPlay
           muted
@@ -61,7 +115,7 @@ export default function CareerHero() {
             width: "100%",
             height: "100%",
             objectFit: "cover",
-            opacity: 0.65,
+            opacity: 0.92,
             zIndex: 0,
           }}
         >
@@ -73,22 +127,27 @@ export default function CareerHero() {
       )}
 
       {/* =====================================================
-          VIDEO OVERLAY
+          WHITE READABILITY OVERLAY
+
+          Only rendered when there's a video underneath it —
+          otherwise it just washed out the white background.
       ===================================================== */}
 
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "linear-gradient(rgba(5,5,5,.25), rgba(5,5,5,.45))",
-          zIndex: 1,
-          pointerEvents: "none",
-        }}
-      />
+      {hasVideo && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(rgba(255,255,255,0.08), rgba(255,255,255,0.16))",
+            zIndex: 1,
+            pointerEvents: "none",
+          }}
+        />
+      )}
 
       {/* =====================================================
-          BACKGROUND GLOWS
+          WHITE GLOWS
       ===================================================== */}
 
       <div
@@ -97,11 +156,11 @@ export default function CareerHero() {
           zIndex: 2,
         }}
       >
-        <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-sky-500/10 blur-[170px]" />
+        <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-white/[0.08] blur-[170px]" />
 
-        <div className="absolute bottom-0 left-0 h-72 w-72 rounded-full bg-sky-500/5 blur-[130px]" />
+        <div className="absolute bottom-0 left-0 h-72 w-72 rounded-full bg-white/[0.05] blur-[130px]" />
 
-        <div className="absolute top-20 right-[-10%] h-96 w-96 rounded-full bg-blue-500/10 blur-[150px]" />
+        <div className="absolute top-20 right-[-10%] h-96 w-96 rounded-full bg-white/[0.07] blur-[150px]" />
       </div>
 
       {/* =====================================================
@@ -117,8 +176,7 @@ export default function CareerHero() {
         "
         style={{
           zIndex: 3,
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.2) 1px, transparent 1px)",
+          backgroundImage: `linear-gradient(${theme.gridLine} 1px, transparent 1px), linear-gradient(90deg, ${theme.gridLine} 1px, transparent 1px)`,
           backgroundSize: "60px 60px",
         }}
       />
@@ -170,11 +228,11 @@ export default function CareerHero() {
             className="
               uppercase
               tracking-[6px]
-              text-sky-400
               text-sm
               font-bold
               mb-6
             "
+            style={{ color: theme.label }}
           >
             CAREERS
           </motion.p>
@@ -195,13 +253,13 @@ export default function CareerHero() {
               text-5xl
               lg:text-6xl
               font-extrabold
-              text-white
               leading-[1.1]
             "
+            style={{ color: theme.heading }}
           >
             Build the Future
 
-            <span className="block text-sky-400">
+            <span className="block" style={{ color: theme.label }}>
               with TerraLens
             </span>
           </motion.h1>
@@ -221,8 +279,8 @@ export default function CareerHero() {
               max-w-xl
               text-lg
               leading-8
-              text-gray-300
             "
+            style={{ color: theme.body }}
           >
             Join a passionate team building innovative GIS,
             AI, cloud and enterprise software solutions that
@@ -293,18 +351,14 @@ export default function CareerHero() {
             borderRadius: "2.5rem",
 
             /* GLASS */
-            backgroundColor:
-              "rgba(17,17,19,0.35)",
+            backgroundColor: theme.cardBg,
 
-            backdropFilter: "blur(18px)",
-            WebkitBackdropFilter:
-              "blur(18px)",
+            backdropFilter: "blur(4px)",
+            WebkitBackdropFilter: "blur(4px)",
 
-            border:
-              "1px solid rgba(255,255,255,0.15)",
+            border: theme.cardBorder,
 
-            boxShadow:
-              "0 20px 80px -20px rgba(14,165,233,0.15)",
+            boxShadow: theme.cardShadow,
 
             padding: "40px",
           }}
@@ -312,153 +366,43 @@ export default function CareerHero() {
 
           <div className="space-y-8">
 
-            {/* =================================================
-                SOFTWARE ENGINEERS
-            ================================================= */}
+            {roles.map(({ Icon, title, blurb }) => (
+              <div className="flex items-center gap-5" key={title}>
 
-            <div className="flex items-center gap-5">
+                <div
+                  className="
+                    w-16
+                    h-16
+                    rounded-2xl
+                    bg-sky-500/10
+                    border
+                    border-sky-500/20
+                    flex
+                    items-center
+                    justify-center
+                    shrink-0
+                  "
+                >
+                  <Icon className="text-sky-400" />
+                </div>
 
-              <div
-                className="
-                  w-16
-                  h-16
-                  rounded-2xl
-                  bg-sky-500/10
-                  border
-                  border-sky-500/20
-                  flex
-                  items-center
-                  justify-center
-                  shrink-0
-                "
-              >
-                <Code2 className="text-sky-400" />
-              </div>
+                <div>
 
-              <div>
+                  <h3
+                    className="font-bold text-xl"
+                    style={{ color: theme.cardHeading }}
+                  >
+                    {title}
+                  </h3>
 
-                <h3 className="text-white font-bold text-xl">
-                  Software Engineers
-                </h3>
+                  <p style={{ color: theme.cardBody }}>
+                    {blurb}
+                  </p>
 
-                <p className="text-gray-300">
-                  Build scalable applications
-                </p>
-
-              </div>
-
-            </div>
-
-            {/* =================================================
-                GIS SPECIALISTS
-            ================================================= */}
-
-            <div className="flex items-center gap-5">
-
-              <div
-                className="
-                  w-16
-                  h-16
-                  rounded-2xl
-                  bg-sky-500/10
-                  border
-                  border-sky-500/20
-                  flex
-                  items-center
-                  justify-center
-                  shrink-0
-                "
-              >
-                <MapPinned className="text-sky-400" />
-              </div>
-
-              <div>
-
-                <h3 className="text-white font-bold text-xl">
-                  GIS Specialists
-                </h3>
-
-                <p className="text-gray-300">
-                  Mapping & Spatial Intelligence
-                </p>
+                </div>
 
               </div>
-
-            </div>
-
-            {/* =================================================
-                AI ENGINEERS
-            ================================================= */}
-
-            <div className="flex items-center gap-5">
-
-              <div
-                className="
-                  w-16
-                  h-16
-                  rounded-2xl
-                  bg-sky-500/10
-                  border
-                  border-sky-500/20
-                  flex
-                  items-center
-                  justify-center
-                  shrink-0
-                "
-              >
-                <BrainCircuit className="text-sky-400" />
-              </div>
-
-              <div>
-
-                <h3 className="text-white font-bold text-xl">
-                  AI Engineers
-                </h3>
-
-                <p className="text-gray-300">
-                  Machine Learning & Computer Vision
-                </p>
-
-              </div>
-
-            </div>
-
-            {/* =================================================
-                COLLABORATIVE CULTURE
-            ================================================= */}
-
-            <div className="flex items-center gap-5">
-
-              <div
-                className="
-                  w-16
-                  h-16
-                  rounded-2xl
-                  bg-sky-500/10
-                  border
-                  border-sky-500/20
-                  flex
-                  items-center
-                  justify-center
-                  shrink-0
-                "
-              >
-                <Users className="text-sky-400" />
-              </div>
-
-              <div>
-
-                <h3 className="text-white font-bold text-xl">
-                  Collaborative Culture
-                </h3>
-
-                <p className="text-gray-300">
-                  Learn, innovate and grow together
-                </p>
-
-              </div>
-
-            </div>
+            ))}
 
           </div>
 
@@ -474,8 +418,7 @@ export default function CareerHero() {
           left: 0,
           width: "100%",
           height: "220px",
-          background:
-            "linear-gradient(to bottom, transparent 0%, rgba(5,5,5,0.3) 35%, rgba(5,5,5,0.8) 70%, #050505 90%, #ffffff 100%)",
+          background: theme.bottomFade,
           pointerEvents: "none",
           zIndex: 20,
         }}

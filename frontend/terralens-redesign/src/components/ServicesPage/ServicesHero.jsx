@@ -31,6 +31,47 @@ export default function ServicesHero() {
     ? `http://127.0.0.1:8000${settings.services_video}`
     : null;
 
+  const hasVideo = Boolean(backgroundVideo);
+
+  /* =======================================================
+     THEME — white section when there's no video, the
+     original dark/video theme when there is
+     ======================================================= */
+
+  const theme = {
+    sectionBg: hasVideo ? "#050505" : "#ffffff",
+    label: hasVideo ? "#38bdf8" : "#0ea5e9",
+    heading: hasVideo ? "#ffffff" : "#0f172a",
+    body: hasVideo ? "#d1d5db" : "#475569",
+    gridLine: hasVideo
+      ? "rgba(255,255,255,.2)"
+      : "rgba(15,23,42,0.07)",
+    contactBg: hasVideo
+      ? "rgba(255,255,255,0.05)"
+      : "rgba(15,23,42,0.03)",
+    contactBorder: hasVideo
+      ? "rgba(255,255,255,0.2)"
+      : "rgba(15,23,42,0.3)",
+    contactText: hasVideo ? "#ffffff" : "#0f172a",
+    contactHoverClass: hasVideo
+      ? "hover:border-sky-400/50 hover:bg-sky-500/10 hover:text-sky-400 hover:-translate-y-0.5 group"
+      : "hover:border-sky-500/50 hover:bg-sky-500/5 hover:text-sky-600 hover:-translate-y-0.5 group",
+    cardBg: hasVideo
+      ? "rgba(17,17,19,0.12)"
+      : "rgba(255,255,255,0.5)",
+    cardBorder: hasVideo
+      ? "1px solid rgba(255,255,255,0.15)"
+      : "1px solid rgba(15,23,42,0.10)",
+    cardShadow: hasVideo
+      ? "0 20px 80px -20px rgba(14,165,233,0.15)"
+      : "0 20px 60px rgba(15,23,42,0.08)",
+    cardHeading: hasVideo ? "#ffffff" : "#0f172a",
+    cardBody: hasVideo ? "#d1d5db" : "#475569",
+    bottomFade: hasVideo
+      ? "linear-gradient(to bottom, transparent 0%, rgba(5,5,5,0.3) 35%, rgba(5,5,5,0.8) 70%, #050505 90%, #ffffff 100%)"
+      : "linear-gradient(to bottom, rgba(255,255,255,0), #ffffff)",
+  };
+
   const scrollToServices = () => {
     const section = document.getElementById("services-list");
 
@@ -51,11 +92,11 @@ export default function ServicesHero() {
   };
 
   return (
-    <section className="w-full bg-white pb-40 mb-20"
+    <section className="w-full pb-40 mb-20"
       style={{ 
         position: "relative",
         overflow: "hidden",
-        backgroundColor: "#050505",
+        backgroundColor: theme.sectionBg,
         minHeight: "100vh",
         width: "100%",
         display: "flex",
@@ -67,7 +108,7 @@ export default function ServicesHero() {
           BACKGROUND VIDEO
       ========================================================= */}
 
-      {backgroundVideo && (
+      {hasVideo && (
         <video
           autoPlay
           muted
@@ -81,7 +122,7 @@ export default function ServicesHero() {
             height: "100%",
             objectFit: "cover",
             objectPosition: "center",
-            opacity: 0.65,
+            opacity: 0.92,
             zIndex: 0,
           }}
         >
@@ -94,18 +135,24 @@ export default function ServicesHero() {
 
       {/* =========================================================
           VIDEO OVERLAY
+
+          Light wash so the video reads through clearly, rather
+          than a dark tint — only rendered when there's actually
+          a video underneath it.
       ========================================================= */}
 
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "linear-gradient(rgba(5,5,5,.25), rgba(5,5,5,.4))",
-          zIndex: 1,
-          pointerEvents: "none",
-        }}
-      />
+      {hasVideo && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(rgba(255,255,255,.08), rgba(255,255,255,.16))",
+            zIndex: 1,
+            pointerEvents: "none",
+          }}
+        />
+      )}
 
       {/* =========================================================
           BACKGROUND GLOWS
@@ -129,7 +176,7 @@ export default function ServicesHero() {
             width: "500px",
             transform: "translateX(-50%)",
             borderRadius: "9999px",
-            backgroundColor: "rgba(56,189,248,0.08)",
+            backgroundColor: "rgba(255,255,255,0.08)",
             filter: "blur(140px)",
           }}
         />
@@ -142,7 +189,7 @@ export default function ServicesHero() {
             height: "288px",
             width: "288px",
             borderRadius: "9999px",
-            backgroundColor: "rgba(56,189,248,0.05)",
+            backgroundColor: "rgba(255,255,255,0.05)",
             filter: "blur(120px)",
           }}
         />
@@ -155,7 +202,7 @@ export default function ServicesHero() {
             height: "384px",
             width: "384px",
             borderRadius: "9999px",
-            backgroundColor: "rgba(59,130,246,0.08)",
+            backgroundColor: "rgba(255,255,255,0.07)",
             filter: "blur(140px)",
           }}
         />
@@ -172,8 +219,7 @@ export default function ServicesHero() {
           opacity: 0.03,
           pointerEvents: "none",
           zIndex: 3,
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.2) 1px, transparent 1px)",
+          backgroundImage: `linear-gradient(${theme.gridLine} 1px, transparent 1px), linear-gradient(90deg, ${theme.gridLine} 1px, transparent 1px)`,
           backgroundSize: "60px 60px",
         }}
       />
@@ -217,7 +263,7 @@ export default function ServicesHero() {
             style={{
               textTransform: "uppercase",
               letterSpacing: "5px",
-              color: "#38bdf8",
+              color: theme.label,
               fontSize: "0.75rem",
               fontWeight: "700",
               marginBottom: "20px",
@@ -233,7 +279,7 @@ export default function ServicesHero() {
             style={{
               fontSize: "clamp(2.5rem, 4vw, 3.75rem)",
               fontWeight: "800",
-              color: "#ffffff",
+              color: theme.heading,
               lineHeight: "1.15",
               letterSpacing: "-0.025em",
             }}
@@ -243,7 +289,7 @@ export default function ServicesHero() {
             <span
               style={{
                 display: "block",
-                color: "#38bdf8",
+                color: theme.label,
                 margin: "4px 0",
               }}
             >
@@ -262,7 +308,7 @@ export default function ServicesHero() {
               maxWidth: "38rem",
               fontSize: "1rem",
               lineHeight: "1.7",
-              color: "#d1d5db",
+              color: theme.body,
             }}
           >
             We deliver end-to-end GIS, remote sensing,
@@ -324,21 +370,19 @@ export default function ServicesHero() {
                 alignItems: "center",
                 justifyContent: "center",
                 borderRadius: "9999px",
-                border:
-                  "1px solid rgba(255,255,255,0.2)",
-                backgroundColor:
-                  "rgba(255,255,255,0.05)",
+                border: `1px solid ${theme.contactBorder}`,
+                backgroundColor: theme.contactBg,
                 backdropFilter: "blur(8px)",
                 WebkitBackdropFilter: "blur(8px)",
                 padding: "16px 36px",
                 fontSize: "1rem",
                 fontWeight: "600",
-                color: "#ffffff",
+                color: theme.contactText,
                 cursor: "pointer",
                 transition: "all 0.3s ease",
                 boxSizing: "border-box",
               }}
-              className="hover:border-sky-400/50 hover:bg-sky-500/10 hover:text-sky-400 hover:-translate-y-0.5 group"
+              className={theme.contactHoverClass}
             >
               Contact Us
             </button>
@@ -360,15 +404,12 @@ export default function ServicesHero() {
             position: "relative",
             width: "100%",
             borderRadius: "2.5rem",
-            backgroundColor:
-              "rgba(17,17,19,0.35)",
-            backdropFilter: "blur(18px)",
+            backgroundColor: theme.cardBg,
+            backdropFilter: "blur(4px)",
             WebkitBackdropFilter:
-              "blur(18px)",
-            border:
-              "1px solid rgba(255,255,255,0.15)",
-            boxShadow:
-              "0 20px 80px -20px rgba(14,165,233,0.15)",
+              "blur(4px)",
+            border: theme.cardBorder,
+            boxShadow: theme.cardShadow,
             overflow: "hidden",
             padding: "40px",
             boxSizing: "border-box",
@@ -417,7 +458,7 @@ export default function ServicesHero() {
                   style={{
                     fontSize: "1.375rem",
                     fontWeight: "700",
-                    color: "#ffffff",
+                    color: theme.cardHeading,
                     marginBottom: "4px",
                   }}
                 >
@@ -426,7 +467,7 @@ export default function ServicesHero() {
 
                 <p
                   style={{
-                    color: "#d1d5db",
+                    color: theme.cardBody,
                     fontSize: "0.95rem",
                     fontWeight: "500",
                   }}
@@ -471,7 +512,7 @@ export default function ServicesHero() {
                   style={{
                     fontSize: "1.375rem",
                     fontWeight: "700",
-                    color: "#ffffff",
+                    color: theme.cardHeading,
                     marginBottom: "4px",
                   }}
                 >
@@ -480,7 +521,7 @@ export default function ServicesHero() {
 
                 <p
                   style={{
-                    color: "#d1d5db",
+                    color: theme.cardBody,
                     fontSize: "0.95rem",
                     fontWeight: "500",
                   }}
@@ -525,7 +566,7 @@ export default function ServicesHero() {
                   style={{
                     fontSize: "1.375rem",
                     fontWeight: "700",
-                    color: "#ffffff",
+                    color: theme.cardHeading,
                     marginBottom: "4px",
                   }}
                 >
@@ -534,7 +575,7 @@ export default function ServicesHero() {
 
                 <p
                   style={{
-                    color: "#d1d5db",
+                    color: theme.cardBody,
                     fontSize: "0.95rem",
                     fontWeight: "500",
                   }}
@@ -558,8 +599,7 @@ export default function ServicesHero() {
           left: 0,
           width: "100%",
           height: "220px",
-          background:
-            "linear-gradient(to bottom, transparent 0%, rgba(5,5,5,0.3) 35%, rgba(5,5,5,0.8) 70%, #050505 90%, #ffffff 100%)",
+          background: theme.bottomFade,
           pointerEvents: "none",
           zIndex: 20,
         }}
