@@ -1,0 +1,1196 @@
+import { useEffect, useState } from "react";
+
+import PageHeader from "../../components/admin/common/PageHeader";
+import FileUploader from "../../components/admin/common/FileUploader";
+
+import {
+  getSettings,
+  updateSettings,
+} from "../../api/settings";
+
+export default function Settings() {
+  const [form, setForm] = useState({});
+  const [saving, setSaving] = useState(false);
+
+  // =====================================================
+  // LOAD SETTINGS
+  // =====================================================
+
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const loadSettings = async () => {
+    try {
+      const data = await getSettings();
+      setForm(data);
+    } catch (error) {
+      console.error("Failed to load settings:", error);
+    }
+  };
+
+  // =====================================================
+  // HANDLE INPUT CHANGE
+  // =====================================================
+
+  const handleChange = (e) => {
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  // =====================================================
+  // SAVE SETTINGS
+  // =====================================================
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+
+      const updated = await updateSettings(form);
+
+      setForm(updated);
+
+      alert("Settings saved successfully!");
+    } catch (error) {
+      console.error("Failed to save settings:", error);
+      alert("Failed to save settings.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // =====================================================
+  // MEDIA URL
+  // =====================================================
+
+  const getMediaUrl = (path) => {
+    if (!path) return "";
+
+    if (path.startsWith("http")) {
+      return path;
+    }
+
+    return `${import.meta.env.VITE_API_URL}${path}`;
+  };
+
+  // =====================================================
+  // UPDATE MEDIA FIELD
+  // =====================================================
+
+  const updateMediaField = (field, file) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: file.path,
+    }));
+  };
+
+
+  const addAboutVideo = (file) => {
+    setForm((prev) => ({
+      ...prev,
+      about_videos: [
+        ...(prev.about_videos || []),
+        file.path,
+      ],
+    }));
+  };
+
+
+  const removeAboutVideo = (index) => {
+    setForm((prev) => ({
+      ...prev,
+      about_videos: (prev.about_videos || []).filter(
+        (_, i) => i !== index
+      ),
+    }));
+  };
+
+  // =====================================================
+  // RENDER
+  // =====================================================
+
+  return (
+    <div>
+
+      <PageHeader
+        title="Website Settings"
+        subtitle="Manage your TerraLens website."
+      />
+
+      {/* =====================================================
+          COMPANY INFORMATION
+      ===================================================== */}
+
+      <section style={sectionStyle}>
+
+        <h2 style={sectionTitle}>
+          Company Information
+        </h2>
+
+        <p style={sectionDescription}>
+          Basic information about TerraLens Innovations.
+        </p>
+
+        <div style={gridStyle}>
+
+          <div>
+            <label style={labelStyle}>
+              Company Name
+            </label>
+
+            <input
+              name="company_name"
+              value={form.company_name || ""}
+              onChange={handleChange}
+              placeholder="TerraLens Innovations"
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>
+              Tagline
+            </label>
+
+            <input
+              name="tagline"
+              value={form.tagline || ""}
+              onChange={handleChange}
+              placeholder="Your company tagline"
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>
+              Email
+            </label>
+
+            <input
+              type="email"
+              name="email"
+              value={form.email || ""}
+              onChange={handleChange}
+              placeholder="info@terralens.com"
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>
+              Phone
+            </label>
+
+            <input
+              name="phone"
+              value={form.phone || ""}
+              onChange={handleChange}
+              placeholder="+91 XXXXX XXXXX"
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>
+              WhatsApp
+            </label>
+
+            <input
+              name="whatsapp"
+              value={form.whatsapp || ""}
+              onChange={handleChange}
+              placeholder="WhatsApp number"
+              style={inputStyle}
+            />
+          </div>
+
+        </div>
+
+        <div style={{ marginTop: "24px" }}>
+
+          <label style={labelStyle}>
+            Address
+          </label>
+
+          <textarea
+            name="address"
+            value={form.address || ""}
+            onChange={handleChange}
+            placeholder="Company address"
+            rows={4}
+            style={textareaStyle}
+          />
+
+        </div>
+
+        <div style={{ marginTop: "24px" }}>
+
+          <label style={labelStyle}>
+            Google Maps Link
+          </label>
+
+          <input
+            name="google_maps"
+            value={form.google_maps || ""}
+            onChange={handleChange}
+            placeholder="Google Maps URL"
+            style={inputStyle}
+          />
+
+        </div>
+
+      </section>
+
+
+      {/* =====================================================
+          BRANDING
+      ===================================================== */}
+
+      <section style={sectionStyle}>
+
+        <h2 style={sectionTitle}>
+          Branding
+        </h2>
+
+        <p style={sectionDescription}>
+          Manage the logo and branding assets used across the website.
+        </p>
+
+
+        {/* LOGO */}
+
+        <div>
+
+          <label style={labelStyle}>
+            Website Logo
+          </label>
+
+          <div
+            style={{
+              marginTop: "10px",
+              padding: "20px",
+              borderRadius: "14px",
+              background: "#f8fafc",
+              border: "1px solid #cbd5e1",
+            }}
+          >
+
+            {form.logo && (
+              <img
+                src={getMediaUrl(form.logo)}
+                alt="Website Logo"
+                style={{
+                  maxWidth: "240px",
+                  maxHeight: "100px",
+                  objectFit: "contain",
+                  display: "block",
+                  marginBottom: "20px",
+                  borderRadius: "8px",
+                }}
+              />
+            )}
+
+            <FileUploader
+              folder="logo"
+              label={
+                form.logo
+                  ? "Change Logo"
+                  : "Choose Logo"
+              }
+              accept="image/*"
+              onUploaded={(file) =>
+                updateMediaField("logo", file)
+              }
+            />
+
+          </div>
+
+        </div>
+
+
+        {/* FAVICON */}
+
+        <div style={{ marginTop: "28px" }}>
+
+          <label style={labelStyle}>
+            Favicon
+          </label>
+
+          <div
+            style={{
+              marginTop: "10px",
+              padding: "20px",
+              borderRadius: "14px",
+              background: "#f8fafc",
+              border: "1px solid #cbd5e1",
+            }}
+          >
+
+            {form.favicon && (
+              <img
+                src={getMediaUrl(form.favicon)}
+                alt="Favicon"
+                style={{
+                  width: "64px",
+                  height: "64px",
+                  objectFit: "contain",
+                  display: "block",
+                  marginBottom: "20px",
+                  borderRadius: "8px",
+                }}
+              />
+            )}
+
+            <FileUploader
+              folder="logo"
+              label={
+                form.favicon
+                  ? "Change Favicon"
+                  : "Choose Favicon"
+              }
+              accept="image/*"
+              onUploaded={(file) =>
+                updateMediaField("favicon", file)
+              }
+            />
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* =====================================================
+          SOCIAL MEDIA
+      ===================================================== */}
+
+      <section style={sectionStyle}>
+
+        <h2 style={sectionTitle}>
+          Social Media
+        </h2>
+
+        <p style={sectionDescription}>
+          Manage TerraLens social media links.
+        </p>
+
+        <div style={gridStyle}>
+
+          <div>
+            <label style={labelStyle}>
+              LinkedIn
+            </label>
+
+            <input
+              name="linkedin"
+              value={form.linkedin || ""}
+              onChange={handleChange}
+              placeholder="https://linkedin.com/company/..."
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>
+              Instagram
+            </label>
+
+            <input
+              name="instagram"
+              value={form.instagram || ""}
+              onChange={handleChange}
+              placeholder="https://instagram.com/..."
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>
+              Facebook
+            </label>
+
+            <input
+              name="facebook"
+              value={form.facebook || ""}
+              onChange={handleChange}
+              placeholder="https://facebook.com/..."
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>
+              X / Twitter
+            </label>
+
+            <input
+              name="twitter"
+              value={form.twitter || ""}
+              onChange={handleChange}
+              placeholder="https://x.com/..."
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>
+              YouTube
+            </label>
+
+            <input
+              name="youtube"
+              value={form.youtube || ""}
+              onChange={handleChange}
+              placeholder="https://youtube.com/..."
+              style={inputStyle}
+            />
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* =====================================================
+          HOMEPAGE
+      ===================================================== */}
+
+      <section style={sectionStyle}>
+
+        <h2 style={sectionTitle}>
+          Homepage
+        </h2>
+
+        <p style={sectionDescription}>
+          Manage the main content displayed on the homepage.
+        </p>
+
+        <div style={gridStyle}>
+
+          <div>
+            <label style={labelStyle}>
+              Hero Title
+            </label>
+
+            <input
+              name="hero_title"
+              value={form.hero_title || ""}
+              onChange={handleChange}
+              placeholder="Precision Beyond Boundaries"
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>
+              Hero Button Text
+            </label>
+
+            <input
+              name="hero_button_text"
+              value={form.hero_button_text || ""}
+              onChange={handleChange}
+              placeholder="Explore Our Services"
+              style={inputStyle}
+            />
+          </div>
+
+        </div>
+
+
+        <div style={{ marginTop: "24px" }}>
+
+          <label style={labelStyle}>
+            Hero Subtitle
+          </label>
+
+          <textarea
+            name="hero_subtitle"
+            value={form.hero_subtitle || ""}
+            onChange={handleChange}
+            placeholder="GIS • AI • Drone Intelligence"
+            rows={4}
+            style={textareaStyle}
+          />
+
+        </div>
+
+
+        <div style={{ marginTop: "24px" }}>
+
+          <label style={labelStyle}>
+            Hero Button Link
+          </label>
+
+          <input
+            name="hero_button_link"
+            value={form.hero_button_link || ""}
+            onChange={handleChange}
+            placeholder="/services"
+            style={inputStyle}
+          />
+
+        </div>
+
+
+        {/* =====================================================
+            HERO VIDEO
+        ===================================================== */}
+
+        <div style={{ marginTop: "28px" }}>
+
+          <label style={labelStyle}>
+            Hero Video
+          </label>
+
+          <div
+            style={{
+              marginTop: "10px",
+              padding: "20px",
+              borderRadius: "14px",
+              background: "#f8fafc",
+              border: "1px solid #cbd5e1",
+            }}
+          >
+
+            {form.hero_video && (
+              <div>
+
+                <p
+                  style={{
+                    color: "#0284c7",
+                    marginBottom: "10px",
+                    fontWeight: "600",
+                  }}
+                >
+                  Current Video
+                </p>
+
+                <p style={selectedVideoStyle}>
+                  {form.hero_video}
+                </p>
+
+              </div>
+            )}
+
+            <FileUploader
+              folder="hero"
+              label={
+                form.hero_video
+                  ? "Change Video"
+                  : "Choose Hero Video"
+              }
+              accept="video/*"
+              onUploaded={(file) =>
+                updateMediaField("hero_video", file)
+              }
+            />
+
+          </div>
+
+        </div>
+
+
+        {/* =====================================================
+            STATEMENT IMAGE
+        ===================================================== */}
+
+        <div style={{ marginTop: "28px" }}>
+
+          <label style={labelStyle}>
+            Statement Image
+          </label>
+
+          <div
+            style={{
+              marginTop: "10px",
+              padding: "20px",
+              borderRadius: "14px",
+              background: "#f8fafc",
+              border: "1px solid #cbd5e1",
+            }}
+          >
+
+            {form.statement_image && (
+              <img
+                src={getMediaUrl(form.statement_image)}
+                alt="Statement"
+                style={{
+                  width: "100%",
+                  maxHeight: "240px",
+                  objectFit: "cover",
+                  borderRadius: "10px",
+                  display: "block",
+                  marginBottom: "20px",
+                }}
+              />
+            )}
+
+            <FileUploader
+              folder="statement"
+              label={
+                form.statement_image
+                  ? "Change Statement Image"
+                  : "Choose Statement Image"
+              }
+              accept="image/*"
+              onUploaded={(file) =>
+                updateMediaField(
+                  "statement_image",
+                  file
+                )
+              }
+            />
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* =====================================================
+          PAGE BACKGROUND VIDEOS
+      ===================================================== */}
+
+      <section style={sectionStyle}>
+
+        <h2 style={sectionTitle}>
+          Page Background Videos
+        </h2>
+
+        <p style={sectionDescription}>
+          Upload and manage the background video for each website page.
+        </p>
+
+
+        <div style={gridStyle}>
+
+
+          {/* ABOUT */}
+
+          <div style={videoFieldStyle}>
+
+            <label style={labelStyle}>
+              About Page Videos
+            </label>
+
+            <p
+              style={{
+                color: "#64748b",
+                fontSize: "13px",
+                marginTop: "6px",
+                marginBottom: "16px",
+              }}
+            >
+              Add multiple videos. They will smoothly fade from one
+              video to the next on the About page.
+            </p>
+
+
+            {/* SELECTED VIDEOS */}
+
+            {(form.about_videos || []).length > 0 && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                  marginBottom: "18px",
+                }}
+              >
+
+                {form.about_videos.map((video, index) => (
+
+                  <div
+                    key={`${video}-${index}`}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: "12px",
+                      padding: "12px 14px",
+                      background: "#ffffff",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "10px",
+                    }}
+                  >
+
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "12px",
+                        minWidth: 0,
+                      }}
+                    >
+
+                      <span
+                        style={{
+                          width: "28px",
+                          height: "28px",
+                          borderRadius: "8px",
+                          background: "#eff6ff",
+                          color: "#0284c7",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "12px",
+                          fontWeight: "700",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {index + 1}
+                      </span>
+
+                      <span
+                        style={{
+                          color: "#334155",
+                          fontSize: "13px",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {video}
+                      </span>
+
+                    </div>
+
+
+                    <button
+                      type="button"
+                      onClick={() => removeAboutVideo(index)}
+                      style={{
+                        padding: "7px 12px",
+                        background: "#fef2f2",
+                        color: "#dc2626",
+                        border: "1px solid #fecaca",
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                        fontSize: "12px",
+                        fontWeight: "600",
+                        flexShrink: 0,
+                      }}
+                    >
+                      Remove
+                    </button>
+
+                  </div>
+
+                ))}
+
+              </div>
+            )}
+
+
+            {/* NO VIDEOS */}
+
+            {(form.about_videos || []).length === 0 && (
+              <p
+                style={{
+                  color: "#64748b",
+                  fontSize: "13px",
+                  marginBottom: "16px",
+                }}
+              >
+                No About videos selected.
+              </p>
+            )}
+
+
+            {/* ADD VIDEO */}
+
+            <FileUploader
+              folder="about"
+              label="Add About Video"
+              accept="video/*"
+              onUploaded={addAboutVideo}
+            />
+
+          </div>
+
+
+          {/* SERVICES */}
+
+          <div style={videoFieldStyle}>
+
+            <label style={labelStyle}>
+              Services Page
+            </label>
+
+            <p style={selectedVideoStyle}>
+              {form.services_video || "No video selected"}
+            </p>
+
+            <FileUploader
+              folder="services"
+              label={
+                form.services_video
+                  ? "Change Video"
+                  : "Choose Video"
+              }
+              accept="video/*"
+              onUploaded={(file) =>
+                updateMediaField(
+                  "services_video",
+                  file
+                )
+              }
+            />
+
+          </div>
+
+
+          {/* PRODUCTS */}
+
+          <div style={videoFieldStyle}>
+
+            <label style={labelStyle}>
+              Products Page
+            </label>
+
+            <p style={selectedVideoStyle}>
+              {form.products_video || "No video selected"}
+            </p>
+
+            <FileUploader
+              folder="products"
+              label={
+                form.products_video
+                  ? "Change Video"
+                  : "Choose Video"
+              }
+              accept="video/*"
+              onUploaded={(file) =>
+                updateMediaField(
+                  "products_video",
+                  file
+                )
+              }
+            />
+
+          </div>
+
+
+          {/* SHOWCASE */}
+
+          <div style={videoFieldStyle}>
+
+            <label style={labelStyle}>
+              Showcase Page
+            </label>
+
+            <p style={selectedVideoStyle}>
+              {form.showcase_video || "No video selected"}
+            </p>
+
+            <FileUploader
+              folder="showcase"
+              label={
+                form.showcase_video
+                  ? "Change Video"
+                  : "Choose Video"
+              }
+              accept="video/*"
+              onUploaded={(file) =>
+                updateMediaField(
+                  "showcase_video",
+                  file
+                )
+              }
+            />
+
+          </div>
+
+
+          {/* CAREERS */}
+
+          <div style={videoFieldStyle}>
+
+            <label style={labelStyle}>
+              Careers Page
+            </label>
+
+            <p style={selectedVideoStyle}>
+              {form.careers_video || "No video selected"}
+            </p>
+
+            <FileUploader
+              folder="careers"
+              label={
+                form.careers_video
+                  ? "Change Video"
+                  : "Choose Video"
+              }
+              accept="video/*"
+              onUploaded={(file) =>
+                updateMediaField(
+                  "careers_video",
+                  file
+                )
+              }
+            />
+
+          </div>
+
+
+          {/* CONTACT */}
+
+          <div style={videoFieldStyle}>
+
+            <label style={labelStyle}>
+              Contact Page
+            </label>
+
+            <p style={selectedVideoStyle}>
+              {form.contact_video || "No video selected"}
+            </p>
+
+            <FileUploader
+              folder="contact"
+              label={
+                form.contact_video
+                  ? "Change Video"
+                  : "Choose Video"
+              }
+              accept="video/*"
+              onUploaded={(file) =>
+                updateMediaField(
+                  "contact_video",
+                  file
+                )
+              }
+            />
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* =====================================================
+          FOOTER
+      ===================================================== */}
+
+      <section style={sectionStyle}>
+
+        <h2 style={sectionTitle}>
+          Footer
+        </h2>
+
+        <p style={sectionDescription}>
+          Manage the content displayed in the website footer.
+        </p>
+
+        <div style={gridStyle}>
+
+          <div>
+
+            <label style={labelStyle}>
+              Footer Description
+            </label>
+
+            <textarea
+              name="footer_text"
+              value={form.footer_text || ""}
+              onChange={handleChange}
+              placeholder="Enter your footer description..."
+              rows={4}
+              style={textareaStyle}
+            />
+
+          </div>
+
+
+          <div>
+
+            <label style={labelStyle}>
+              Footer Address
+            </label>
+
+            <textarea
+              name="address"
+              value={form.address || ""}
+              onChange={handleChange}
+              placeholder="Nagercoil, Tamil Nadu, India"
+              rows={4}
+              style={textareaStyle}
+            />
+
+          </div>
+
+
+          <div>
+
+            <label style={labelStyle}>
+              Footer Phone
+            </label>
+
+            <input
+              name="phone"
+              value={form.phone || ""}
+              onChange={handleChange}
+              placeholder="+91 XXXXX XXXXX"
+              style={inputStyle}
+            />
+
+          </div>
+
+
+          <div>
+
+            <label style={labelStyle}>
+              Footer Email
+            </label>
+
+            <input
+              type="email"
+              name="email"
+              value={form.email || ""}
+              onChange={handleChange}
+              placeholder="info@terralens.in"
+              style={inputStyle}
+            />
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* =====================================================
+          SAVE SETTINGS
+      ===================================================== */}
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginTop: "24px",
+          marginBottom: "40px",
+        }}
+      >
+
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={saving}
+          style={{
+            ...buttonStyle,
+            opacity: saving ? 0.6 : 1,
+            cursor: saving
+              ? "not-allowed"
+              : "pointer",
+          }}
+        >
+          {saving
+            ? "Saving..."
+            : "Save Settings"}
+        </button>
+
+      </div>
+
+    </div>
+  );
+}
+
+
+/* =====================================================
+   STYLES
+===================================================== */
+
+const sectionStyle = {
+  background: "#ffffff",
+  border: "1px solid #e2e8f0",
+  borderRadius: "20px",
+  padding: "32px",
+  marginBottom: "24px",
+};
+
+const sectionTitle = {
+  color: "#0f172a",
+  fontSize: "20px",
+  fontWeight: "700",
+  margin: 0,
+};
+
+const sectionDescription = {
+  color: "#64748b",
+  marginTop: "8px",
+  marginBottom: "28px",
+};
+
+const gridStyle = {
+  display: "grid",
+  gridTemplateColumns:
+    "repeat(auto-fit, minmax(280px, 1fr))",
+  gap: "22px",
+};
+
+const labelStyle = {
+  display: "block",
+  color: "#334155",
+  fontSize: "14px",
+  fontWeight: "600",
+  marginBottom: "8px",
+};
+
+const inputStyle = {
+  width: "100%",
+  boxSizing: "border-box",
+  padding: "14px 16px",
+  borderRadius: "10px",
+  background: "#f8fafc",
+  color: "#0f172a",
+  border: "1px solid #cbd5e1",
+  outline: "none",
+  fontSize: "14px",
+};
+
+const textareaStyle = {
+  ...inputStyle,
+  resize: "vertical",
+};
+
+const buttonStyle = {
+  padding: "14px 28px",
+  background: "#0ea5e9",
+  color: "#0f172a",
+  border: "none",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "600",
+  fontSize: "15px",
+};
+
+const secondaryButtonStyle = {
+  padding: "12px 20px",
+  background: "#eff6ff",
+  color: "#0284c7",
+  border: "1px solid #bae6fd",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "600",
+  fontSize: "14px",
+};
+
+const videoFieldStyle = {
+  padding: "20px",
+  background: "#f8fafc",
+  border: "1px solid #cbd5e1",
+  borderRadius: "14px",
+};
+
+const selectedVideoStyle = {
+  color: "#64748b",
+  fontSize: "13px",
+  margin: "10px 0 16px",
+  wordBreak: "break-all",
+  minHeight: "38px",
+};

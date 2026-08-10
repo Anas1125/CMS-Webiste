@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "dev": "concurrently -n BACKEND,FRONTEND \"cd backend && ./venv/bin/uvicorn app.main:app --reload\" \"cd frontend/terralens-redesign && npm run dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}
