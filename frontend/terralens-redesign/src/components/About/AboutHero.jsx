@@ -381,16 +381,13 @@ export default function AboutHero() {
       : "0 20px 60px rgba(15,23,42,0.08)",
     cardHeading: hasVideo ? "#ffffff" : "#0f172a",
     cardBody: hasVideo ? "#d1d5db" : "#475569",
-    bottomFade: hasVideo
-      ? "linear-gradient(to bottom, transparent 0%, rgba(5,5,5,0.3) 35%, rgba(5,5,5,0.8) 70%, #050505 90%, #ffffff 100%)"
-      : "linear-gradient(to bottom, rgba(255,255,255,0), #ffffff)",
   };
   /* =======================================================
      PAGE
      ======================================================= */
 
   return (
-    <section
+    <section className="w-full"
       style={{
         position: "relative",
         overflow: "hidden",
@@ -974,6 +971,14 @@ export default function AboutHero() {
           </div>
         </motion.div>
       </div>
+      <div
+        className="absolute bottom-0 left-0 w-full h-72 pointer-events-none"
+        style={{
+          zIndex: 5,
+          background:
+            "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.05) 45%, rgba(255,255,255,0.35) 75%, #ffffff 90%)",
+        }}
+      />
     </section>
   );
 }

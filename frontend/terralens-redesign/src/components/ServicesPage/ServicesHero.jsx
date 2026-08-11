@@ -92,7 +92,7 @@ export default function ServicesHero() {
   };
 
   return (
-    <section className="w-full pb-40 mb-20"
+    <section className="w-full"
       style={{ 
         position: "relative",
         overflow: "hidden",
@@ -593,15 +593,11 @@ export default function ServicesHero() {
       ========================================================= */}
 
       <div
+        className="absolute bottom-0 left-0 w-full h-72 pointer-events-none"
         style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          width: "100%",
-          height: "220px",
-          background: theme.bottomFade,
-          pointerEvents: "none",
-          zIndex: 20,
+          zIndex: 5,
+          background:
+            "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.05) 45%, rgba(255,255,255,0.35) 75%, #ffffff 100%)",
         }}
       />
     </section>
