@@ -173,7 +173,7 @@ export default function ContactSection() {
               {
                 icon: MapPin,
                 title: "Office",
-                value: "Bangalore, Karnataka, India",
+                value: "Nagercoi, Tamil Nadu, India",
               },
             ].map((item) => {
               const Icon = item.icon;

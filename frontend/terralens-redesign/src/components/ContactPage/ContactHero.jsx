@@ -80,7 +80,7 @@ export default function ContactHero() {
     {
       icon: MapPin,
       title: "Location",
-      value: "Bangalore, India",
+      value: "Nagercoil, India",
     },
     {
       icon: Clock,
