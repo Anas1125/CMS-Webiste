@@ -1,8 +1,6 @@
 import { NavLink, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
-
-import logo from "../../assets/images/logo.png";
 import { getSettings } from "../../api/settings";
 
 function Navbar() {
@@ -100,10 +98,10 @@ function Navbar() {
   // =========================
 
   const logoUrl = settings?.logo
-    ? settings.logo.startsWith("http")
-      ? settings.logo
-      : `http://127.0.0.1:8000${settings.logo}`
-    : logo;
+  ? settings.logo.startsWith("http")
+    ? settings.logo
+    : `http://127.0.0.1:8000${settings.logo}`
+  : "";
 
   return (
     <header
@@ -174,19 +172,18 @@ function Navbar() {
             flexShrink: 0,
           }}
         >
-          <img
-            src={logoUrl}
-            alt={
-              settings?.company_name ||
-              "TerraLens"
-            }
-            style={{
-              width: "44px",
-              height: "44px",
-              objectFit: "contain",
-              borderRadius: "8px",
-            }}
-          />
+          {logoUrl && (
+            <img
+              src={logoUrl}
+              alt={settings?.company_name || "TerraLens"}
+              style={{
+                width: "44px",
+                height: "44px",
+                objectFit: "contain",
+                borderRadius: "8px",
+              }}
+            />
+          )}
 
           <h1
             style={{
