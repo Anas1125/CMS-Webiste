@@ -353,45 +353,38 @@ export default function AboutHero() {
      ======================================================= */
 
   const theme = {
-    sectionBg: hasVideo ? "#0f172a" : "#ffffff",
+    sectionBg: hasVideo ? "#050505" : "#ffffff",
     label: hasVideo ? "#38bdf8" : "#0ea5e9",
     heading: hasVideo ? "#ffffff" : "#0f172a",
-    headingShadow: hasVideo
-      ? "0 2px 24px rgba(0,0,0,0.35)"
-      : "none",
-    body: hasVideo ? "rgba(255,255,255,0.82)" : "#475569",
+    body: hasVideo ? "#d1d5db" : "#475569",
     gridLine: hasVideo
-      ? "rgba(255,255,255,0.15)"
+      ? "rgba(255,255,255,.2)"
       : "rgba(15,23,42,0.07)",
-    bottomFade: hasVideo
-      ? "linear-gradient(to bottom, rgba(15,23,42,0), rgba(15,23,42,0.5))"
-      : "linear-gradient(to bottom, rgba(255,255,255,0), #ffffff)",
-    contactBg: hasVideo ? "rgba(255,255,255,0.06)" : "rgba(15,23,42,0.03)",
+    contactBg: hasVideo
+      ? "rgba(255,255,255,0.05)"
+      : "rgba(15,23,42,0.03)",
     contactBorder: hasVideo
-      ? "rgba(255,255,255,0.45)"
+      ? "rgba(255,255,255,0.2)"
       : "rgba(15,23,42,0.3)",
     contactText: hasVideo ? "#ffffff" : "#0f172a",
     contactHoverClass: hasVideo
-      ? "hover:bg-white/15 hover:border-white/70 hover:-translate-y-0.5 group"
-      : "hover:bg-slate-900/5 hover:border-slate-500 hover:-translate-y-0.5 group",
-    cardBg: hasVideo ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.6)",
+      ? "hover:border-sky-400/50 hover:bg-sky-500/10 hover:text-sky-400 hover:-translate-y-0.5 group"
+      : "hover:border-sky-500/50 hover:bg-sky-500/5 hover:text-sky-600 hover:-translate-y-0.5 group",
+    cardBg: hasVideo
+      ? "rgba(17,17,19,0.12)"
+      : "rgba(255,255,255,0.5)",
     cardBorder: hasVideo
-      ? "1px solid rgba(255,255,255,0.25)"
+      ? "1px solid rgba(255,255,255,0.15)"
       : "1px solid rgba(15,23,42,0.10)",
     cardShadow: hasVideo
-      ? "0 20px 60px rgba(0,0,0,0.25)"
+      ? "0 20px 80px -20px rgba(14,165,233,0.15)"
       : "0 20px 60px rgba(15,23,42,0.08)",
-    cardTopHighlight: hasVideo
-      ? "rgba(255,255,255,0.5)"
-      : "rgba(255,255,255,0.9)",
     cardHeading: hasVideo ? "#ffffff" : "#0f172a",
-    cardBody: hasVideo ? "rgba(255,255,255,0.78)" : "#334155",
-    cardDivider: hasVideo
-      ? "rgba(255,255,255,0.18)"
-      : "rgba(15,23,42,0.12)",
-    statLabel: hasVideo ? "rgba(255,255,255,0.65)" : "#64748b",
+    cardBody: hasVideo ? "#d1d5db" : "#475569",
+    bottomFade: hasVideo
+      ? "linear-gradient(to bottom, transparent 0%, rgba(5,5,5,0.3) 35%, rgba(5,5,5,0.8) 70%, #050505 90%, #ffffff 100%)"
+      : "linear-gradient(to bottom, rgba(255,255,255,0), #ffffff)",
   };
-
   /* =======================================================
      PAGE
      ======================================================= */

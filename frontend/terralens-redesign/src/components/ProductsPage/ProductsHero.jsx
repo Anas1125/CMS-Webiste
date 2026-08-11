@@ -1,8 +1,33 @@
 import { motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
-import productsVideo from "../../assets/videos/products.mp4";
+import { useEffect, useState } from "react";
+import { getSettings } from "../../api/settings";
 
 export default function ProductsHero() {
+  const [productsVideo, setProductsVideo] = useState("");
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const data = await getSettings();
+
+        if (data?.products_video) {
+          const videoUrl = data.products_video.startsWith("http")
+            ? data.products_video
+            : `${import.meta.env.VITE_API_URL}${data.products_video}`;
+
+          setProductsVideo(videoUrl);
+        } else {
+          setProductsVideo("");
+        }
+      } catch (error) {
+        console.error("Failed to load Products video:", error);
+        setProductsVideo("");
+      }
+    };
+
+    loadSettings();
+  }, []);
   const scrollToProducts = () => {
     document.getElementById("products-grid")?.scrollIntoView({
       behavior: "smooth",
@@ -15,7 +40,7 @@ export default function ProductsHero() {
       style={{
         minHeight: "100vh",
         width: "100%",
-        backgroundColor: "#0B0B0D",
+        backgroundColor: "#ffffff",
         position: "relative",
         display: "flex",
         alignItems: "center",
@@ -25,26 +50,28 @@ export default function ProductsHero() {
     >
       {/* Background Video */}
 
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          objectPosition: "center",
-          opacity: 0.92,
-          zIndex: 0,
-        }}
-      >
-        <source src={productsVideo} type="video/mp4" />
-      </video>
+      {productsVideo && (
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center",
+            opacity: 0.92,
+            zIndex: 0,
+          }}
+        >
+          <source src={productsVideo} type="video/mp4" />
+        </video>
+      )}
 
       {/* White Readability Overlay */}
 
@@ -129,7 +156,7 @@ export default function ProductsHero() {
             md:text-6xl
             lg:text-7xl
             font-extrabold
-            text-white
+            text-black font-extrabold
             leading-tight
           "
         >
@@ -206,7 +233,7 @@ export default function ProductsHero() {
         style={{
           zIndex: 5,
           background:
-            "linear-gradient(to bottom, transparent 0%, rgba(11,11,13,0.25) 30%, rgba(11,11,13,0.7) 65%, #0B0B0D 100%)",
+            "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.25) 30%, rgba(255,255,255,0.7) 65%, #ffffff 100%)",
         }}
       />
     </section>
