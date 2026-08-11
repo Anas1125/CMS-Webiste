@@ -1,4 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
+import { useEffect } from "react";
+import { getSettings } from "../api/settings";
 import {
   LayoutDashboard,
   Settings,
@@ -95,6 +97,34 @@ const menu = [
 ];
 
 export default function AdminLayout() {
+  useEffect(() => {
+    const loadFavicon = async () => {
+      try {
+        const settings = await getSettings();
+
+        if (!settings?.favicon) return;
+
+        const faviconUrl = settings.favicon.startsWith("http")
+          ? settings.favicon
+          : `${import.meta.env.VITE_API_URL}${settings.favicon}`;
+
+        let favicon = document.querySelector("link[rel='icon']");
+
+        if (!favicon) {
+          favicon = document.createElement("link");
+          favicon.rel = "icon";
+          document.head.appendChild(favicon);
+        }
+
+        favicon.href = `${faviconUrl}?v=${Date.now()}`;
+      } catch (error) {
+        console.error("Failed to load favicon:", error);
+      }
+    };
+
+    loadFavicon();
+  }, []);
+
   return (
     <div
       style={{

@@ -6,7 +6,6 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-import Button from "../ui/Button";
 import LiquidGlassButton from "../ui/LiquidGlassButton";
 
 import { getSettings } from "../../api/settings";
@@ -36,9 +35,7 @@ function Hero() {
             file.mime_type
               ?.toLowerCase()
               .startsWith("video/") ||
-            /\.(mp4|webm|mov|avi|mkv)$/i.test(
-              filename
-            );
+            /\.(mp4|webm|mov|avi|mkv)$/i.test(filename);
 
           return (
             file.folder === "hero" &&
@@ -46,16 +43,15 @@ function Hero() {
           );
         });
 
-        const sortedVideos =
-          heroVideos.sort((a, b) =>
-            a.filename.localeCompare(
-              b.filename,
-              undefined,
-              {
-                numeric: true,
-              }
-            )
-          );
+        const sortedVideos = heroVideos.sort((a, b) =>
+          a.filename.localeCompare(
+            b.filename,
+            undefined,
+            {
+              numeric: true,
+            }
+          )
+        );
 
         setVideos(sortedVideos);
       } catch (error) {
@@ -77,7 +73,6 @@ function Hero() {
     const loadSettings = async () => {
       try {
         const data = await getSettings();
-
         setSettings(data);
       } catch (error) {
         console.error(
@@ -105,6 +100,41 @@ function Hero() {
   };
 
   // =====================================================
+  // WORD ANIMATION
+  //
+  // Starts BEHIND + TOP RIGHT
+  // Comes FORWARD + DOWN LEFT
+  // =====================================================
+
+  const wordVariants = {
+    hidden: {
+      opacity: 0,
+      x: 110,
+      y: -85,
+      scale: 0.82,
+      rotateX: -28,
+      rotateY: 18,
+      z: -300,
+    },
+
+    visible: (delay = 0) => ({
+      opacity: 1,
+      x: 0,
+      y: 0,
+      scale: 1,
+      rotateX: 0,
+      rotateY: 0,
+      z: 0,
+
+      transition: {
+        duration: 1.05,
+        delay,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    }),
+  };
+
+  // =====================================================
   // AUTOMATIC VIDEO CHANGE
   // =====================================================
 
@@ -115,8 +145,7 @@ function Hero() {
 
     const interval = setInterval(() => {
       setCurrentVideo(
-        (prev) =>
-          (prev + 1) % videos.length
+        (prev) => (prev + 1) % videos.length
       );
     }, 6000);
 
@@ -146,8 +175,7 @@ function Hero() {
     if (videos.length === 0) return;
 
     setCurrentVideo(
-      (prev) =>
-        (prev + 1) % videos.length
+      (prev) => (prev + 1) % videos.length
     );
   };
 
@@ -179,17 +207,77 @@ function Hero() {
   const hasVideo = Boolean(currentVideoUrl);
 
   // =====================================================
-  // THEME — white section when there's no video, the
-  // original dark/video theme when there is
+  // THEME
   // =====================================================
 
   const theme = {
-    labelClass: hasVideo ? "text-white/80" : "text-slate-500",
-    headingClass: hasVideo ? "text-white" : "text-slate-900",
+    labelClass: hasVideo
+      ? "text-white/80"
+      : "text-slate-500",
+
+    headingClass: hasVideo
+      ? "text-white"
+      : "text-slate-900",
+
     headingShadow: hasVideo
       ? "0 4px 24px rgba(0,0,0,0.45), 0 1px 4px rgba(0,0,0,0.5)"
       : "none",
-    subtitleClass: hasVideo ? "text-gray-100" : "text-slate-600",
+
+    subtitleClass: hasVideo
+      ? "text-gray-100"
+      : "text-slate-600",
+  };
+
+  // =====================================================
+  // WORD REVEAL
+  // =====================================================
+
+  const renderWords = (
+    text,
+    startDelay = 0,
+    wordClass = "",
+    gapClass = "mr-[0.25em]"
+  ) => {
+    if (!text) return null;
+
+    return text.split(/\s+/).map(
+      (word, index) => (
+        <span
+          key={`${word}-${index}`}
+          className="
+            inline-block
+            align-baseline
+          "
+          style={{
+            perspective: "900px",
+            perspectiveOrigin:
+              "100% 0%",
+          }}
+        >
+          <motion.span
+            custom={
+              startDelay + index * 0.13
+            }
+            variants={wordVariants}
+            initial="hidden"
+            animate="visible"
+            className={`
+              inline-block
+              ${gapClass}
+              ${wordClass}
+            `}
+            style={{
+              transformStyle:
+                "preserve-3d",
+              willChange:
+                "transform, opacity",
+            }}
+          >
+            {word}
+          </motion.span>
+        </span>
+      )
+    );
   };
 
   // =====================================================
@@ -206,9 +294,8 @@ function Hero() {
         bg-white
       "
     >
-
       {/* =================================================
-          BACKGROUND VIDEOS
+          BACKGROUND VIDEO
           ================================================= */}
 
       {currentVideoUrl ? (
@@ -219,19 +306,24 @@ function Hero() {
             muted
             playsInline
             preload="auto"
+
             initial={{
               opacity: 0,
             }}
+
             animate={{
               opacity: 1,
             }}
+
             exit={{
               opacity: 0,
             }}
+
             transition={{
               duration: 1.5,
               ease: "easeInOut",
             }}
+
             className="
               absolute
               inset-0
@@ -240,6 +332,7 @@ function Hero() {
               w-full
               object-cover
             "
+
             onError={(error) => {
               console.error(
                 "Hero video failed:",
@@ -264,11 +357,7 @@ function Hero() {
       )}
 
       {/* =================================================
-          LIGHT READABILITY OVERLAY
-
-          Only rendered when there's a video underneath it —
-          kept very faint now, just enough to lift text
-          contrast without milk-washing the footage.
+          READABILITY OVERLAY
           ================================================= */}
 
       {hasVideo && (
@@ -282,38 +371,42 @@ function Hero() {
         />
       )}
 
-      {/* SUBTLE DEPTH OVERLAY — barely-there vignette instead of a
-          flat white wash, so the video keeps its own brightness */}
-          {hasVideo && (
-            <div
-              className="
-                pointer-events-none
-                absolute
-                inset-0
-                z-[2]
-                bg-gradient-to-b
-                from-black/[0.10]
-                via-transparent
-                to-black/[0.15]
-              "
-            />
-          )}
+      {/* =================================================
+          DEPTH OVERLAY
+          ================================================= */}
 
-          {/* BOTTOM GRADIENT — fades video into white, kept short
-              and only visible right at the very bottom edge */}
-          <div
-            className="
-              pointer-events-none
-              absolute
-              inset-x-0
-              bottom-0
-              z-[3]
-              h-10
-              bg-gradient-to-b
-              from-transparent
-              to-white
-            "
-          />
+      {hasVideo && (
+        <div
+          className="
+            pointer-events-none
+            absolute
+            inset-0
+            z-[2]
+            bg-gradient-to-b
+            from-black/[0.10]
+            via-transparent
+            to-black/[0.15]
+          "
+        />
+      )}
+
+      {/* =================================================
+          BOTTOM GRADIENT
+          ================================================= */}
+
+      <div
+        className="
+          pointer-events-none
+          absolute
+          inset-x-0
+          bottom-0
+          z-[3]
+          h-10
+          bg-gradient-to-b
+          from-transparent
+          to-white
+        "
+      />
 
       {/* =================================================
           LEFT ARROW
@@ -325,7 +418,8 @@ function Hero() {
             position: "absolute",
             top: "50%",
             left: "2rem",
-            transform: "translateY(-50%)",
+            transform:
+              "translateY(-50%)",
             zIndex: 20,
           }}
         >
@@ -351,7 +445,8 @@ function Hero() {
             position: "absolute",
             top: "50%",
             right: "2rem",
-            transform: "translateY(-50%)",
+            transform:
+              "translateY(-50%)",
             zIndex: 20,
           }}
         >
@@ -381,73 +476,139 @@ function Hero() {
           justify-center
           px-6
         "
+        style={{
+          perspective: "1200px",
+          perspectiveOrigin:
+            "50% 45%",
+        }}
       >
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 60,
+        <div
+          className="
+            -mt-20
+            text-center
+          "
+          style={{
+            transformStyle:
+              "preserve-3d",
           }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 0.9,
-          }}
-          className="-mt-20 text-center"
         >
 
-          {/* COMPANY NAME */}
+          {/* =================================================
+              COMPANY NAME
+              ================================================= */}
 
-          <p
-            className={`
+          <div
+            className="
               mb-6
-              text-sm
-              font-medium
-              uppercase
-              tracking-[8px]
-              ${theme.labelClass}
-            `}
-          >
-            {settings?.company_name ||
-              "TerraLens Innovations"}
-          </p>
-
-          {/* TITLE */}
-
-          <h1
-            className={`
-              text-6xl
-              font-bold
-              leading-[0.95]
-              tracking-tight
-              md:text-8xl
-              ${theme.headingClass}
-            `}
+              overflow-visible
+              leading-none
+            "
             style={{
-              whiteSpace: "pre-line",
-              textShadow: theme.headingShadow,
+              perspective: "900px",
+              perspectiveOrigin:
+                "100% 0%",
             }}
           >
-            {settings?.hero_title ||
-              "Precision\nBeyond\nBoundaries"}
-          </h1>
+            <p
+              className={`
+                text-sm
+                font-medium
+                uppercase
+                tracking-[8px]
+                ${theme.labelClass}
+              `}
+              style={{
+                transformStyle:
+                  "preserve-3d",
+              }}
+            >
+              {renderWords(
+                settings?.company_name ||
+                  "TerraLens Innovations",
+                0,
+                "",
+                "mr-[0.55em]"
+              )}
+            </p>
+          </div>
 
-          {/* SUBTITLE */}
+          {/* =================================================
+              TITLE
+              ================================================= */}
 
-          <p
-            className={`
-              mx-auto
-              mt-8
-              max-w-3xl
-              text-xl
-              leading-8
-              ${theme.subtitleClass}
-            `}
+          <div
+            className="
+              overflow-visible
+              leading-[0.95]
+            "
+            style={{
+              perspective: "1000px",
+              perspectiveOrigin:
+                "100% 0%",
+            }}
           >
-            {settings?.hero_subtitle ||
-              "Engineering the future with GIS, Surveying, LiDAR and Geospatial Intelligence."}
-          </p>
+            <h1
+              className={`
+                text-6xl
+                font-bold
+                tracking-tight
+                md:text-8xl
+                ${theme.headingClass}
+              `}
+              style={{
+                textShadow:
+                  theme.headingShadow,
+                whiteSpace:
+                  "pre-line",
+                transformStyle:
+                  "preserve-3d",
+              }}
+            >
+              {renderWords(
+                settings?.hero_title ||
+                  "Precision Beyond Boundaries",
+                0.16
+              )}
+            </h1>
+          </div>
+
+          {/* =================================================
+              SUBTITLE
+              ================================================= */}
+
+          <div
+            className="
+              mt-8
+              overflow-visible
+              leading-8
+            "
+            style={{
+              perspective: "900px",
+              perspectiveOrigin:
+                "100% 0%",
+            }}
+          >
+            <p
+              className={`
+                mx-auto
+                max-w-3xl
+                text-xl
+                ${theme.subtitleClass}
+              `}
+              style={{
+                transformStyle:
+                  "preserve-3d",
+              }}
+            >
+              {renderWords(
+                settings?.hero_subtitle ||
+                  "Engineering the future with GIS, Surveying, LiDAR and Geospatial Intelligence.",
+                0.48,
+                "",
+                "mr-[0.2em]"
+              )}
+            </p>
+          </div>
 
           {/* =================================================
               BUTTONS
@@ -461,11 +622,12 @@ function Hero() {
               gap-6
             "
           >
-
-            {/* EXPLORE SOLUTIONS */}
-
             <LiquidGlassButton
-              tone={hasVideo ? "dark" : "light"}
+              tone={
+                hasVideo
+                  ? "dark"
+                  : "light"
+              }
               variant="primary"
               onClick={() =>
                 navigate(
@@ -478,10 +640,12 @@ function Hero() {
                 "Explore Solutions"}
             </LiquidGlassButton>
 
-            {/* VIEW PROJECTS */}
-
             <LiquidGlassButton
-              tone={hasVideo ? "dark" : "light"}
+              tone={
+                hasVideo
+                  ? "dark"
+                  : "light"
+              }
               variant="secondary"
               onClick={() =>
                 navigate("/showcase")
@@ -489,10 +653,8 @@ function Hero() {
             >
               View Projects
             </LiquidGlassButton>
-
           </div>
-
-        </motion.div>
+        </div>
       </div>
 
       {/* =================================================
@@ -583,7 +745,6 @@ function Hero() {
           />
         </div>
       </motion.div>
-
     </section>
   );
 }

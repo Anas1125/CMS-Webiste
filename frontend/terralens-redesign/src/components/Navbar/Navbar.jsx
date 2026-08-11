@@ -42,6 +42,28 @@ function Navbar() {
   }, []);
 
   // =========================
+  // UPDATE FAVICON
+  // =========================
+
+  useEffect(() => {
+    if (!settings?.favicon) return;
+
+    const faviconUrl = settings.favicon.startsWith("http")
+      ? settings.favicon
+      : `http://127.0.0.1:8000${settings.favicon}`;
+
+    let favicon = document.querySelector("link[rel='icon']");
+
+    if (!favicon) {
+      favicon = document.createElement("link");
+      favicon.rel = "icon";
+      document.head.appendChild(favicon);
+    }
+
+    favicon.href = `${faviconUrl}?v=${Date.now()}`;
+  }, [settings?.favicon]);
+
+  // =========================
   // NAVBAR SCROLL BEHAVIOR
   // =========================
 

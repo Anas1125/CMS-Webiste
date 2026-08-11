@@ -636,3 +636,742 @@ function Hero() {
 }
 
 export default Hero;
+
+
+///
+import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+
+import Button from "../ui/Button";
+import LiquidGlassButton from "../ui/LiquidGlassButton";
+
+import { getSettings } from "../../api/settings";
+import { getMedia } from "../../api/media";
+
+function Hero() {
+  const navigate = useNavigate();
+
+  const [currentVideo, setCurrentVideo] = useState(0);
+  const [videos, setVideos] = useState([]);
+  const [settings, setSettings] = useState(null);
+
+  // =====================================================
+  // LOAD HERO VIDEOS
+  // =====================================================
+
+  useEffect(() => {
+    const loadHeroVideos = async () => {
+      try {
+        const data = await getMedia();
+
+        const heroVideos = data.filter((file) => {
+          const filename =
+            file.filename?.toLowerCase() || "";
+
+          const isVideo =
+            file.mime_type
+              ?.toLowerCase()
+              .startsWith("video/") ||
+            /\.(mp4|webm|mov|avi|mkv)$/i.test(
+              filename
+            );
+
+          return (
+            file.folder === "hero" &&
+            isVideo
+          );
+        });
+
+        const sortedVideos =
+          heroVideos.sort((a, b) =>
+            a.filename.localeCompare(
+              b.filename,
+              undefined,
+              {
+                numeric: true,
+              }
+            )
+          );
+
+        setVideos(sortedVideos);
+      } catch (error) {
+        console.error(
+          "Failed to load hero videos:",
+          error
+        );
+      }
+    };
+
+    loadHeroVideos();
+  }, []);
+
+  // =====================================================
+  // LOAD SETTINGS
+  // =====================================================
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const data = await getSettings();
+
+        setSettings(data);
+      } catch (error) {
+        console.error(
+          "Failed to load homepage settings:",
+          error
+        );
+      }
+    };
+
+    loadSettings();
+  }, []);
+
+  // =====================================================
+  // VIDEO URL
+  // =====================================================
+
+  const getVideoUrl = (path) => {
+    if (!path) return null;
+
+    if (path.startsWith("http")) {
+      return path;
+    }
+
+    return `${import.meta.env.VITE_API_URL}${path}`;
+  };
+
+  // =====================================================
+  // WORD-BY-WORD ANIMATION
+  // =====================================================
+
+  const wordReveal = {
+    hidden: {
+      opacity: 0,
+      x: 120,
+      y: -80,
+      rotate: 8,
+      scale: 0.96,
+    },
+
+    visible: (delay = 0) => ({
+      opacity: 1,
+      x: 0,
+      y: 0,
+      rotate: 0,
+      scale: 1,
+
+      transition: {
+        duration: 0.8,
+        delay,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    }),
+  };
+
+  // =====================================================
+  // AUTOMATIC VIDEO CHANGE
+  // =====================================================
+
+  useEffect(() => {
+    if (videos.length <= 1) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setCurrentVideo(
+        (prev) =>
+          (prev + 1) % videos.length
+      );
+    }, 6000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [videos.length]);
+
+  // =====================================================
+  // RESET INDEX
+  // =====================================================
+
+  useEffect(() => {
+    if (
+      videos.length > 0 &&
+      currentVideo >= videos.length
+    ) {
+      setCurrentVideo(0);
+    }
+  }, [videos.length, currentVideo]);
+
+  // =====================================================
+  // NEXT VIDEO
+  // =====================================================
+
+  const nextVideo = () => {
+    if (videos.length === 0) return;
+
+    setCurrentVideo(
+      (prev) =>
+        (prev + 1) % videos.length
+    );
+  };
+
+  // =====================================================
+  // PREVIOUS VIDEO
+  // =====================================================
+
+  const prevVideo = () => {
+    if (videos.length === 0) return;
+
+    setCurrentVideo((prev) =>
+      prev === 0
+        ? videos.length - 1
+        : prev - 1
+    );
+  };
+
+  // =====================================================
+  // CURRENT VIDEO
+  // =====================================================
+
+  const currentVideoUrl =
+    videos.length > 0
+      ? getVideoUrl(
+          videos[currentVideo]?.path
+        )
+      : null;
+
+  const hasVideo =
+    Boolean(currentVideoUrl);
+
+  // =====================================================
+  // THEME
+  // =====================================================
+
+  const theme = {
+    labelClass: hasVideo
+      ? "text-white/80"
+      : "text-slate-500",
+
+    headingClass: hasVideo
+      ? "text-white"
+      : "text-slate-900",
+
+    headingShadow: hasVideo
+      ? "0 4px 24px rgba(0,0,0,0.45), 0 1px 4px rgba(0,0,0,0.5)"
+      : "none",
+
+    subtitleClass: hasVideo
+      ? "text-gray-100"
+      : "text-slate-600",
+  };
+
+  // =====================================================
+  // HERO
+  // =====================================================
+
+  return (
+    <section
+      className="
+        relative
+        h-screen
+        min-h-[700px]
+        overflow-hidden
+        bg-white
+      "
+    >
+
+      {/* =================================================
+          BACKGROUND VIDEOS
+          ================================================= */}
+
+      {currentVideoUrl ? (
+        <AnimatePresence initial={false}>
+          <motion.video
+            key={currentVideoUrl}
+            autoPlay
+            muted
+            playsInline
+            preload="auto"
+
+            initial={{
+              opacity: 0,
+            }}
+
+            animate={{
+              opacity: 1,
+            }}
+
+            exit={{
+              opacity: 0,
+            }}
+
+            transition={{
+              duration: 1.5,
+              ease: "easeInOut",
+            }}
+
+            className="
+              absolute
+              inset-0
+              z-0
+              h-full
+              w-full
+              object-cover
+            "
+
+            onError={(error) => {
+              console.error(
+                "Hero video failed:",
+                error
+              );
+            }}
+          >
+            <source
+              src={currentVideoUrl}
+              type="video/mp4"
+            />
+          </motion.video>
+        </AnimatePresence>
+      ) : (
+        <div
+          className="
+            absolute
+            inset-0
+            bg-white
+          "
+        />
+      )}
+
+      {/* =================================================
+          LIGHT READABILITY OVERLAY
+          ================================================= */}
+
+      {hasVideo && (
+        <div
+          className="
+            absolute
+            inset-0
+            z-[1]
+            bg-black/[0.05]
+          "
+        />
+      )}
+
+      {/* =================================================
+          SUBTLE DEPTH OVERLAY
+          ================================================= */}
+
+      {hasVideo && (
+        <div
+          className="
+            pointer-events-none
+            absolute
+            inset-0
+            z-[2]
+            bg-gradient-to-b
+            from-black/[0.10]
+            via-transparent
+            to-black/[0.15]
+          "
+        />
+      )}
+
+      {/* =================================================
+          BOTTOM GRADIENT
+          ================================================= */}
+
+      <div
+        className="
+          pointer-events-none
+          absolute
+          inset-x-0
+          bottom-0
+          z-[3]
+          h-10
+          bg-gradient-to-b
+          from-transparent
+          to-white
+        "
+      />
+
+      {/* =================================================
+          LEFT ARROW
+          ================================================= */}
+
+      {videos.length > 1 && (
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "2rem",
+            transform:
+              "translateY(-50%)",
+            zIndex: 20,
+          }}
+        >
+          <LiquidGlassButton
+            tone="dark"
+            variant="secondary"
+            shape="circle"
+            ariaLabel="Previous video"
+            onClick={prevVideo}
+          >
+            <ChevronLeft size={26} />
+          </LiquidGlassButton>
+        </div>
+      )}
+
+      {/* =================================================
+          RIGHT ARROW
+          ================================================= */}
+
+      {videos.length > 1 && (
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            right: "2rem",
+            transform:
+              "translateY(-50%)",
+            zIndex: 20,
+          }}
+        >
+          <LiquidGlassButton
+            tone="dark"
+            variant="secondary"
+            shape="circle"
+            ariaLabel="Next video"
+            onClick={nextVideo}
+          >
+            <ChevronRight size={26} />
+          </LiquidGlassButton>
+        </div>
+      )}
+
+      {/* =================================================
+          CONTENT
+          ================================================= */}
+
+      <div
+        className="
+          relative
+          z-10
+          flex
+          h-full
+          items-center
+          justify-center
+          px-6
+        "
+      >
+        <div
+          className="
+            -mt-20
+            text-center
+          "
+          style={{
+            perspective: "1000px",
+          }}
+        >
+
+          {/* =================================================
+              COMPANY NAME
+              ================================================= */}
+
+          <div className="mb-6 overflow-hidden">
+            <motion.p
+              className={`
+                text-sm
+                font-medium
+                uppercase
+                tracking-[8px]
+                ${theme.labelClass}
+              `}
+            >
+              {(
+                settings?.company_name ||
+                "TerraLens Innovations"
+              )
+                .split(/\s+/)
+                .map((word, index) => (
+                  <span
+                    key={`${word}-${index}`}
+                    className="
+                      inline-block
+                      overflow-hidden
+                    "
+                  >
+                    <motion.span
+                      custom={
+                        index * 0.08
+                      }
+                      variants={wordReveal}
+                      initial="hidden"
+                      animate="visible"
+                      className="
+                        inline-block
+                        mr-[0.5em]
+                      "
+                    >
+                      {word}
+                    </motion.span>
+                  </span>
+                ))}
+            </motion.p>
+          </div>
+
+          {/* =================================================
+              TITLE
+              ================================================= */}
+
+          <div className="overflow-hidden">
+            <motion.h1
+              className={`
+                text-6xl
+                font-bold
+                leading-[0.95]
+                tracking-tight
+                md:text-8xl
+                ${theme.headingClass}
+              `}
+              style={{
+                textShadow:
+                  theme.headingShadow,
+              }}
+            >
+              {(
+                settings?.hero_title ||
+                "TerraLens Homepage"
+              )
+                .split(/\s+/)
+                .map((word, index) => (
+                  <span
+                    key={`${word}-${index}`}
+                    className="
+                      inline-block
+                      overflow-hidden
+                    "
+                  >
+                    <motion.span
+                      custom={
+                        0.15 +
+                        index * 0.12
+                      }
+                      variants={wordReveal}
+                      initial="hidden"
+                      animate="visible"
+                      className="
+                        inline-block
+                        mr-[0.25em]
+                      "
+                    >
+                      {word}
+                    </motion.span>
+                  </span>
+                ))}
+            </motion.h1>
+          </div>
+
+          {/* =================================================
+              SUBTITLE
+              ================================================= */}
+
+          <div
+            className="
+              mt-8
+              overflow-hidden
+            "
+          >
+            <motion.p
+              className={`
+                mx-auto
+                max-w-3xl
+                text-xl
+                leading-8
+                ${theme.subtitleClass}
+              `}
+            >
+              {(
+                settings?.hero_subtitle ||
+                "Hello From Terralens"
+              )
+                .split(/\s+/)
+                .map((word, index) => (
+                  <span
+                    key={`${word}-${index}`}
+                    className="
+                      inline-block
+                      overflow-hidden
+                    "
+                  >
+                    <motion.span
+                      custom={
+                        0.45 +
+                        index * 0.1
+                      }
+                      variants={wordReveal}
+                      initial="hidden"
+                      animate="visible"
+                      className="
+                        inline-block
+                        mr-[0.2em]
+                      "
+                    >
+                      {word}
+                    </motion.span>
+                  </span>
+                ))}
+            </motion.p>
+          </div>
+
+          {/* =================================================
+              BUTTONS
+              ================================================= */}
+
+          <div
+            className="
+              mt-14
+              flex
+              justify-center
+              gap-6
+            "
+          >
+
+            {/* EXPLORE SOLUTIONS */}
+
+            <LiquidGlassButton
+              tone={
+                hasVideo
+                  ? "dark"
+                  : "light"
+              }
+              variant="primary"
+              onClick={() =>
+                navigate(
+                  settings?.hero_button_link ||
+                    "/services"
+                )
+              }
+            >
+              {settings?.hero_button_text ||
+                "Explore Solutions"}
+            </LiquidGlassButton>
+
+            {/* VIEW PROJECTS */}
+
+            <LiquidGlassButton
+              tone={
+                hasVideo
+                  ? "dark"
+                  : "light"
+              }
+              variant="secondary"
+              onClick={() =>
+                navigate("/showcase")
+              }
+            >
+              View Projects
+            </LiquidGlassButton>
+
+          </div>
+        </div>
+      </div>
+
+      {/* =================================================
+          NAVIGATION DOTS
+          ================================================= */}
+
+      {videos.length > 1 && (
+        <div
+          className="
+            absolute
+            bottom-28
+            left-1/2
+            z-20
+            flex
+            -translate-x-1/2
+            gap-3
+          "
+        >
+          {videos.map(
+            (video, index) => (
+              <button
+                key={video.path}
+                onClick={() =>
+                  setCurrentVideo(index)
+                }
+                aria-label={`Go to video ${
+                  index + 1
+                }`}
+                className={`
+                  cursor-pointer
+                  rounded-full
+                  transition-all
+                  duration-500
+
+                  ${
+                    currentVideo === index
+                      ? "h-2.5 w-8 bg-white shadow-[0_0_12px_rgba(255,255,255,0.5)]"
+                      : "h-2.5 w-2.5 bg-white/40 hover:bg-white/70"
+                  }
+                `}
+              />
+            )
+          )}
+        </div>
+      )}
+
+      {/* =================================================
+          SCROLL INDICATOR
+          ================================================= */}
+
+      <motion.div
+        animate={{
+          y: [0, 10, 0],
+        }}
+        transition={{
+          repeat: Infinity,
+          duration: 3,
+        }}
+        className="
+          absolute
+          bottom-10
+          left-1/2
+          z-20
+          -translate-x-1/2
+        "
+      >
+        <div
+          className="
+            flex
+            h-12
+            w-7
+            justify-center
+            rounded-full
+            border
+            border-white/40
+            bg-white/[0.03]
+            backdrop-blur-sm
+          "
+        >
+          <div
+            className="
+              mt-2
+              h-3
+              w-1
+              rounded-full
+              bg-white
+            "
+          />
+        </div>
+      </motion.div>
+
+    </section>
+  );
+}
+
+export default Hero;
