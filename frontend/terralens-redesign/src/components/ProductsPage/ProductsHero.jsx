@@ -28,6 +28,7 @@ export default function ProductsHero() {
 
     loadSettings();
   }, []);
+
   const scrollToProducts = () => {
     document.getElementById("products-grid")?.scrollIntoView({
       behavior: "smooth",
@@ -65,7 +66,7 @@ export default function ProductsHero() {
             height: "100%",
             objectFit: "cover",
             objectPosition: "center",
-            opacity: 0.92,
+            opacity: 1,
             zIndex: 0,
           }}
         >
@@ -73,20 +74,23 @@ export default function ProductsHero() {
         </video>
       )}
 
-      {/* White Readability Overlay */}
+      {/* Subtle Video Color Overlay */}
 
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "linear-gradient(rgba(255,255,255,0.08), rgba(255,255,255,0.16))",
+            "linear-gradient(to bottom, rgba(14,165,233,0.06), rgba(255,255,255,0.02) 60%, rgba(255,255,255,0.08))",
           zIndex: 1,
         }}
       />
 
       {/* Background Glow */}
 
-      <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 2 }}>
+      <div
+        className="absolute inset-0 overflow-hidden pointer-events-none"
+        style={{ zIndex: 2 }}
+      >
         <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-white/[0.08] blur-[170px]" />
 
         <div className="absolute bottom-0 left-0 h-80 w-80 rounded-full bg-white/[0.05] blur-[140px]" />
@@ -229,11 +233,11 @@ export default function ProductsHero() {
       {/* Bottom Fade */}
 
       <div
-        className="absolute bottom-0 left-0 w-full h-64 pointer-events-none"
+        className="absolute bottom-0 left-0 w-full h-72 pointer-events-none"
         style={{
           zIndex: 5,
           background:
-            "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.25) 30%, rgba(255,255,255,0.7) 65%, #ffffff 100%)",
+            "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.05) 45%, rgba(255,255,255,0.35) 75%, #ffffff 100%)",
         }}
       />
     </section>
