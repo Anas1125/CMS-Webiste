@@ -4,8 +4,49 @@ import {
   Navigation,
   Building2,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getSettings } from "../../api/settings";
 
 export default function OfficeLocation() {
+  const [address, setAddress] = useState("");
+  const [googleMaps, setGoogleMaps] = useState("");
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const data = await getSettings();
+
+        setAddress(data?.address || "");
+        setGoogleMaps(data?.google_maps || "");
+      } catch (error) {
+        console.error(
+          "Failed to load office location settings:",
+          error
+        );
+      }
+    };
+
+    loadSettings();
+  }, []);
+
+  // Extract the actual URL if the CMS contains
+  // a complete Google Maps iframe HTML snippet.
+  const getGoogleMapsUrl = (value) => {
+    if (!value) return "";
+
+    const iframeMatch = value.match(
+      /<iframe[^>]+src=["']([^"']+)["']/i
+    );
+
+    if (iframeMatch) {
+      return iframeMatch[1];
+    }
+
+    return value.trim();
+  };
+
+  const googleMapsUrl = getGoogleMapsUrl(googleMaps);
+
   return (
     <section
       style={{
@@ -28,7 +69,6 @@ export default function OfficeLocation() {
           boxSizing: "border-box",
         }}
       >
-
         {/* Header */}
         <div
           style={{
@@ -89,8 +129,7 @@ export default function OfficeLocation() {
             boxSizing: "border-box",
           }}
         >
-
-          {/* Map Placeholder Card */}
+          {/* Map */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -102,80 +141,103 @@ export default function OfficeLocation() {
               border: "1px solid #e2e8f0",
               backgroundColor: "#ffffff",
               minHeight: "440px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
               position: "relative",
               overflow: "hidden",
               boxSizing: "border-box",
-              padding: "32px",
               boxShadow:
                 "0 12px 40px rgba(15,23,42,0.05)",
             }}
           >
-
-            {/* Background Grid Pattern */}
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                opacity: 0.5,
-                backgroundImage:
-                  "linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px)",
-                backgroundSize: "40px 40px",
-                pointerEvents: "none",
-              }}
-            />
-
-            <div
-              style={{
-                textAlign: "center",
-                position: "relative",
-                zIndex: 10,
-                maxWidth: "28rem",
-              }}
-            >
-              <div
+            {googleMapsUrl ? (
+              <iframe
+                src={googleMapsUrl}
+                title="TerraLens Office Location"
+                width="100%"
+                height="100%"
                 style={{
-                  display: "inline-flex",
-                  padding: "20px",
-                  borderRadius: "50%",
-                  backgroundColor:
-                    "rgba(14, 165, 233, 0.08)",
-                  border:
-                    "1px solid rgba(14, 165, 233, 0.2)",
-                  marginBottom: "20px",
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  border: "none",
                 }}
-              >
-                <MapPinned
-                  className="text-sky-500"
-                  size={48}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            ) : (
+              <>
+                {/* Background Grid Pattern */}
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    opacity: 0.5,
+                    backgroundImage:
+                      "linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px)",
+                    backgroundSize: "40px 40px",
+                    pointerEvents: "none",
+                  }}
                 />
-              </div>
 
-              <h3
-                style={{
-                  fontSize: "1.75rem",
-                  fontWeight: "700",
-                  color: "#0f172a",
-                  marginBottom: "12px",
-                  letterSpacing: "-0.025em",
-                }}
-              >
-                Interactive Map
-              </h3>
+                <div
+                  style={{
+                    textAlign: "center",
+                    position: "relative",
+                    zIndex: 10,
+                    maxWidth: "28rem",
+                    padding: "32px",
+                    margin: "auto",
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxSizing: "border-box",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "inline-flex",
+                      padding: "20px",
+                      borderRadius: "50%",
+                      backgroundColor:
+                        "rgba(14, 165, 233, 0.08)",
+                      border:
+                        "1px solid rgba(14, 165, 233, 0.2)",
+                      marginBottom: "20px",
+                    }}
+                  >
+                    <MapPinned
+                      className="text-sky-500"
+                      size={48}
+                    />
+                  </div>
 
-              <p
-                style={{
-                  color: "#64748b",
-                  fontSize: "0.95rem",
-                  lineHeight: "1.6",
-                }}
-              >
-                Google Maps integration will be added here
-                once the office location is finalized.
-              </p>
-            </div>
+                  <h3
+                    style={{
+                      fontSize: "1.75rem",
+                      fontWeight: "700",
+                      color: "#0f172a",
+                      marginBottom: "12px",
+                      letterSpacing: "-0.025em",
+                    }}
+                  >
+                    Interactive Map
+                  </h3>
+
+                  <p
+                    style={{
+                      color: "#64748b",
+                      fontSize: "0.95rem",
+                      lineHeight: "1.6",
+                    }}
+                  >
+                    Add your Google Maps location from the
+                    admin settings to display the map here.
+                  </p>
+                </div>
+              </>
+            )}
           </motion.div>
 
           {/* Office Details Stack */}
@@ -187,7 +249,6 @@ export default function OfficeLocation() {
               boxSizing: "border-box",
             }}
           >
-
             {/* Office */}
             <div
               style={{
@@ -238,12 +299,13 @@ export default function OfficeLocation() {
                   color: "#64748b",
                   fontSize: "0.95rem",
                   lineHeight: "1.6",
+                  margin: 0,
                 }}
               >
                 TerraLens Innovations
                 <br />
                 <br />
-                Office address will be updated soon.
+                {address || "Office address will be updated soon."}
               </p>
             </div>
 
@@ -297,14 +359,39 @@ export default function OfficeLocation() {
                   color: "#64748b",
                   fontSize: "0.95rem",
                   lineHeight: "1.6",
+                  margin: 0,
                 }}
               >
-                Once our office location is published,
-                you'll be able to navigate directly using
-                Google Maps.
+                Find our office location and get directions
+                directly through Google Maps.
               </p>
-            </div>
 
+              {googleMapsUrl && (
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+                    address
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginTop: "18px",
+                    padding: "11px 18px",
+                    borderRadius: "10px",
+                    backgroundColor: "#0ea5e9",
+                    color: "#ffffff",
+                    textDecoration: "none",
+                    fontSize: "14px",
+                    fontWeight: "600",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  Open in Google Maps
+                </a>
+              )}
+            </div>
           </div>
         </div>
       </div>
