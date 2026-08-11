@@ -207,29 +207,6 @@ function Hero() {
   const hasVideo = Boolean(currentVideoUrl);
 
   // =====================================================
-  // BRIGHTNESS-AWARE SCRIM
-  //
-  // Bright/high-key clips (e.g. ocean, sky, VFX-heavy)
-  // need a stronger scrim than dark/moody clips to keep
-  // text and buttons legible. Falls back to a moderate
-  // default when a video hasn't been tagged yet.
-  //
-  // Tag videos in your media library with `is_bright: true`
-  // (or add any other field your CMS uses) to opt a clip
-  // into the stronger treatment.
-  // =====================================================
-
-  const isBrightVideo = Boolean(
-    videos[currentVideo]?.is_bright
-  );
-
-  const scrimStrength = !hasVideo
-    ? { top: 0, mid: 0, bottom: 0 }
-    : isBrightVideo
-    ? { top: 0.35, mid: 0.2, bottom: 0.55 }
-    : { top: 0.18, mid: 0.08, bottom: 0.35 };
-
-  // =====================================================
   // THEME
   // =====================================================
 
@@ -249,12 +226,6 @@ function Hero() {
     subtitleClass: hasVideo
       ? "text-gray-100"
       : "text-slate-600",
-
-    buttonTone: !hasVideo
-      ? "light"
-      : isBrightVideo
-      ? "dark"
-      : "dark",
   };
 
   // =====================================================
@@ -387,38 +358,21 @@ function Hero() {
 
       {/* =================================================
           READABILITY OVERLAY
-
-          Flat scrim across the whole frame. Strength is
-          driven by scrimStrength.top, which is boosted
-          for bright/high-key clips so text and glass
-          buttons stay legible regardless of which video
-          is currently playing.
           ================================================= */}
 
       {hasVideo && (
         <div
           className="
-            pointer-events-none
             absolute
             inset-0
             z-[1]
-            transition-opacity
-            duration-700
+            bg-black/[0.05]
           "
-          style={{
-            backgroundColor: `rgba(0,0,0,${scrimStrength.top})`,
-          }}
         />
       )}
 
       {/* =================================================
           DEPTH OVERLAY
-
-          Radial scrim centered on the content block (the
-          hero copy + buttons sit at ~50/45%), darkest
-          directly behind the text/buttons and easing out
-          toward the edges so the video itself still reads
-          clearly outside the content area.
           ================================================= */}
 
       {hasVideo && (
@@ -428,15 +382,11 @@ function Hero() {
             absolute
             inset-0
             z-[2]
-            transition-opacity
-            duration-700
+            bg-gradient-to-b
+            from-black/[0.10]
+            via-transparent
+            to-black/[0.15]
           "
-          style={{
-            background: `radial-gradient(ellipse 60% 55% at 50% 48%,
-              rgba(0,0,0,${scrimStrength.bottom}) 0%,
-              rgba(0,0,0,${scrimStrength.mid}) 55%,
-              rgba(0,0,0,0) 100%)`,
-          }}
         />
       )}
 
@@ -673,7 +623,11 @@ function Hero() {
             "
           >
             <LiquidGlassButton
-              tone={theme.buttonTone}
+              tone={
+                hasVideo
+                  ? "dark"
+                  : "light"
+              }
               variant="primary"
               onClick={() =>
                 navigate(
@@ -687,7 +641,11 @@ function Hero() {
             </LiquidGlassButton>
 
             <LiquidGlassButton
-              tone={theme.buttonTone}
+              tone={
+                hasVideo
+                  ? "dark"
+                  : "light"
+              }
               variant="secondary"
               onClick={() =>
                 navigate("/showcase")
@@ -772,7 +730,7 @@ function Hero() {
             rounded-full
             border
             border-white/40
-            bg-white/10
+            bg-white/[0.03]
             backdrop-blur-sm
           "
         >
