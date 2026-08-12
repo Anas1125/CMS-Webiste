@@ -797,6 +797,484 @@ export default function Settings() {
 
       </section>
 
+      {/* =====================================================
+          ABOUT PAGE
+      ===================================================== */}
+
+      <section style={sectionStyle}>
+
+        <h2 style={sectionTitle}>
+          About Page
+        </h2>
+
+        <p style={sectionDescription}>
+          Manage the content displayed on the About page.
+        </p>
+
+        <div style={gridStyle}>
+
+          {/* ABOUT LABEL */}
+
+          <div>
+            <label style={labelStyle}>
+              About Label
+            </label>
+
+            <input
+              name="about_label"
+              value={form.about_label || ""}
+              onChange={handleChange}
+              placeholder="ABOUT TERRALENS"
+              style={inputStyle}
+            />
+          </div>
+
+
+          {/* EXPERTISE LABEL */}
+
+          <div>
+            <label style={labelStyle}>
+              Expertise Label
+            </label>
+
+            <input
+              name="about_expertise_label"
+              value={form.about_expertise_label || ""}
+              onChange={handleChange}
+              placeholder="EXPERTISE"
+              style={inputStyle}
+            />
+          </div>
+
+
+          {/* EXPERTISE TITLE */}
+
+          <div>
+            <label style={labelStyle}>
+              Expertise Title
+            </label>
+
+            <input
+              name="about_expertise_title"
+              value={form.about_expertise_title || ""}
+              onChange={handleChange}
+              placeholder="GIS + IT"
+              style={inputStyle}
+            />
+          </div>
+
+
+          {/* PROJECT COUNT */}
+
+          <div>
+            <label style={labelStyle}>
+              Projects Count
+            </label>
+
+            <input
+              name="about_projects_count"
+              value={form.about_projects_count || ""}
+              onChange={handleChange}
+              placeholder="500+"
+              style={inputStyle}
+            />
+          </div>
+
+
+          {/* PROJECT LABEL */}
+
+          <div>
+            <label style={labelStyle}>
+              Projects Label
+            </label>
+
+            <input
+              name="about_projects_label"
+              value={form.about_projects_label || ""}
+              onChange={handleChange}
+              placeholder="PROJECTS"
+              style={inputStyle}
+            />
+          </div>
+
+
+          {/* CLIENT COUNT */}
+
+          <div>
+            <label style={labelStyle}>
+              Clients Count
+            </label>
+
+            <input
+              name="about_clients_count"
+              value={form.about_clients_count || ""}
+              onChange={handleChange}
+              placeholder="100+"
+              style={inputStyle}
+            />
+          </div>
+
+
+          {/* CLIENT LABEL */}
+
+          <div>
+            <label style={labelStyle}>
+              Clients Label
+            </label>
+
+            <input
+              name="about_clients_label"
+              value={form.about_clients_label || ""}
+              onChange={handleChange}
+              placeholder="CLIENTS"
+              style={inputStyle}
+            />
+          </div>
+
+        </div>
+
+
+        {/* ABOUT TITLE */}
+
+        <div style={{ marginTop: "24px" }}>
+
+          <label style={labelStyle}>
+            About Title
+          </label>
+
+          <textarea
+            name="about_title"
+            value={form.about_title || ""}
+            onChange={handleChange}
+            placeholder="Bridging Geospatial Intelligence & Digital Innovation"
+            rows={3}
+            style={textareaStyle}
+          />
+
+        </div>
+
+
+        {/* ABOUT DESCRIPTION */}
+
+        <div style={{ marginTop: "24px" }}>
+
+          <label style={labelStyle}>
+            About Description
+          </label>
+
+          <textarea
+            name="about_description"
+            value={form.about_description || ""}
+            onChange={handleChange}
+            placeholder="Enter your About page description..."
+            rows={6}
+            style={textareaStyle}
+          />
+
+        </div>
+
+
+        {/* EXPERTISE DESCRIPTION */}
+
+        <div style={{ marginTop: "24px" }}>
+
+          <label style={labelStyle}>
+            Expertise Description
+          </label>
+
+          <textarea
+            name="about_expertise_description"
+            value={form.about_expertise_description || ""}
+            onChange={handleChange}
+            placeholder="Remote Sensing, Artificial Intelligence, Enterprise Software, Cloud Infrastructure, Spatial Analytics & Web Platforms."
+            rows={5}
+            style={textareaStyle}
+          />
+
+        </div>
+
+      </section>
+
+        {/* =====================================================
+          CONTACT PAGE
+      ===================================================== */}
+
+      <section style={sectionStyle}>
+
+        <h2 style={sectionTitle}>
+          Contact Page
+        </h2>
+
+        <p style={sectionDescription}>
+          Manage the content and contact information displayed on the Contact page.
+        </p>
+
+        {/* CONTACT HERO */}
+
+        <div style={gridStyle}>
+
+          {/* CONTACT LABEL */}
+
+          <div>
+            <label style={labelStyle}>
+              Contact Label
+            </label>
+
+            <input
+              name="contact_label"
+              value={form.contact_label || ""}
+              onChange={handleChange}
+              placeholder="CONTACT"
+              style={inputStyle}
+            />
+          </div>
+
+          {/* CONTACT BUTTON */}
+
+          <div>
+            <label style={labelStyle}>
+              Contact Button Text
+            </label>
+
+            <input
+              name="contact_button_text"
+              value={form.contact_button_text || ""}
+              onChange={handleChange}
+              placeholder="Contact Us"
+              style={inputStyle}
+            />
+          </div>
+
+        </div>
+
+        {/* CONTACT TITLE */}
+
+        <div style={{ marginTop: "24px" }}>
+
+          <label style={labelStyle}>
+            Contact Title
+          </label>
+
+          <textarea
+            name="contact_title"
+            value={form.contact_title || ""}
+            onChange={handleChange}
+            placeholder="Let's Build Something Great"
+            rows={3}
+            style={textareaStyle}
+          />
+
+        </div>
+
+        {/* CONTACT DESCRIPTION */}
+
+        <div style={{ marginTop: "24px" }}>
+
+          <label style={labelStyle}>
+            Contact Description
+          </label>
+
+          <textarea
+            name="contact_subtitle"
+            value={form.contact_subtitle || ""}
+            onChange={handleChange}
+            placeholder="Whether you need GIS solutions, enterprise software, AI integration or consulting services, our team is ready to help turn your ideas into reality."
+            rows={5}
+            style={textareaStyle}
+          />
+
+        </div>
+
+        {/* =====================================================
+            SHOWCASE PAGE
+        ===================================================== */}
+
+        <section
+          style={{
+            ...sectionStyle,
+            marginTop: "28px",
+          }}
+        >
+
+          <h2 style={sectionTitle}>
+            Showcase Page
+          </h2>
+
+          <p style={sectionDescription}>
+            Manage the content displayed in the Showcase page hero section.
+          </p>
+
+          <div style={gridStyle}>
+
+            {/* SHOWCASE LABEL */}
+
+            <div>
+              <label style={labelStyle}>
+                Showcase Label
+              </label>
+
+              <input
+                name="showcase_label"
+                value={form.showcase_label || ""}
+                onChange={handleChange}
+                placeholder="OUR SHOWCASE"
+                style={inputStyle}
+              />
+            </div>
+
+            {/* BUTTON TEXT */}
+
+            <div>
+              <label style={labelStyle}>
+                Showcase Button Text
+              </label>
+
+              <input
+                name="showcase_button_text"
+                value={form.showcase_button_text || ""}
+                onChange={handleChange}
+                placeholder="Explore Projects"
+                style={inputStyle}
+              />
+            </div>
+
+          </div>
+
+          {/* SHOWCASE TITLE */}
+
+          <div style={{ marginTop: "24px" }}>
+
+            <label style={labelStyle}>
+              Showcase Title
+            </label>
+
+            <input
+              name="showcase_title"
+              value={form.showcase_title || ""}
+              onChange={handleChange}
+              placeholder="Featured Projects"
+              style={inputStyle}
+            />
+
+          </div>
+
+          {/* SHOWCASE DESCRIPTION */}
+
+          <div style={{ marginTop: "24px" }}>
+
+            <label style={labelStyle}>
+              Showcase Description
+            </label>
+
+            <textarea
+              name="showcase_subtitle"
+              value={form.showcase_subtitle || ""}
+              onChange={handleChange}
+              placeholder="Explore our latest work across GIS, IT, Artificial Intelligence, IoT, Cloud Computing and Cybersecurity solutions delivered for governments, enterprises and infrastructure projects."
+              rows={5}
+              style={textareaStyle}
+            />
+
+          </div>
+
+        </section>
+
+        {/* CONTACT INFORMATION */}
+
+        <div
+          style={{
+            marginTop: "28px",
+            paddingTop: "28px",
+            borderTop: "1px solid #e2e8f0",
+          }}
+        >
+
+          <h3
+            style={{
+              color: "#0f172a",
+              fontSize: "16px",
+              fontWeight: "700",
+              margin: "0 0 20px",
+            }}
+          >
+            Contact Information
+          </h3>
+
+          <div style={gridStyle}>
+
+            {/* EMAIL */}
+
+            <div>
+              <label style={labelStyle}>
+                Contact Email
+              </label>
+
+              <input
+                type="email"
+                name="email"
+                value={form.email || ""}
+                onChange={handleChange}
+                placeholder="info@terralens.com"
+                style={inputStyle}
+              />
+            </div>
+
+            {/* PHONE */}
+
+            <div>
+              <label style={labelStyle}>
+                Contact Phone
+              </label>
+
+              <input
+                name="phone"
+                value={form.phone || ""}
+                onChange={handleChange}
+                placeholder="+91 XXXXX XXXXX"
+                style={inputStyle}
+              />
+            </div>
+
+            {/* BUSINESS HOURS */}
+
+            <div>
+              <label style={labelStyle}>
+                Business Hours
+              </label>
+
+              <input
+                name="business_hours"
+                value={form.business_hours || ""}
+                onChange={handleChange}
+                placeholder="Mon - Fri • 9:00 AM - 6:00 PM"
+                style={inputStyle}
+              />
+            </div>
+
+          </div>
+
+          {/* LOCATION */}
+
+          <div style={{ marginTop: "24px" }}>
+
+            <label style={labelStyle}>
+              Contact Location
+            </label>
+
+            <textarea
+              name="address"
+              value={form.address || ""}
+              onChange={handleChange}
+              placeholder="Nagercoil, Tamil Nadu, India"
+              rows={3}
+              style={textareaStyle}
+            />
+
+          </div>
+
+        </div>
+
+      </section>
 
       {/* =====================================================
           PAGE BACKGROUND VIDEOS

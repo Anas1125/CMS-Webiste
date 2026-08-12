@@ -9,7 +9,11 @@ router = APIRouter()
 
 @router.get("/")
 def get_projects(db: Session = Depends(get_db)):
-    return db.query(models.Project).all()
+    return (
+        db.query(models.Project)
+        .order_by(models.Project.created_at.desc())
+        .all()
+    )
 
 
 @router.get("/{project_id}")

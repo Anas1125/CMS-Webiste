@@ -49,7 +49,6 @@ export default function ServiceTabs({
           sm:grid-cols-2
           lg:grid-cols-4
           gap-2
-          shadow-[0_15px_45px_rgba(15,23,42,0.08)]
         "
       >
 

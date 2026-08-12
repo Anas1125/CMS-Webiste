@@ -160,7 +160,7 @@ export default function ProductsHero() {
             md:text-6xl
             lg:text-7xl
             font-extrabold
-            text-black font-extrabold
+            text-white font-extrabold
             leading-tight
           "
         >
@@ -214,6 +214,7 @@ export default function ProductsHero() {
             hover:bg-sky-400
             hover:shadow-[0_0_35px_rgba(56,189,248,.35)]
             hover:-translate-y-1
+            cursor-pointer
           "
         >
           Explore Products

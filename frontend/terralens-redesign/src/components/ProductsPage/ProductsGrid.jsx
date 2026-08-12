@@ -3,8 +3,10 @@ import { getProducts } from "../../api/products";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function ProductGrid() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -544,33 +546,47 @@ export default function ProductGrid() {
 
             {/* Contact Button */}
 
-            <Link
-              to="/contact"
+            <motion.button
+              type="button"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "12px",
+                borderRadius: "9999px",
+                border: "1px solid rgba(14, 165, 233, 0.45)",
+                backgroundColor: "#EFF6FF",
+                backdropFilter: "blur(12px)",
+                padding: "16px 36px",
+                color: "#0284C7",
+                fontSize: "1rem",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                boxSizing: "border-box",
+              }}
+              onClick={() => navigate("/contact")}
               className="
-                inline-flex
-                items-center
-                justify-center
-                gap-3
-                rounded-full
-                bg-sky-500
-                px-8
-                py-4
-                text-base
-                font-bold
-                text-white
-                no-underline
-                transition-all
-                duration-300
-                hover:-translate-y-1
-                hover:bg-sky-400
-                hover:shadow-[0_12px_30px_rgba(14,165,233,0.25)]
+                group
+                hover:bg-sky-500
+                hover:text-white
+                hover:scale-105
+                hover:shadow-[0_0_25px_rgba(14,165,233,0.25)]
               "
             >
               Contact Us
 
-              <ArrowRight size={20} />
-
-            </Link>
+              <ArrowRight
+                size={18}
+                style={{
+                  transition: "transform 0.3s ease",
+                }}
+                className="group-hover:translate-x-1.5"
+              />
+            </motion.button>
 
           </div>
 

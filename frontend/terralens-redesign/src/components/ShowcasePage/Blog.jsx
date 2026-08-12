@@ -1,11 +1,37 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BlogModal from "./BlogModal";
 import { ArrowRight } from "lucide-react";
-import { blogs } from "../../data/blogs";
+import { getBlogs } from "../../api/blog";
 
 export default function Blog() {
   const [selectedBlog, setSelectedBlog] = useState(null);
+  const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadBlogs = async () => {
+      try {
+        const data = await getBlogs();
+
+        // Only show active blogs
+        const activeBlogs = data.filter(
+          (blog) => blog.is_active !== false
+        );
+
+        setBlogs(activeBlogs);
+      } catch (error) {
+        console.error(
+          "Failed to load blogs:",
+          error
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadBlogs();
+  }, []);
 
   return (
     <section
@@ -77,196 +103,268 @@ export default function Blog() {
           </p>
         </div>
 
+        {/* Loading */}
+
+        {loading && (
+          <p
+            style={{
+              color: "#64748b",
+              fontSize: "1rem",
+            }}
+          >
+            Loading blogs...
+          </p>
+        )}
+
+        {/* No Blogs */}
+
+        {!loading && blogs.length === 0 && (
+          <p
+            style={{
+              color: "#64748b",
+              fontSize: "1rem",
+            }}
+          >
+            No blog posts available.
+          </p>
+        )}
+
         {/* Blog Grid */}
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fit, minmax(340px, 1fr))",
-            gap: "36px",
-            width: "100%",
-            maxWidth: "75rem",
-            justifyContent: "center",
-            boxSizing: "border-box",
-          }}
-        >
-          {blogs.map((blog, index) => (
-            <motion.div
-              key={blog.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{
-                duration: 0.5,
-                delay: index * 0.05,
-              }}
-              whileHover={{ y: -6 }}
-              className="group"
-              style={{
-                backgroundColor: "#ffffff",
-                border: "1px solid #e2e8f0",
-                borderRadius: "32px",
-                display: "flex",
-                flexDirection: "column",
-                overflow: "hidden",
-                boxSizing: "border-box",
-                transition: "all 0.4s ease",
-                boxShadow:
-                  "0 10px 35px rgba(15,23,42,0.06)",
-              }}
-            >
+        {!loading && blogs.length > 0 && (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns:
+                "repeat(auto-fit, minmax(340px, 1fr))",
+              gap: "36px",
+              width: "100%",
+              maxWidth: "75rem",
+              justifyContent: "center",
+              boxSizing: "border-box",
+            }}
+          >
+            {blogs.map((blog, index) => {
 
-              {/* Image */}
+              const imageUrl =
+                blog.image?.startsWith("http")
+                  ? blog.image
+                  : `${import.meta.env.VITE_API_URL}${blog.image}`;
 
-              <div
-                style={{
-                  position: "relative",
-                  height: "240px",
-                  width: "100%",
-                  overflow: "hidden",
-                  backgroundColor: "#f8fafc",
-                  flexShrink: 0,
-                }}
-              >
-                <img
-                  src={blog.image}
-                  alt={blog.title}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    transition:
-                      "transform 0.7s ease",
+              return (
+                <motion.div
+                  key={blog.id}
+                  initial={{
+                    opacity: 0,
+                    y: 30,
                   }}
-                  className="group-hover:scale-110"
-                />
-              </div>
-
-              {/* Content */}
-
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  flex: 1,
-                  padding: "36px",
-                  boxSizing: "border-box",
-                  width: "100%",
-                }}
-              >
-
-                {/* Category + Date */}
-
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "100%",
-                    marginBottom: "18px",
+                  whileInView={{
+                    opacity: 1,
+                    y: 0,
                   }}
-                >
-                  <span
-                    style={{
-                      borderRadius: "9999px",
-                      border:
-                        "1px solid rgba(56,189,248,0.3)",
-                      backgroundColor:
-                        "rgba(56,189,248,0.08)",
-                      padding: "4px 14px",
-                      fontSize: "0.75rem",
-                      fontWeight: "600",
-                      color: "#0284c7",
-                    }}
-                  >
-                    {blog.category}
-                  </span>
-
-                  <span
-                    style={{
-                      fontSize: "0.875rem",
-                      color: "#64748b",
-                    }}
-                  >
-                    {blog.date}
-                  </span>
-                </div>
-
-                {/* Title */}
-
-                <h3
-                  style={{
-                    fontSize: "1.5rem",
-                    fontWeight: "700",
-                    color: "#0f172a",
-                    letterSpacing: "-0.025em",
-                    marginBottom: "16px",
-                    lineHeight: "1.3",
+                  viewport={{
+                    once: true,
                   }}
-                >
-                  {blog.title}
-                </h3>
-
-                {/* Excerpt */}
-
-                <p
-                  style={{
-                    color: "#64748b",
-                    fontSize: "1rem",
-                    lineHeight: "1.6",
-                    marginBottom: "28px",
-                    flex: 1,
+                  transition={{
+                    duration: 0.5,
+                    delay: index * 0.05,
                   }}
-                >
-                  {blog.excerpt}
-                </p>
-
-                {/* Read More */}
-
-                <div
+                  whileHover={{
+                    y: -6,
+                  }}
+                  className="group"
                   style={{
-                    paddingTop: "20px",
-                    marginTop: "auto",
-                    borderTop:
+                    backgroundColor: "#ffffff",
+                    border:
                       "1px solid #e2e8f0",
-                    width: "100%",
+                    borderRadius: "32px",
+                    display: "flex",
+                    flexDirection: "column",
+                    overflow: "hidden",
+                    boxSizing: "border-box",
+                    transition:
+                      "all 0.4s ease",
+                    boxShadow:
+                      "0 10px 35px rgba(15,23,42,0.06)",
                   }}
                 >
-                  <button
-                    onClick={() =>
-                      setSelectedBlog(blog)
-                    }
+
+                  {/* Image */}
+
+                  <div
                     style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      color: "#0284c7",
-                      fontWeight: "700",
-                      fontSize: "1rem",
-                      background: "transparent",
-                      border: "none",
-                      cursor: "pointer",
-                      padding: 0,
+                      position: "relative",
+                      height: "240px",
+                      width: "100%",
+                      overflow: "hidden",
+                      backgroundColor:
+                        "#f8fafc",
+                      flexShrink: 0,
                     }}
                   >
-                    Read More
+                    {blog.image && (
+                      <img
+                        src={imageUrl}
+                        alt={blog.title}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          transition:
+                            "transform 0.7s ease",
+                        }}
+                        className="group-hover:scale-110"
+                      />
+                    )}
+                  </div>
 
-                    <ArrowRight
-                      size={18}
+                  {/* Content */}
+
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      flex: 1,
+                      padding: "36px",
+                      boxSizing: "border-box",
+                      width: "100%",
+                    }}
+                  >
+
+                    {/* Category + Date */}
+
+                    <div
                       style={{
-                        transition:
-                          "transform 0.3s ease",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent:
+                          "space-between",
+                        width: "100%",
+                        marginBottom: "18px",
                       }}
-                      className="group-hover:translate-x-1"
-                    />
-                  </button>
-                </div>
+                    >
+                      <span
+                        style={{
+                          borderRadius:
+                            "9999px",
+                          border:
+                            "1px solid rgba(56,189,248,0.3)",
+                          backgroundColor:
+                            "rgba(56,189,248,0.08)",
+                          padding:
+                            "4px 14px",
+                          fontSize:
+                            "0.75rem",
+                          fontWeight: "600",
+                          color: "#0284c7",
+                        }}
+                      >
+                        {blog.category}
+                      </span>
 
-              </div>
-            </motion.div>
-          ))}
-        </div>
+                      <span
+                        style={{
+                          fontSize:
+                            "0.875rem",
+                          color: "#64748b",
+                        }}
+                      >
+                        {blog.date}
+                      </span>
+                    </div>
+
+                    {/* Title */}
+
+                    <h3
+                      style={{
+                        fontSize: "1.5rem",
+                        fontWeight: "700",
+                        color: "#0f172a",
+                        letterSpacing:
+                          "-0.025em",
+                        marginBottom:
+                          "16px",
+                        lineHeight: "1.3",
+                      }}
+                    >
+                      {blog.title}
+                    </h3>
+
+                    {/* Excerpt */}
+
+                    <p
+                      style={{
+                        color: "#64748b",
+                        fontSize: "1rem",
+                        lineHeight: "1.6",
+                        marginBottom:
+                          "28px",
+                        flex: 1,
+                      }}
+                    >
+                      {blog.excerpt}
+                    </p>
+
+                    {/* Read More */}
+
+                    <div
+                      style={{
+                        paddingTop: "20px",
+                        marginTop: "auto",
+                        borderTop:
+                          "1px solid #e2e8f0",
+                        width: "100%",
+                      }}
+                    >
+                      <button
+                        onClick={() =>
+                          setSelectedBlog({
+                            ...blog,
+
+                            // BlogModal currently expects
+                            // readTime, while backend uses
+                            // read_time.
+                            readTime:
+                              blog.read_time ||
+                              blog.readTime ||
+                              "",
+                          })
+                        }
+                        style={{
+                          display:
+                            "inline-flex",
+                          alignItems:
+                            "center",
+                          gap: "8px",
+                          color: "#0284c7",
+                          fontWeight: "700",
+                          fontSize: "1rem",
+                          background:
+                            "transparent",
+                          border: "none",
+                          cursor: "pointer",
+                          padding: 0,
+                        }}
+                      >
+                        Read More
+
+                        <ArrowRight
+                          size={18}
+                          style={{
+                            transition:
+                              "transform 0.3s ease",
+                          }}
+                          className="group-hover:translate-x-1"
+                        />
+                      </button>
+                    </div>
+
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
 
       </div>
 
@@ -274,8 +372,12 @@ export default function Blog() {
 
       <BlogModal
         blog={selectedBlog}
-        isOpen={selectedBlog !== null}
-        onClose={() => setSelectedBlog(null)}
+        isOpen={
+          selectedBlog !== null
+        }
+        onClose={() =>
+          setSelectedBlog(null)
+        }
       />
 
     </section>

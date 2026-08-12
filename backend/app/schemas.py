@@ -66,6 +66,24 @@ class SiteSettingsBase(BaseModel):
     hero_button_text: str | None = None
     hero_button_link: str | None = None
 
+    # =====================================================
+    # ABOUT
+    # =====================================================
+
+    about_label: str | None = None
+    about_title: str | None = None
+    about_description: str | None = None
+
+    about_expertise_label: str | None = None
+    about_expertise_title: str | None = None
+    about_expertise_description: str | None = None
+
+    about_projects_count: str | None = None
+    about_projects_label: str | None = None
+
+    about_clients_count: str | None = None
+    about_clients_label: str | None = None
+
     footer_text: str | None = None
 
     seo_title: str | None = None
@@ -77,11 +95,25 @@ class SiteSettingsBase(BaseModel):
 
     about_video: str | None = None
     about_videos: list[str] | None = None
+    
     services_video: str | None = None
+
     products_video: str | None = None
+
     showcase_video: str | None = None
+    showcase_label: str | None = None
+    showcase_title: str | None = None
+    showcase_subtitle: str | None = None
+    showcase_button_text: str | None = None
+
     careers_video: str | None = None
     contact_video: str | None = None
+
+    contact_label: str | None = None
+    contact_title: str | None = None
+    contact_subtitle: str | None = None
+    contact_button_text: str | None = None
+    business_hours: str | None = None
 
 
 class SiteSettingsUpdate(SiteSettingsBase):
@@ -163,6 +195,41 @@ class PartnerCreate(BaseModel):
 
 class PartnerResponse(PartnerCreate):
     id: int
+
+    class Config:
+        from_attributes = True
+
+class BlogCreate(BaseModel):
+    category: str
+    date: str
+    author: str
+    read_time: str
+
+    title: str
+    excerpt: str | None = None
+    content: str | None = None
+
+    image: str | None = None
+    is_active: bool = True
+
+
+class BlogResponse(BlogCreate):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class GalleryCreate(BaseModel):
+    title: str
+    category: str
+    image: str
+    is_active: bool = True
+
+
+class GalleryResponse(GalleryCreate):
+    id: int
+    created_at: datetime
 
     class Config:
         from_attributes = True

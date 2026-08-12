@@ -26,7 +26,7 @@ export default function ContactHero() {
   }, []);
 
   const backgroundVideo = settings?.contact_video
-    ? `http://127.0.0.1:8000${settings.contact_video}`
+    ? `${import.meta.env.VITE_API_URL}${settings.contact_video}`
     : null;
 
   const hasVideo = Boolean(backgroundVideo);
@@ -70,22 +70,22 @@ export default function ContactHero() {
     {
       icon: Mail,
       title: "Email",
-      value: "info@terralens.com",
+      value: settings?.email || "",
     },
     {
       icon: Phone,
       title: "Phone",
-      value: "+91 98765 43210",
+      value: settings?.phone || "",
     },
     {
       icon: MapPin,
       title: "Location",
-      value: "Nagercoil, India",
+      value: settings?.address || "",
     },
     {
       icon: Clock,
       title: "Business Hours",
-      value: "Mon - Fri • 9:00 AM - 6:00 PM",
+      value: settings?.business_hours || "",
     },
   ];
 
@@ -234,7 +234,7 @@ export default function ContactHero() {
             "
             style={{ color: theme.label }}
           >
-            CONTACT
+            {settings?.contact_label || "CONTACT"}
           </motion.p>
 
           <motion.h1
@@ -257,7 +257,7 @@ export default function ContactHero() {
             "
             style={{ color: theme.heading }}
           >
-            Let's Build
+            {settings?.contact_title || "Let's Build Something Great"}
 
             <span className="block" style={{ color: theme.label }}>
               Something Great
@@ -282,9 +282,8 @@ export default function ContactHero() {
             "
             style={{ color: theme.body }}
           >
-            Whether you need GIS solutions, enterprise software,
-            AI integration or consulting services, our team is
-            ready to help turn your ideas into reality.
+            {settings?.contact_subtitle ||
+            "Whether you need GIS solutions, enterprise software, AI integration or consulting services, our team is ready to help turn your ideas into reality."}
           </motion.p>
 
           <motion.button
@@ -314,9 +313,10 @@ export default function ContactHero() {
               hover:bg-sky-400
               hover:shadow-[0_0_35px_rgba(56,189,248,.35)]
               hover:-translate-y-1
+              cursor-pointer
             "
           >
-            Contact Us
+            {settings?.contact_button_text || "Contact Us"}
 
             <ArrowDown
               className="ml-3"
@@ -427,8 +427,9 @@ export default function ContactHero() {
           bottom: 0,
           left: 0,
           width: "100%",
-          height: "220px",
-          background: theme.bottomFade,
+          height: "180px",
+          background:
+            "linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 35%, rgba(255,255,255,0.6) 75%, #ffffff 100%)",
           pointerEvents: "none",
           zIndex: 20,
         }}

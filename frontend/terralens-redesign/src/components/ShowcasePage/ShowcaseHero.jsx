@@ -20,7 +20,7 @@ export default function ShowcaseHero() {
   }, []);
 
   const backgroundVideo = settings?.showcase_video
-    ? `http://127.0.0.1:8000${settings.showcase_video}`
+    ? `${import.meta.env.VITE_API_URL}${settings.showcase_video}`
     : null;
 
   const hasVideo = Boolean(backgroundVideo);
@@ -39,7 +39,7 @@ export default function ShowcaseHero() {
       ? "rgba(255,255,255,.2)"
       : "rgba(15,23,42,0.07)",
     bottomFade: hasVideo
-      ? "linear-gradient(to bottom, transparent 0%, rgba(5,5,5,0.3) 35%, rgba(5,5,5,0.8) 70%, #050505 90%, #ffffff 100%)"
+      ? "linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 35%, rgba(255,255,255,0.6) 75%, #ffffff 100%)"
       : "linear-gradient(to bottom, rgba(255,255,255,0), #ffffff)",
   };
 
@@ -238,7 +238,7 @@ export default function ShowcaseHero() {
           "
           style={{ color: theme.label }}
         >
-          OUR SHOWCASE
+          {settings?.showcase_label || "OUR SHOWCASE"}
         </motion.p>
 
         <motion.h1
@@ -266,7 +266,7 @@ export default function ShowcaseHero() {
           "
           style={{ color: theme.heading }}
         >
-          Featured Projects
+          {settings?.showcase_title || "Featured Projects"}
         </motion.h1>
 
         <motion.p
@@ -293,9 +293,8 @@ export default function ShowcaseHero() {
           "
           style={{ color: theme.body }}
         >
-          Explore our latest work across GIS, IT, Artificial Intelligence,
-          IoT, Cloud Computing and Cybersecurity solutions delivered for
-          governments, enterprises and infrastructure projects.
+          {settings?.showcase_subtitle ||
+            "Explore our latest work across GIS, IT, Artificial Intelligence, IoT, Cloud Computing and Cybersecurity solutions delivered for governments, enterprises and infrastructure projects."}
         </motion.p>
 
         <motion.button
@@ -335,7 +334,7 @@ export default function ShowcaseHero() {
             border: "none",
           }}
         >
-          Explore Projects
+          {settings?.showcase_button_text || "Explore Projects"}
 
           <ArrowDown
             size={22}

@@ -33,7 +33,6 @@ function SmoothBackgroundVideo({ sources }) {
   const transitioning = useRef(false);
   const currentIndex = useRef(0);
 
-  // Only one clip: let the browser loop it natively.
   const singleSource = sources.length <= 1;
 
   /* -------------------------------------------------------
@@ -86,15 +85,17 @@ function SmoothBackgroundVideo({ sources }) {
   const crossfade = () => {
     if (transitioning.current) return;
 
-    // Nothing to crossfade to — just restart this clip so it loops.
     if (sources.length < 2) {
       const current =
-        activeVideo === "a" ? videoA.current : videoB.current;
+        activeVideo === "a"
+          ? videoA.current
+          : videoB.current;
 
       if (current) {
         current.currentTime = 0;
         current.play().catch(() => {});
       }
+
       return;
     }
 
@@ -167,10 +168,9 @@ function SmoothBackgroundVideo({ sources }) {
     }
   };
 
-  // Fallback safety net: if `ended` fires before the timeupdate
-  // threshold catches it (e.g. tab was backgrounded), force a restart.
   const handleEnded = (event) => {
     const video = event.currentTarget;
+
     video.currentTime = 0;
     video.play().catch(() => {});
   };
@@ -189,9 +189,7 @@ function SmoothBackgroundVideo({ sources }) {
         pointerEvents: "none",
       }}
     >
-      {/* =====================================================
-          VIDEO A
-          ===================================================== */}
+      {/* VIDEO A */}
 
       <video
         ref={videoA}
@@ -215,9 +213,7 @@ function SmoothBackgroundVideo({ sources }) {
         }}
       />
 
-      {/* =====================================================
-          VIDEO B
-          ===================================================== */}
+      {/* VIDEO B */}
 
       <video
         ref={videoB}
@@ -240,16 +236,7 @@ function SmoothBackgroundVideo({ sources }) {
         }}
       />
 
-      {/* =====================================================
-          READABILITY SCRIM
-
-          The video is the star here — this should barely be
-          visible. A dark (not white) scrim, weighted to the left
-          where the heading/body copy sit, gives just enough
-          contrast for the white text without milking out the
-          footage. The right side, behind the glass card, is left
-          almost untouched so the video reads clearly through it.
-          ===================================================== */}
+      {/* READABILITY SCRIM */}
 
       <div
         style={{
@@ -262,9 +249,8 @@ function SmoothBackgroundVideo({ sources }) {
         }}
       />
 
-      {/* thin dark scrim at the very bottom only, so the section's
-          bottom fade has something to blend from without touching
-          the rest of the video */}
+      {/* BOTTOM SCRIM */}
+
       <div
         style={{
           position: "absolute",
@@ -279,7 +265,6 @@ function SmoothBackgroundVideo({ sources }) {
   );
 }
 
-
 /* =========================================================
    ABOUT HERO
    ========================================================= */
@@ -287,8 +272,7 @@ function SmoothBackgroundVideo({ sources }) {
 export default function AboutHero() {
   const navigate = useNavigate();
 
-  const [settings, setSettings] =
-    useState(null);
+  const [settings, setSettings] = useState(null);
 
   /* =======================================================
      LOAD CMS SETTINGS
@@ -322,7 +306,7 @@ export default function AboutHero() {
       return path;
     }
 
-    return `http://127.0.0.1:8000${path}`;
+    return `${import.meta.env.VITE_API_URL}${path}`;
   };
 
   /* =======================================================
@@ -348,57 +332,142 @@ export default function AboutHero() {
   const hasVideo = backgroundVideos.length > 0;
 
   /* =======================================================
-     THEME — light section when there's no video, dark/video
-     theme when there is
+     DYNAMIC ABOUT CONTENT
+     ======================================================= */
+
+  const aboutLabel =
+    settings?.about_label ||
+    "ABOUT TERRALENS";
+
+  const aboutTitle =
+    settings?.about_title ||
+    "Bridging Geospatial Intelligence & Digital Innovation";
+
+  const aboutDescription =
+    settings?.about_description ||
+    "Terralens Innovations Private Limited empowers governments, enterprises and research institutions with precision-driven GIS, AI and software engineering solutions that transform complex spatial data into intelligent business decisions.";
+
+  const expertiseLabel =
+    settings?.about_expertise_label ||
+    "EXPERTISE";
+
+  const expertiseTitle =
+    settings?.about_expertise_title ||
+    "GIS + IT";
+
+  const expertiseDescription =
+    settings?.about_expertise_description ||
+    "Remote Sensing, Artificial Intelligence, Enterprise Software, Cloud Infrastructure, Spatial Analytics & Web Platforms.";
+
+  const projectsCount =
+    settings?.about_projects_count ||
+    "500+";
+
+  const projectsLabel =
+    settings?.about_projects_label ||
+    "PROJECTS";
+
+  const clientsCount =
+    settings?.about_clients_count ||
+    "100+";
+
+  const clientsLabel =
+    settings?.about_clients_label ||
+    "CLIENTS";
+
+  /* =======================================================
+     THEME
      ======================================================= */
 
   const theme = {
-    sectionBg: hasVideo ? "#050505" : "#ffffff",
-    label: hasVideo ? "#38bdf8" : "#0ea5e9",
-    heading: hasVideo ? "#ffffff" : "#0f172a",
-    body: hasVideo ? "#d1d5db" : "#475569",
+    sectionBg: hasVideo
+      ? "#050505"
+      : "#ffffff",
+
+    label: hasVideo
+      ? "#38bdf8"
+      : "#0ea5e9",
+
+    heading: hasVideo
+      ? "#ffffff"
+      : "#0f172a",
+
+    body: hasVideo
+      ? "#d1d5db"
+      : "#475569",
+
     gridLine: hasVideo
       ? "rgba(255,255,255,.2)"
       : "rgba(15,23,42,0.07)",
+
     contactBg: hasVideo
       ? "rgba(255,255,255,0.05)"
       : "rgba(15,23,42,0.03)",
+
     contactBorder: hasVideo
       ? "rgba(255,255,255,0.2)"
       : "rgba(15,23,42,0.3)",
-    contactText: hasVideo ? "#ffffff" : "#0f172a",
+
+    contactText: hasVideo
+      ? "#ffffff"
+      : "#0f172a",
+
     contactHoverClass: hasVideo
       ? "hover:border-sky-400/50 hover:bg-sky-500/10 hover:text-sky-400 hover:-translate-y-0.5 group"
       : "hover:border-sky-500/50 hover:bg-sky-500/5 hover:text-sky-600 hover:-translate-y-0.5 group",
+
     cardBg: hasVideo
       ? "rgba(17,17,19,0.12)"
       : "rgba(255,255,255,0.5)",
+
     cardBorder: hasVideo
       ? "1px solid rgba(255,255,255,0.15)"
       : "1px solid rgba(15,23,42,0.10)",
+
     cardShadow: hasVideo
       ? "0 20px 80px -20px rgba(14,165,233,0.15)"
       : "0 20px 60px rgba(15,23,42,0.08)",
-    cardHeading: hasVideo ? "#ffffff" : "#0f172a",
-    cardBody: hasVideo ? "#d1d5db" : "#475569",
+
+    cardHeading: hasVideo
+      ? "#ffffff"
+      : "#0f172a",
+
+    cardBody: hasVideo
+      ? "#d1d5db"
+      : "#475569",
+
+    bottomFade: hasVideo
+      ? "linear-gradient(to bottom, transparent, rgba(5,5,5,0.9))"
+      : "linear-gradient(to bottom, transparent, #ffffff)",
+
+    headingShadow: hasVideo
+      ? "0 4px 24px rgba(0,0,0,0.45)"
+      : "none",
+
+    cardTopHighlight: hasVideo
+      ? "rgba(255,255,255,0.25)"
+      : "rgba(14,165,233,0.2)",
+
+    cardDivider: hasVideo
+      ? "rgba(255,255,255,0.15)"
+      : "rgba(15,23,42,0.1)",
+
+    statLabel: hasVideo
+      ? "#d1d5db"
+      : "#475569",
   };
+
   /* =======================================================
      PAGE
      ======================================================= */
 
   return (
-    <section className="w-full"
+    <section
+      className="w-full"
       style={{
         position: "relative",
         overflow: "hidden",
-
-        /*
-          Fallback base so the section never looks broken while
-          the video loads or if it fails — this reads as a dark
-          navy, not white, so text stays legible either way.
-        */
         backgroundColor: theme.sectionBg,
-
         width: "100%",
         minHeight: "760px",
         padding: "128px 0 96px 0",
@@ -417,14 +486,8 @@ export default function AboutHero() {
         />
       )}
 
-
       {/* =================================================
           WHITE ATMOSPHERIC GLOW
-
-          Only for the plain (no-video) light section — on the
-          video path these two large blurred blobs were spreading
-          a soft white haze across most of the footage and were
-          the main reason it looked washed out.
           ================================================= */}
 
       {!hasVideo && (
@@ -466,7 +529,6 @@ export default function AboutHero() {
         </div>
       )}
 
-
       {/* =================================================
           VERY LIGHT GRID
           ================================================= */}
@@ -483,25 +545,6 @@ export default function AboutHero() {
         }}
       />
 
-
-      {/* =================================================
-          BOTTOM FADE
-          ================================================= */}
-
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          height: "24px",
-          background: theme.bottomFade,
-          pointerEvents: "none",
-          zIndex: 6,
-        }}
-      />
-
-
       {/* =================================================
           MAIN CONTENT
           ================================================= */}
@@ -515,7 +558,8 @@ export default function AboutHero() {
           margin: "0 auto",
           padding: "0 24px",
           display: "grid",
-          gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
+          gridTemplateColumns:
+            "minmax(0, 1fr) minmax(0, 1fr)",
           alignItems: "center",
           gap: "64px",
           boxSizing: "border-box",
@@ -549,16 +593,18 @@ export default function AboutHero() {
               color: theme.label,
             }}
           >
-            ABOUT TERRALENS
+            {aboutLabel}
           </motion.p>
-
 
           {/* HEADING */}
 
           <motion.h1
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.6 }}
+            transition={{
+              delay: 0.1,
+              duration: 0.6,
+            }}
             style={{
               margin: 0,
               fontSize: "clamp(2.7rem, 4.2vw, 4.2rem)",
@@ -569,37 +615,18 @@ export default function AboutHero() {
               textShadow: theme.headingShadow,
             }}
           >
-            Bridging
-
-            <span
-              style={{
-                display: "block",
-                color: theme.label,
-                marginTop: "4px",
-              }}
-            >
-              Geospatial
-            </span>
-
-            Intelligence &
-
-            <span
-              style={{
-                display: "block",
-                marginTop: "4px",
-              }}
-            >
-              Digital Innovation
-            </span>
+            {aboutTitle}
           </motion.h1>
-
 
           {/* DESCRIPTION */}
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25, duration: 0.6 }}
+            transition={{
+              delay: 0.25,
+              duration: 0.6,
+            }}
             style={{
               margin: 0,
               marginTop: "32px",
@@ -610,18 +637,8 @@ export default function AboutHero() {
               color: theme.body,
             }}
           >
-            Terralens Innovations
-            Private Limited empowers
-            governments, enterprises
-            and research institutions
-            with precision-driven GIS,
-            AI and software engineering
-            solutions that transform
-            complex spatial data into
-            intelligent business
-            decisions.
+            {aboutDescription}
           </motion.p>
-
 
           {/* =================================================
               BUTTONS
@@ -630,7 +647,10 @@ export default function AboutHero() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
+            transition={{
+              delay: 0.4,
+              duration: 0.6,
+            }}
             style={{
               display: "flex",
               alignItems: "center",
@@ -639,11 +659,10 @@ export default function AboutHero() {
               marginTop: "44px",
             }}
           >
-            {/* =================================================
-                EXPLORE - SOLID BLUE
-                ================================================= */}
+            {/* EXPLORE */}
 
             <button
+              type="button"
               onClick={() => navigate("/services")}
               style={{
                 display: "inline-flex",
@@ -659,7 +678,8 @@ export default function AboutHero() {
                 fontWeight: "700",
                 cursor: "pointer",
                 transition: "all 0.3s ease",
-                boxShadow: "0 10px 30px rgba(14,165,233,0.35)",
+                boxShadow:
+                  "0 10px 30px rgba(14,165,233,0.35)",
               }}
               className="
                 hover:bg-sky-400
@@ -681,12 +701,10 @@ export default function AboutHero() {
               />
             </button>
 
-
-            {/* =================================================
-                CONTACT - TRANSPARENT
-                ================================================= */}
+            {/* CONTACT */}
 
             <button
+              type="button"
               onClick={() => navigate("/contact")}
               style={{
                 display: "inline-flex",
@@ -721,7 +739,6 @@ export default function AboutHero() {
           </motion.div>
         </div>
 
-
         {/* =================================================
             RIGHT GLASS CARD
             ================================================= */}
@@ -729,19 +746,16 @@ export default function AboutHero() {
         <motion.div
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.25, duration: 0.7 }}
+          transition={{
+            delay: 0.25,
+            duration: 0.7,
+          }}
           style={{
             position: "relative",
             width: "100%",
             minHeight: "500px",
             padding: "42px",
             borderRadius: "40px",
-
-            /*
-              Genuinely transparent glass: low-alpha white fill,
-              thin light border, small blur so the video reads
-              clearly through it instead of washing it out.
-            */
             background: theme.cardBg,
             border: theme.cardBorder,
             backdropFilter: "blur(2px)",
@@ -760,11 +774,11 @@ export default function AboutHero() {
               left: "8%",
               right: "8%",
               height: "1px",
-              background: theme.cardTopHighlight,
+              background:
+                theme.cardTopHighlight,
               pointerEvents: "none",
             }}
           />
-
 
           {/* ICON */}
 
@@ -776,14 +790,18 @@ export default function AboutHero() {
               alignItems: "center",
               justifyContent: "center",
               borderRadius: "18px",
-              background: "rgba(14,165,233,0.15)",
-              border: "1px solid rgba(56,189,248,0.35)",
+              background:
+                "rgba(14,165,233,0.15)",
+              border:
+                "1px solid rgba(56,189,248,0.35)",
               marginBottom: "28px",
             }}
           >
-            <Globe size={26} className="text-sky-400" />
+            <Globe
+              size={26}
+              className="text-sky-400"
+            />
           </div>
-
 
           {/* EXPERTISE */}
 
@@ -798,24 +816,23 @@ export default function AboutHero() {
               fontWeight: "700",
             }}
           >
-            EXPERTISE
+            {expertiseLabel}
           </p>
-
 
           {/* GIS + IT */}
 
           <h2
             style={{
               margin: 0,
-              fontSize: "clamp(2.2rem, 3vw, 3rem)",
+              fontSize:
+                "clamp(2.2rem, 3vw, 3rem)",
               fontWeight: "800",
               letterSpacing: "-0.04em",
               color: theme.cardHeading,
             }}
           >
-            GIS + IT
+            {expertiseTitle}
           </h2>
-
 
           {/* DESCRIPTION */}
 
@@ -830,14 +847,8 @@ export default function AboutHero() {
               fontWeight: "500",
             }}
           >
-            Remote Sensing,
-            Artificial Intelligence,
-            Enterprise Software,
-            Cloud Infrastructure,
-            Spatial Analytics &
-            Web Platforms.
+            {expertiseDescription}
           </p>
-
 
           {/* DIVIDER */}
 
@@ -850,13 +861,13 @@ export default function AboutHero() {
             }}
           />
 
-
           {/* STATS */}
 
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+              gridTemplateColumns:
+                "repeat(2, minmax(0, 1fr))",
               gap: "30px",
             }}
           >
@@ -878,11 +889,16 @@ export default function AboutHero() {
                   alignItems: "center",
                   justifyContent: "center",
                   borderRadius: "17px",
-                  background: "rgba(14,165,233,0.15)",
-                  border: "1px solid rgba(56,189,248,0.35)",
+                  background:
+                    "rgba(14,165,233,0.15)",
+                  border:
+                    "1px solid rgba(56,189,248,0.35)",
                 }}
               >
-                <MapPinned size={23} className="text-sky-400" />
+                <MapPinned
+                  size={23}
+                  className="text-sky-400"
+                />
               </div>
 
               <div>
@@ -895,7 +911,7 @@ export default function AboutHero() {
                     fontWeight: "800",
                   }}
                 >
-                  500+
+                  {projectsCount}
                 </h3>
 
                 <p
@@ -909,11 +925,10 @@ export default function AboutHero() {
                     letterSpacing: "1px",
                   }}
                 >
-                  PROJECTS
+                  {projectsLabel}
                 </p>
               </div>
             </div>
-
 
             {/* CLIENTS */}
 
@@ -933,11 +948,16 @@ export default function AboutHero() {
                   alignItems: "center",
                   justifyContent: "center",
                   borderRadius: "17px",
-                  background: "rgba(14,165,233,0.15)",
-                  border: "1px solid rgba(56,189,248,0.35)",
+                  background:
+                    "rgba(14,165,233,0.15)",
+                  border:
+                    "1px solid rgba(56,189,248,0.35)",
                 }}
               >
-                <Globe size={23} className="text-sky-400" />
+                <Globe
+                  size={23}
+                  className="text-sky-400"
+                />
               </div>
 
               <div>
@@ -950,7 +970,7 @@ export default function AboutHero() {
                     fontWeight: "800",
                   }}
                 >
-                  100+
+                  {clientsCount}
                 </h3>
 
                 <p
@@ -964,15 +984,25 @@ export default function AboutHero() {
                     letterSpacing: "1px",
                   }}
                 >
-                  CLIENTS
+                  {clientsLabel}
                 </p>
               </div>
             </div>
           </div>
         </motion.div>
       </div>
+
+      {/* FINAL WHITE FADE */}
+
       <div
-        className="absolute bottom-0 left-0 w-full h-72 pointer-events-none"
+        className="
+          absolute
+          bottom-0
+          left-0
+          w-full
+          h-72
+          pointer-events-none
+        "
         style={{
           zIndex: 5,
           background:

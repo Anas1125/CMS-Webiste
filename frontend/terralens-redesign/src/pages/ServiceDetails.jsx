@@ -83,7 +83,7 @@ export default function ServiceDetails() {
   const imageUrl = service.image
     ? service.image.startsWith("http")
       ? service.image
-      : `http://127.0.0.1:8000${service.image}`
+      : `${import.meta.env.VITE_API_URL}${service.image}`
     : null;
 
   return (

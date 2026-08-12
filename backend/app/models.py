@@ -109,11 +109,37 @@ class SiteSettings(Base):
     youtube = Column(String)
     twitter = Column(String)
 
+    # =====================================================
+    # HERO
+    # =====================================================
+
     hero_title = Column(String)
     hero_subtitle = Column(Text)
 
     hero_button_text = Column(String)
     hero_button_link = Column(String)
+
+    # =====================================================
+    # ABOUT
+    # =====================================================
+
+    about_label = Column(String)
+    about_title = Column(Text)
+    about_description = Column(Text)
+
+    about_expertise_label = Column(String)
+    about_expertise_title = Column(String)
+    about_expertise_description = Column(Text)
+
+    about_projects_count = Column(String)
+    about_projects_label = Column(String)
+
+    about_clients_count = Column(String)
+    about_clients_label = Column(String)
+
+    # =====================================================
+    # FOOTER / SEO
+    # =====================================================
 
     footer_text = Column(Text)
 
@@ -121,19 +147,38 @@ class SiteSettings(Base):
     seo_description = Column(Text)
     seo_keywords = Column(Text)
 
+    # =====================================================
+    # VIDEOS / MEDIA
+    # =====================================================
+
     hero_video = Column(String, nullable=True)
     statement_image = Column(String, nullable=True)
 
     about_video = Column(String, nullable=True)
+
     about_videos = Column(
-            Text,
-            nullable=True
-        )
+        Text,
+        nullable=True
+    )
+
     services_video = Column(String, nullable=True)
+    
     products_video = Column(String, nullable=True)
+
     showcase_video = Column(String, nullable=True)
+    showcase_label = Column(String, nullable=True)
+    showcase_title = Column(String, nullable=True)
+    showcase_subtitle = Column(Text, nullable=True)
+    showcase_button_text = Column(String, nullable=True)
+
     careers_video = Column(String, nullable=True)
     contact_video = Column(String, nullable=True)
+
+    contact_label = Column(String, nullable=True)
+    contact_title = Column(String, nullable=True)
+    contact_subtitle = Column(Text, nullable=True)
+    contact_button_text = Column(String, nullable=True)
+    business_hours = Column(String, nullable=True)
 
 
 class Project(Base):
@@ -207,6 +252,42 @@ class Partner(Base):
 
     type = Column(String, nullable=False)
     # "client" or "partner"
+
+    is_active = Column(Boolean, default=True)
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+class Gallery(Base):
+    __tablename__ = "gallery"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    category = Column(String, nullable=False)
+    image = Column(String, nullable=True)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+class Blog(Base):
+    __tablename__ = "blogs"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    category = Column(String, nullable=False)
+    date = Column(String, nullable=False)
+    author = Column(String, nullable=False)
+    read_time = Column(String, nullable=False)
+
+    title = Column(String, nullable=False)
+    excerpt = Column(Text, nullable=True)
+    content = Column(Text, nullable=True)
+
+    image = Column(String, nullable=True)
 
     is_active = Column(Boolean, default=True)
 

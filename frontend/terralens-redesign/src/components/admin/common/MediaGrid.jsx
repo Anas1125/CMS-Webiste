@@ -3,7 +3,13 @@ import { deleteMedia } from "../../../api/media";
 
 export default function MediaGrid({ files, onRefresh }) {
   const getMediaUrl = (file) => {
-    return `http://127.0.0.1:8000${file.path}`;
+    if (!file?.path) return "";
+
+    if (file.path.startsWith("http")) {
+      return file.path;
+    }
+
+    return `${import.meta.env.VITE_API_URL}${file.path}`;
   };
 
   const isVideo = (file) => {
@@ -27,7 +33,9 @@ export default function MediaGrid({ files, onRefresh }) {
   };
 
   const copyUrl = (file) => {
-    navigator.clipboard.writeText(getMediaUrl(file));
+    const mediaUrl = getMediaUrl(file);
+
+    navigator.clipboard.writeText(mediaUrl);
 
     alert("Copied URL!");
   };
@@ -61,9 +69,7 @@ export default function MediaGrid({ files, onRefresh }) {
               transition: "all 0.3s ease",
             }}
           >
-            {/* =====================================================
-                MEDIA PREVIEW
-            ===================================================== */}
+            {/* MEDIA PREVIEW */}
 
             <div
               style={{
@@ -100,9 +106,7 @@ export default function MediaGrid({ files, onRefresh }) {
               )}
             </div>
 
-            {/* =====================================================
-                FILE INFORMATION
-            ===================================================== */}
+            {/* FILE INFORMATION */}
 
             <div
               style={{
@@ -134,9 +138,7 @@ export default function MediaGrid({ files, onRefresh }) {
                 {file.folder}
               </p>
 
-              {/* =====================================================
-                  ACTIONS
-              ===================================================== */}
+              {/* ACTIONS */}
 
               <div
                 style={{
@@ -146,7 +148,7 @@ export default function MediaGrid({ files, onRefresh }) {
                   marginTop: "20px",
                 }}
               >
-                {/* View */}
+                {/* VIEW */}
 
                 <button
                   type="button"
@@ -170,7 +172,7 @@ export default function MediaGrid({ files, onRefresh }) {
                   <Eye size={18} />
                 </button>
 
-                {/* Copy URL */}
+                {/* COPY URL */}
 
                 <button
                   type="button"
@@ -192,7 +194,7 @@ export default function MediaGrid({ files, onRefresh }) {
                   <Copy size={18} />
                 </button>
 
-                {/* Delete */}
+                {/* DELETE */}
 
                 <button
                   type="button"

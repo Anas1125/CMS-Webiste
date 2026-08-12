@@ -487,7 +487,7 @@ export default function Products() {
                   src={
                     form.image.startsWith("http")
                       ? form.image
-                      : `http://127.0.0.1:8000${form.image}`
+                      : `${import.meta.env.VITE_API_URL}${form.image}`
                   }
                   alt="Product preview"
                   style={{
@@ -691,7 +691,7 @@ export default function Products() {
                       src={
                         product.image.startsWith("http")
                           ? product.image
-                          : `http://127.0.0.1:8000${product.image}`
+                          : `${import.meta.env.VITE_API_URL}${product.image}`
                       }
                       alt={product.name}
                       style={{

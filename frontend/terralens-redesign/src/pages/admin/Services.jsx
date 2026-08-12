@@ -378,7 +378,7 @@ export default function Services() {
                   src={
                     form.image.startsWith("http")
                       ? form.image
-                      : `http://127.0.0.1:8000${form.image}`
+                      : `${import.meta.env.VITE_API_URL}${form.image}`
                   }
                   alt="Selected service"
                   style={{
@@ -590,7 +590,7 @@ export default function Services() {
                             "http"
                           )
                             ? service.image
-                            : `http://127.0.0.1:8000${service.image}`
+                            : `${import.meta.env.VITE_API_URL}${service.image}`
                         }
                         alt={service.name}
                         style={{

@@ -26,7 +26,7 @@ export default function CareerHero() {
   }, []);
 
   const backgroundVideo = settings?.careers_video
-    ? `http://127.0.0.1:8000${settings.careers_video}`
+    ? `${import.meta.env.VITE_API_URL}${settings.careers_video}`
     : null;
 
   const hasVideo = Boolean(backgroundVideo);
@@ -314,6 +314,7 @@ export default function CareerHero() {
               hover:bg-sky-400
               hover:shadow-[0_0_35px_rgba(56,189,248,.35)]
               hover:-translate-y-1
+              cursor-pointer
             "
           >
             Explore Careers
@@ -410,19 +411,20 @@ export default function CareerHero() {
 
       </div>
 
-      {/* Bottom Video Fade */}
       <div
         style={{
           position: "absolute",
           bottom: 0,
           left: 0,
           width: "100%",
-          height: "220px",
-          background: theme.bottomFade,
+          height: "180px",
+          background:
+            "linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 35%, rgba(255,255,255,0.6) 75%, #ffffff 100%)",
           pointerEvents: "none",
           zIndex: 20,
         }}
       />
+
     </section>
   );
 }

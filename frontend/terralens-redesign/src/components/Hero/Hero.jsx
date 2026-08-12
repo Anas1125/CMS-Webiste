@@ -1,10 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import Button from "../ui/Button";
 import LiquidGlassButton from "../ui/LiquidGlassButton";
@@ -29,40 +26,24 @@ function Hero() {
         const data = await getMedia();
 
         const heroVideos = data.filter((file) => {
-          const filename =
-            file.filename?.toLowerCase() || "";
+          const filename = file.filename?.toLowerCase() || "";
 
           const isVideo =
-            file.mime_type
-              ?.toLowerCase()
-              .startsWith("video/") ||
-            /\.(mp4|webm|mov|avi|mkv)$/i.test(
-              filename
-            );
+            file.mime_type?.toLowerCase().startsWith("video/") ||
+            /\.(mp4|webm|mov|avi|mkv)$/i.test(filename);
 
-          return (
-            file.folder === "hero" &&
-            isVideo
-          );
+          return file.folder === "hero" && isVideo;
         });
 
-        const sortedVideos =
-          heroVideos.sort((a, b) =>
-            a.filename.localeCompare(
-              b.filename,
-              undefined,
-              {
-                numeric: true,
-              }
-            )
-          );
+        const sortedVideos = heroVideos.sort((a, b) =>
+          a.filename.localeCompare(b.filename, undefined, {
+            numeric: true,
+          })
+        );
 
         setVideos(sortedVideos);
       } catch (error) {
-        console.error(
-          "Failed to load hero videos:",
-          error
-        );
+        console.error("Failed to load hero videos:", error);
       }
     };
 
@@ -80,10 +61,7 @@ function Hero() {
 
         setSettings(data);
       } catch (error) {
-        console.error(
-          "Failed to load homepage settings:",
-          error
-        );
+        console.error("Failed to load homepage settings:", error);
       }
     };
 
@@ -105,27 +83,31 @@ function Hero() {
   };
 
   // =====================================================
-  // WORD-BY-WORD ANIMATION
+  // LETTER-BY-LETTER 3D REVEAL
   // =====================================================
 
-  const wordReveal = {
+  const letterReveal = {
     hidden: {
       opacity: 0,
-      x: 120,
-      y: -80,
-      rotate: 8,
-      scale: 0.96,
+      x: 35,
+      y: -15,
+      z: -180,
+      rotateY: 70,
+      rotateX: 10,
+      scale: 0.9,
     },
 
     visible: (delay = 0) => ({
       opacity: 1,
       x: 0,
       y: 0,
-      rotate: 0,
+      z: 0,
+      rotateY: 0,
+      rotateX: 0,
       scale: 1,
 
       transition: {
-        duration: 0.8,
+        duration: 0.9,
         delay,
         ease: [0.16, 1, 0.3, 1],
       },
@@ -142,10 +124,7 @@ function Hero() {
     }
 
     const interval = setInterval(() => {
-      setCurrentVideo(
-        (prev) =>
-          (prev + 1) % videos.length
-      );
+      setCurrentVideo((prev) => (prev + 1) % videos.length);
     }, 6000);
 
     return () => {
@@ -173,10 +152,7 @@ function Hero() {
   const nextVideo = () => {
     if (videos.length === 0) return;
 
-    setCurrentVideo(
-      (prev) =>
-        (prev + 1) % videos.length
-    );
+    setCurrentVideo((prev) => (prev + 1) % videos.length);
   };
 
   // =====================================================
@@ -187,9 +163,7 @@ function Hero() {
     if (videos.length === 0) return;
 
     setCurrentVideo((prev) =>
-      prev === 0
-        ? videos.length - 1
-        : prev - 1
+      prev === 0 ? videos.length - 1 : prev - 1
     );
   };
 
@@ -199,13 +173,10 @@ function Hero() {
 
   const currentVideoUrl =
     videos.length > 0
-      ? getVideoUrl(
-          videos[currentVideo]?.path
-        )
+      ? getVideoUrl(videos[currentVideo]?.path)
       : null;
 
-  const hasVideo =
-    Boolean(currentVideoUrl);
+  const hasVideo = Boolean(currentVideoUrl);
 
   // =====================================================
   // THEME
@@ -243,7 +214,6 @@ function Hero() {
         bg-white
       "
     >
-
       {/* =================================================
           BACKGROUND VIDEOS
           ================================================= */}
@@ -256,24 +226,19 @@ function Hero() {
             muted
             playsInline
             preload="auto"
-
             initial={{
               opacity: 0,
             }}
-
             animate={{
               opacity: 1,
             }}
-
             exit={{
               opacity: 0,
             }}
-
             transition={{
               duration: 1.5,
               ease: "easeInOut",
             }}
-
             className="
               absolute
               inset-0
@@ -282,12 +247,8 @@ function Hero() {
               w-full
               object-cover
             "
-
             onError={(error) => {
-              console.error(
-                "Hero video failed:",
-                error
-              );
+              console.error("Hero video failed:", error);
             }}
           >
             <source
@@ -368,8 +329,7 @@ function Hero() {
             position: "absolute",
             top: "50%",
             left: "2rem",
-            transform:
-              "translateY(-50%)",
+            transform: "translateY(-50%)",
             zIndex: 20,
           }}
         >
@@ -395,8 +355,7 @@ function Hero() {
             position: "absolute",
             top: "50%",
             right: "2rem",
-            transform:
-              "translateY(-50%)",
+            transform: "translateY(-50%)",
             zIndex: 20,
           }}
         >
@@ -434,14 +393,14 @@ function Hero() {
           "
           style={{
             perspective: "1000px",
+            perspectiveOrigin: "50% 50%",
           }}
         >
-
           {/* =================================================
               COMPANY NAME
               ================================================= */}
 
-          <div className="mb-6 overflow-hidden">
+          <div className="mb-6">
             <motion.p
               className={`
                 text-sm
@@ -450,35 +409,32 @@ function Hero() {
                 tracking-[8px]
                 ${theme.labelClass}
               `}
+              style={{
+                transformStyle: "preserve-3d",
+              }}
             >
-              {(
-                settings?.company_name ||
-                "TerraLens Innovations"
-              )
-                .split(/\s+/)
-                .map((word, index) => (
-                  <span
-                    key={`${word}-${index}`}
+              {(settings?.company_name ||
+                "TerraLens Innovations")
+                .split("")
+                .map((letter, index) => (
+                  <motion.span
+                    key={`${letter}-${index}`}
+                    custom={0.35 + index * 0.08}
+                    variants={letterReveal}
+                    initial="hidden"
+                    animate="visible"
                     className="
                       inline-block
-                      overflow-hidden
+                      will-change-transform
                     "
+                    style={{
+                      transformStyle: "preserve-3d",
+                      whiteSpace:
+                        letter === " " ? "pre" : "normal",
+                    }}
                   >
-                    <motion.span
-                      custom={
-                        index * 0.08
-                      }
-                      variants={wordReveal}
-                      initial="hidden"
-                      animate="visible"
-                      className="
-                        inline-block
-                        mr-[0.5em]
-                      "
-                    >
-                      {word}
-                    </motion.span>
-                  </span>
+                    {letter}
+                  </motion.span>
                 ))}
             </motion.p>
           </div>
@@ -487,7 +443,7 @@ function Hero() {
               TITLE
               ================================================= */}
 
-          <div className="overflow-hidden">
+          <div>
             <motion.h1
               className={`
                 text-6xl
@@ -498,39 +454,32 @@ function Hero() {
                 ${theme.headingClass}
               `}
               style={{
-                textShadow:
-                  theme.headingShadow,
+                textShadow: theme.headingShadow,
+                transformStyle: "preserve-3d",
               }}
             >
-              {(
-                settings?.hero_title ||
-                "TerraLens Homepage"
-              )
-                .split(/\s+/)
-                .map((word, index) => (
-                  <span
-                    key={`${word}-${index}`}
+              {(settings?.hero_title ||
+                "TerraLens Homepage")
+                .split("")
+                .map((letter, index) => (
+                  <motion.span
+                    key={`${letter}-${index}`}
+                    custom={0.35 + index * 0.045}
+                    variants={letterReveal}
+                    initial="hidden"
+                    animate="visible"
                     className="
                       inline-block
-                      overflow-hidden
+                      will-change-transform
                     "
+                    style={{
+                      transformStyle: "preserve-3d",
+                      whiteSpace:
+                        letter === " " ? "pre" : "normal",
+                    }}
                   >
-                    <motion.span
-                      custom={
-                        0.15 +
-                        index * 0.12
-                      }
-                      variants={wordReveal}
-                      initial="hidden"
-                      animate="visible"
-                      className="
-                        inline-block
-                        mr-[0.25em]
-                      "
-                    >
-                      {word}
-                    </motion.span>
-                  </span>
+                    {letter}
+                  </motion.span>
                 ))}
             </motion.h1>
           </div>
@@ -539,12 +488,7 @@ function Hero() {
               SUBTITLE
               ================================================= */}
 
-          <div
-            className="
-              mt-8
-              overflow-hidden
-            "
-          >
+          <div className="mt-8">
             <motion.p
               className={`
                 mx-auto
@@ -553,36 +497,32 @@ function Hero() {
                 leading-8
                 ${theme.subtitleClass}
               `}
+              style={{
+                transformStyle: "preserve-3d",
+              }}
             >
-              {(
-                settings?.hero_subtitle ||
-                "Hello From Terralens"
-              )
-                .split(/\s+/)
-                .map((word, index) => (
-                  <span
-                    key={`${word}-${index}`}
+              {(settings?.hero_subtitle ||
+                "Hello From Terralens")
+                .split("")
+                .map((letter, index) => (
+                  <motion.span
+                    key={`${letter}-${index}`}
+                    custom={1.15 + index * 0.025}
+                    variants={letterReveal}
+                    initial="hidden"
+                    animate="visible"
                     className="
                       inline-block
-                      overflow-hidden
+                      will-change-transform
                     "
+                    style={{
+                      transformStyle: "preserve-3d",
+                      whiteSpace:
+                        letter === " " ? "pre" : "normal",
+                    }}
                   >
-                    <motion.span
-                      custom={
-                        0.45 +
-                        index * 0.1
-                      }
-                      variants={wordReveal}
-                      initial="hidden"
-                      animate="visible"
-                      className="
-                        inline-block
-                        mr-[0.2em]
-                      "
-                    >
-                      {word}
-                    </motion.span>
-                  </span>
+                    {letter}
+                  </motion.span>
                 ))}
             </motion.p>
           </div>
@@ -599,15 +539,10 @@ function Hero() {
               gap-6
             "
           >
-
             {/* EXPLORE SOLUTIONS */}
 
             <LiquidGlassButton
-              tone={
-                hasVideo
-                  ? "dark"
-                  : "light"
-              }
+              tone={hasVideo ? "dark" : "light"}
               variant="primary"
               onClick={() =>
                 navigate(
@@ -623,19 +558,12 @@ function Hero() {
             {/* VIEW PROJECTS */}
 
             <LiquidGlassButton
-              tone={
-                hasVideo
-                  ? "dark"
-                  : "light"
-              }
+              tone={hasVideo ? "dark" : "light"}
               variant="secondary"
-              onClick={() =>
-                navigate("/showcase")
-              }
+              onClick={() => navigate("/showcase")}
             >
               View Projects
             </LiquidGlassButton>
-
           </div>
         </div>
       </div>
@@ -656,31 +584,24 @@ function Hero() {
             gap-3
           "
         >
-          {videos.map(
-            (video, index) => (
-              <button
-                key={video.path}
-                onClick={() =>
-                  setCurrentVideo(index)
+          {videos.map((video, index) => (
+            <button
+              key={video.path}
+              onClick={() => setCurrentVideo(index)}
+              aria-label={`Go to video ${index + 1}`}
+              className={`
+                cursor-pointer
+                rounded-full
+                transition-all
+                duration-500
+                ${
+                  currentVideo === index
+                    ? "h-2.5 w-8 bg-white shadow-[0_0_12px_rgba(255,255,255,0.5)]"
+                    : "h-2.5 w-2.5 bg-white/40 hover:bg-white/70"
                 }
-                aria-label={`Go to video ${
-                  index + 1
-                }`}
-                className={`
-                  cursor-pointer
-                  rounded-full
-                  transition-all
-                  duration-500
-
-                  ${
-                    currentVideo === index
-                      ? "h-2.5 w-8 bg-white shadow-[0_0_12px_rgba(255,255,255,0.5)]"
-                      : "h-2.5 w-2.5 bg-white/40 hover:bg-white/70"
-                  }
-                `}
-              />
-            )
-          )}
+              `}
+            />
+          ))}
         </div>
       )}
 
@@ -728,7 +649,6 @@ function Hero() {
           />
         </div>
       </motion.div>
-
     </section>
   );
 }

@@ -28,7 +28,7 @@ export default function ServicesHero() {
   }, []);
 
   const backgroundVideo = settings?.services_video
-    ? `http://127.0.0.1:8000${settings.services_video}`
+    ? `${import.meta.env.VITE_API_URL}${settings.services_video}`
     : null;
 
   const hasVideo = Boolean(backgroundVideo);

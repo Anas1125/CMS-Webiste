@@ -1,19 +1,69 @@
-import { useState } from "react";
-import { gallery } from "../../data/gallery";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
-
-const categories = [
-  "All",
-  "Office",
-  "Fieldwork",
-  "Events",
-  "Projects",
-];
+import {
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import api from "../../api/client";
 
 export default function Gallery() {
+  const [gallery, setGallery] = useState([]);
   const [activeCategory, setActiveCategory] = useState("All");
   const [selectedImage, setSelectedImage] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // =====================================================
+  // LOAD GALLERY FROM BACKEND
+  // =====================================================
+
+  useEffect(() => {
+    const loadGallery = async () => {
+      try {
+        const { data } = await api.get("/gallery/");
+
+        setGallery(data);
+      } catch (error) {
+        console.error("Failed to load gallery:", error);
+        setGallery([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadGallery();
+  }, []);
+
+  // =====================================================
+  // IMAGE URL
+  // =====================================================
+
+  const getImageUrl = (image) => {
+    if (!image) return "";
+
+    if (image.startsWith("http")) {
+      return image;
+    }
+
+    return `${import.meta.env.VITE_API_URL}${image}`;
+  };
+
+  // =====================================================
+  // DYNAMIC CATEGORIES
+  // =====================================================
+
+  const categories = [
+    "All",
+    ...new Set(
+      gallery
+        .map((item) => item.category)
+        .filter(Boolean)
+    ),
+  ];
+
+  // =====================================================
+  // FILTER GALLERY
+  // =====================================================
 
   const filteredGallery =
     activeCategory === "All"
@@ -22,9 +72,17 @@ export default function Gallery() {
           (item) => item.category === activeCategory
         );
 
+  // =====================================================
+  // CURRENT IMAGE INDEX
+  // =====================================================
+
   const currentIndex = filteredGallery.findIndex(
     (item) => item.id === selectedImage?.id
   );
+
+  // =====================================================
+  // PREVIOUS
+  // =====================================================
 
   const showPrevious = (e) => {
     e.stopPropagation();
@@ -36,10 +94,17 @@ export default function Gallery() {
     }
   };
 
+  // =====================================================
+  // NEXT
+  // =====================================================
+
   const showNext = (e) => {
     e.stopPropagation();
 
-    if (currentIndex < filteredGallery.length - 1) {
+    if (
+      currentIndex <
+      filteredGallery.length - 1
+    ) {
       setSelectedImage(
         filteredGallery[currentIndex + 1]
       );
@@ -69,7 +134,9 @@ export default function Gallery() {
         }}
       >
 
-        {/* HEADER */}
+        {/* =====================================================
+            HEADER
+        ===================================================== */}
 
         <div
           style={{
@@ -117,185 +184,257 @@ export default function Gallery() {
           </p>
         </div>
 
-        {/* CATEGORY FILTER */}
+        {/* =====================================================
+            LOADING
+        ===================================================== */}
 
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: "10px",
-            marginBottom: "64px",
-            width: "100%",
-            maxWidth: "52rem",
-            boxSizing: "border-box",
-          }}
-        >
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              style={{
-                padding: "8px 20px",
-                borderRadius: "9999px",
-                fontWeight: "600",
-                fontSize: "0.875rem",
-                cursor: "pointer",
-                transition: "all 0.3s ease",
+        {loading && (
+          <div
+            style={{
+              padding: "60px 0",
+              color: "#64748b",
+              fontSize: "1rem",
+            }}
+          >
+            Loading gallery...
+          </div>
+        )}
 
-                border:
-                  activeCategory === category
-                    ? "1px solid #0ea5e9"
-                    : "1px solid #e2e8f0",
+        {/* =====================================================
+            CATEGORY FILTER
+        ===================================================== */}
 
-                backgroundColor:
-                  activeCategory === category
-                    ? "#0ea5e9"
-                    : "#ffffff",
-
-                color:
-                  activeCategory === category
-                    ? "#ffffff"
-                    : "#64748b",
-
-                boxShadow:
-                  activeCategory === category
-                    ? "0 0 20px rgba(56,189,248,0.2)"
-                    : "0 2px 10px rgba(15,23,42,0.03)",
-              }}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-
-        {/* GALLERY GRID */}
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: "32px",
-            width: "100%",
-            maxWidth: "75rem",
-            justifyContent: "center",
-            boxSizing: "border-box",
-          }}
-        >
-          {filteredGallery.map((item, index) => (
-            <motion.div
-              key={item.id}
-              onClick={() => setSelectedImage(item)}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{
-                duration: 0.5,
-                delay: index * 0.05,
-              }}
-              whileHover={{ y: -6 }}
-              style={{
-                position: "relative",
-                overflow: "hidden",
-                borderRadius: "28px",
-                border: "1px solid #e2e8f0",
-                backgroundColor: "#ffffff",
-                cursor: "pointer",
-                boxSizing: "border-box",
-                transition: "all 0.4s ease",
-                boxShadow:
-                  "0 10px 35px rgba(15,23,42,0.06)",
-              }}
-            >
-
-              {/* IMAGE */}
-
-              <div
+        {!loading && gallery.length > 0 && (
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: "10px",
+              marginBottom: "64px",
+              width: "100%",
+              maxWidth: "52rem",
+              boxSizing: "border-box",
+            }}
+          >
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() =>
+                  setActiveCategory(category)
+                }
                 style={{
-                  height: "300px",
-                  width: "100%",
-                  overflow: "hidden",
-                  backgroundColor: "#f8fafc",
+                  padding: "8px 20px",
+                  borderRadius: "9999px",
+                  fontWeight: "600",
+                  fontSize: "0.875rem",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+
+                  border:
+                    activeCategory === category
+                      ? "1px solid #0ea5e9"
+                      : "1px solid #e2e8f0",
+
+                  backgroundColor:
+                    activeCategory === category
+                      ? "#0ea5e9"
+                      : "#ffffff",
+
+                  color:
+                    activeCategory === category
+                      ? "#ffffff"
+                      : "#64748b",
+
+                  boxShadow:
+                    activeCategory === category
+                      ? "0 0 20px rgba(56,189,248,0.2)"
+                      : "0 2px 10px rgba(15,23,42,0.03)",
                 }}
               >
-                <img
-                  src={item.image}
-                  alt={item.title}
+                {category}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* =====================================================
+            EMPTY STATE
+        ===================================================== */}
+
+        {!loading && gallery.length === 0 && (
+          <div
+            style={{
+              padding: "60px 0",
+              textAlign: "center",
+              color: "#94a3b8",
+              fontSize: "1rem",
+            }}
+          >
+            No gallery items available at the moment.
+          </div>
+        )}
+
+        {/* =====================================================
+            GALLERY GRID
+        ===================================================== */}
+
+        {!loading && filteredGallery.length > 0 && (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns:
+                "repeat(auto-fit, minmax(280px, 1fr))",
+              gap: "32px",
+              width: "100%",
+              maxWidth: "75rem",
+              justifyContent: "center",
+              boxSizing: "border-box",
+            }}
+          >
+            {filteredGallery.map((item, index) => (
+              <motion.div
+                key={item.id}
+                onClick={() =>
+                  setSelectedImage(item)
+                }
+                initial={{
+                  opacity: 0,
+                  y: 30,
+                }}
+                whileInView={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                viewport={{
+                  once: true,
+                }}
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.05,
+                }}
+                whileHover={{
+                  y: -6,
+                }}
+                style={{
+                  position: "relative",
+                  overflow: "hidden",
+                  borderRadius: "28px",
+                  border: "1px solid #e2e8f0",
+                  backgroundColor: "#ffffff",
+                  cursor: "pointer",
+                  boxSizing: "border-box",
+                  transition: "all 0.4s ease",
+                  boxShadow:
+                    "0 10px 35px rgba(15,23,42,0.06)",
+                }}
+              >
+
+                {/* =================================================
+                    IMAGE
+                ================================================= */}
+
+                <div
                   style={{
-                    height: "100%",
+                    height: "300px",
                     width: "100%",
-                    objectFit: "cover",
-                    transition:
-                      "transform 0.7s ease",
+                    overflow: "hidden",
+                    backgroundColor: "#f8fafc",
+                  }}
+                >
+                  <img
+                    src={getImageUrl(item.image)}
+                    alt={item.title}
+                    style={{
+                      height: "100%",
+                      width: "100%",
+                      objectFit: "cover",
+                      transition:
+                        "transform 0.7s ease",
+                    }}
+                  />
+                </div>
+
+                {/* =================================================
+                    WHITE FADE
+                ================================================= */}
+
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    background:
+                      "linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.15), transparent)",
+                    pointerEvents: "none",
                   }}
                 />
-              </div>
 
-              {/* WHITE FADE */}
+                {/* =================================================
+                    CARD CONTENT
+                ================================================= */}
 
-              <div
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  background:
-                    "linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.15), transparent)",
-                  pointerEvents: "none",
-                }}
-              />
-
-              {/* CARD CONTENT */}
-
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: "24px",
-                  left: "24px",
-                  right: "24px",
-                }}
-              >
-                <span
+                <div
                   style={{
-                    display: "inline-block",
-                    borderRadius: "9999px",
-                    backgroundColor: "#0ea5e9",
-                    padding: "4px 12px",
-                    fontSize: "0.75rem",
-                    fontWeight: "600",
-                    color: "#ffffff",
-                    marginBottom: "8px",
+                    position: "absolute",
+                    bottom: "24px",
+                    left: "24px",
+                    right: "24px",
                   }}
                 >
-                  {item.category}
-                </span>
+                  <span
+                    style={{
+                      display: "inline-block",
+                      borderRadius: "9999px",
+                      backgroundColor: "#0ea5e9",
+                      padding: "4px 12px",
+                      fontSize: "0.75rem",
+                      fontWeight: "600",
+                      color: "#ffffff",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    {item.category}
+                  </span>
 
-                <h3
-                  style={{
-                    fontSize: "1.25rem",
-                    fontWeight: "700",
-                    color: "#0f172a",
-                  }}
-                >
-                  {item.title}
-                </h3>
-              </div>
+                  <h3
+                    style={{
+                      fontSize: "1.25rem",
+                      fontWeight: "700",
+                      color: "#0f172a",
+                      margin: 0,
+                    }}
+                  >
+                    {item.title}
+                  </h3>
+                </div>
 
-            </motion.div>
-          ))}
-        </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
 
       </div>
 
-      {/* LIGHTBOX */}
+      {/* =========================================================
+          LIGHTBOX
+      ========================================================= */}
 
       <AnimatePresence>
         {selectedImage && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedImage(null)}
+            initial={{
+              opacity: 0,
+            }}
+            animate={{
+              opacity: 1,
+            }}
+            exit={{
+              opacity: 0,
+            }}
+            onClick={() =>
+              setSelectedImage(null)
+            }
             style={{
               position: "fixed",
               inset: 0,
@@ -324,7 +463,9 @@ export default function Gallery() {
                 scale: 0.9,
                 opacity: 0,
               }}
-              transition={{ duration: 0.3 }}
+              transition={{
+                duration: 0.3,
+              }}
               onClick={(e) =>
                 e.stopPropagation()
               }
@@ -338,7 +479,9 @@ export default function Gallery() {
               }}
             >
 
-              {/* CLOSE */}
+              {/* =================================================
+                  CLOSE
+              ================================================= */}
 
               <button
                 onClick={() =>
@@ -369,7 +512,9 @@ export default function Gallery() {
                 <X size={20} />
               </button>
 
-              {/* PREVIOUS */}
+              {/* =================================================
+                  PREVIOUS
+              ================================================= */}
 
               <button
                 onClick={showPrevious}
@@ -408,7 +553,9 @@ export default function Gallery() {
                 <ChevronLeft size={24} />
               </button>
 
-              {/* NEXT */}
+              {/* =================================================
+                  NEXT
+              ================================================= */}
 
               <button
                 onClick={showNext}
@@ -452,10 +599,14 @@ export default function Gallery() {
                 <ChevronRight size={24} />
               </button>
 
-              {/* IMAGE */}
+              {/* =================================================
+                  IMAGE
+              ================================================= */}
 
               <img
-                src={selectedImage.image}
+                src={getImageUrl(
+                  selectedImage.image
+                )}
                 alt={selectedImage.title}
                 style={{
                   width: "100%",
@@ -466,7 +617,9 @@ export default function Gallery() {
                 }}
               />
 
-              {/* CAPTION */}
+              {/* =================================================
+                  CAPTION
+              ================================================= */}
 
               <div
                 style={{
@@ -478,8 +631,7 @@ export default function Gallery() {
                   style={{
                     color: "#0ea5e9",
                     fontSize: "0.875rem",
-                    textTransform:
-                      "uppercase",
+                    textTransform: "uppercase",
                     letterSpacing: "4px",
                     fontWeight: "700",
                   }}

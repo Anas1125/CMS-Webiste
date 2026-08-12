@@ -13,6 +13,8 @@ from .routers import services
 from .routers import projects
 from .routers import applications
 from .routers import partners
+from .routers import gallery
+from .routers import blog
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -91,15 +93,21 @@ app.include_router(
 )
 
 app.include_router(
-    applications.router,
-    prefix="/applications",
-    tags=["Applications"],
-)
-
-app.include_router(
     partners.router,
     prefix="/partners",
     tags=["Partners"],
+)
+
+app.include_router(
+    gallery.router,
+    prefix="/gallery",
+    tags=["Gallery"],
+)
+
+app.include_router(
+    blog.router,
+    prefix="/blogs",
+    tags=["Blogs"],
 )
 
 @app.get("/")

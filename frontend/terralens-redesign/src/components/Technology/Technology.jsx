@@ -270,6 +270,7 @@ export default function Technology() {
         hover:text-white
         hover:scale-105
         hover:shadow-[0_10px_30px_rgba(14,165,233,0.25)]
+        cursor-pointer
       "
     >
       View Full Technology Stack

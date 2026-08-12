@@ -46,9 +46,9 @@ function Navbar() {
   useEffect(() => {
     if (!settings?.favicon) return;
 
-    const faviconUrl = settings.favicon.startsWith("http")
-      ? settings.favicon
-      : `http://127.0.0.1:8000${settings.favicon}`;
+   const faviconUrl = settings.favicon.startsWith("http")
+    ? settings.favicon
+    : `${import.meta.env.VITE_API_URL}${settings.favicon}`;
 
     let favicon = document.querySelector("link[rel='icon']");
 
@@ -98,10 +98,10 @@ function Navbar() {
   // =========================
 
   const logoUrl = settings?.logo
-  ? settings.logo.startsWith("http")
-    ? settings.logo
-    : `http://127.0.0.1:8000${settings.logo}`
-  : "";
+    ? settings.logo.startsWith("http")
+      ? settings.logo
+      : `${import.meta.env.VITE_API_URL}${settings.logo}`
+    : "";
 
   return (
     <header
@@ -198,7 +198,8 @@ function Navbar() {
                 "0 0 8px rgba(255,255,255,0.35), 0 2px 12px rgba(0,0,0,0.4)",
             }}
           >
-            TerraLens
+            {settings?.company_name || "TerraLens"}
+            
           </h1>
         </Link>
 

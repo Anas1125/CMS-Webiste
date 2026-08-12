@@ -38,7 +38,12 @@ export default function Services() {
       <ServicesHero />
 
       {/* Service Tabs */}
-      <div id="services-list">
+      <div
+        id="services-list"
+        style={{
+          marginTop: "50px",
+        }}
+      >
         <ServiceTabs
           activeTab={activeTab}
           setActiveTab={setActiveTab}
