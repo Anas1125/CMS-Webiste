@@ -4,7 +4,14 @@ import { useEffect, useState } from "react";
 import { getSettings } from "../../api/settings";
 
 export default function ProductsHero() {
-  const [productsVideo, setProductsVideo] = useState("");
+  const [productsVideo, setProductsVideo] =
+    useState("");
+
+  /*
+  =======================================================
+  LOAD PRODUCTS VIDEO
+  =======================================================
+  */
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -12,16 +19,21 @@ export default function ProductsHero() {
         const data = await getSettings();
 
         if (data?.products_video) {
-          const videoUrl = data.products_video.startsWith("http")
-            ? data.products_video
-            : `${import.meta.env.VITE_API_URL}${data.products_video}`;
+          const videoUrl =
+            data.products_video.startsWith("http")
+              ? data.products_video
+              : `${import.meta.env.VITE_API_URL}${data.products_video}`;
 
           setProductsVideo(videoUrl);
         } else {
           setProductsVideo("");
         }
       } catch (error) {
-        console.error("Failed to load Products video:", error);
+        console.error(
+          "Failed to load Products video:",
+          error
+        );
+
         setProductsVideo("");
       }
     };
@@ -29,10 +41,46 @@ export default function ProductsHero() {
     loadSettings();
   }, []);
 
+  const hasVideo = Boolean(productsVideo);
+
+  /*
+  =======================================================
+  THEME
+  =======================================================
+  */
+
+  const theme = {
+    sectionBg: "#ffffff",
+
+    label: hasVideo
+      ? "#38bdf8"
+      : "#0ea5e9",
+
+    heading: hasVideo
+      ? "#ffffff"
+      : "#0f172a",
+
+    body: hasVideo
+      ? "#d1d5db"
+      : "#475569",
+
+    gridLine: hasVideo
+      ? "rgba(255,255,255,.2)"
+      : "rgba(15,23,42,0.07)",
+  };
+
+  /*
+  =======================================================
+  SCROLL TO PRODUCTS
+  =======================================================
+  */
+
   const scrollToProducts = () => {
-    document.getElementById("products-grid")?.scrollIntoView({
-      behavior: "smooth",
-    });
+    document
+      .getElementById("products-grid")
+      ?.scrollIntoView({
+        behavior: "smooth",
+      });
   };
 
   return (
@@ -49,7 +97,10 @@ export default function ProductsHero() {
         boxSizing: "border-box",
       }}
     >
-      {/* Background Video */}
+
+      {/* =====================================================
+          BACKGROUND VIDEO
+      ===================================================== */}
 
       {productsVideo && (
         <video
@@ -60,8 +111,7 @@ export default function ProductsHero() {
           preload="auto"
           style={{
             position: "absolute",
-            top: 0,
-            left: 0,
+            inset: 0,
             width: "100%",
             height: "100%",
             objectFit: "cover",
@@ -70,26 +120,37 @@ export default function ProductsHero() {
             zIndex: 0,
           }}
         >
-          <source src={productsVideo} type="video/mp4" />
+          <source
+            src={productsVideo}
+            type="video/mp4"
+          />
         </video>
       )}
 
-      {/* Subtle Video Color Overlay */}
+      {/* =====================================================
+          SUBTLE VIDEO COLOR OVERLAY
+      ===================================================== */}
 
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(14,165,233,0.06), rgba(255,255,255,0.02) 60%, rgba(255,255,255,0.08))",
-          zIndex: 1,
-        }}
-      />
+      {hasVideo && (
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(rgba(255,255,255,.08), rgba(255,255,255,.16))",
+            zIndex: 1,
+          }}
+        />
+      )}
 
-      {/* Background Glow */}
+      {/* =====================================================
+          BACKGROUND GLOW
+      ===================================================== */}
 
       <div
         className="absolute inset-0 overflow-hidden pointer-events-none"
-        style={{ zIndex: 2 }}
+        style={{
+          zIndex: 2,
+        }}
       >
         <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-white/[0.08] blur-[170px]" />
 
@@ -98,7 +159,9 @@ export default function ProductsHero() {
         <div className="absolute top-20 right-[-10%] h-96 w-96 rounded-full bg-white/[0.07] blur-[170px]" />
       </div>
 
-      {/* Grid Pattern */}
+      {/* =====================================================
+          GRID PATTERN
+      ===================================================== */}
 
       <div
         className="
@@ -110,12 +173,15 @@ export default function ProductsHero() {
         style={{
           zIndex: 3,
           backgroundImage:
-            "linear-gradient(rgba(255,255,255,.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.2) 1px, transparent 1px)",
+            `linear-gradient(${theme.gridLine} 1px, transparent 1px),
+             linear-gradient(90deg, ${theme.gridLine} 1px, transparent 1px)`,
           backgroundSize: "60px 60px",
         }}
       />
 
-      {/* Content */}
+      {/* =====================================================
+          CONTENT
+      ===================================================== */}
 
       <div
         className="
@@ -132,25 +198,45 @@ export default function ProductsHero() {
           text-center
         "
       >
+        {/* LABEL */}
+
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            duration: 0.6,
+          }}
           className="
             uppercase
             tracking-[6px]
-            text-sky-400
             text-sm
             font-bold
             mb-6
           "
+          style={{
+            color: theme.label,
+          }}
         >
           OUR PRODUCTS
         </motion.p>
 
+        {/* TITLE */}
+
         <motion.h1
-          initial={{ opacity: 0, y: 25 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{
+            opacity: 0,
+            y: 25,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
           transition={{
             delay: 0.15,
             duration: 0.6,
@@ -160,16 +246,24 @@ export default function ProductsHero() {
             md:text-6xl
             lg:text-7xl
             font-extrabold
-            text-white font-extrabold
             leading-tight
           "
+          style={{
+            color: theme.heading,
+          }}
         >
           Software Products
         </motion.h1>
 
+        {/* DESCRIPTION */}
+
         <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{
+            opacity: 0,
+          }}
+          animate={{
+            opacity: 1,
+          }}
           transition={{
             delay: 0.3,
             duration: 0.6,
@@ -179,18 +273,28 @@ export default function ProductsHero() {
             max-w-3xl
             text-lg
             md:text-xl
-            text-gray-300
             leading-relaxed
           "
+          style={{
+            color: theme.body,
+          }}
         >
-          Purpose-built software solutions by TerraLens Innovations —
-          designed for GIS professionals, field surveyors, and municipal
-          authorities.
+          Purpose-built software solutions by TerraLens
+          Innovations — designed for GIS professionals,
+          field surveyors, and municipal authorities.
         </motion.p>
 
+        {/* BUTTON */}
+
         <motion.button
-          initial={{ opacity: 0, y: 25 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{
+            opacity: 0,
+            y: 25,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
           transition={{
             delay: 0.45,
             duration: 0.6,
@@ -231,16 +335,23 @@ export default function ProductsHero() {
         </motion.button>
       </div>
 
-      {/* Bottom Fade */}
+      {/* =====================================================
+          BOTTOM FADE
+      ===================================================== */}
 
       <div
-        className="absolute bottom-0 left-0 w-full h-72 pointer-events-none"
-        style={{
-          zIndex: 5,
-          background:
-            "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.05) 45%, rgba(255,255,255,0.35) 75%, #ffffff 100%)",
-        }}
-      />
+      style={{
+        position: "absolute",
+        left: 0,
+        right: 0,
+        bottom: 0,
+        height: "80px",
+        background:
+          "linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 25%, rgba(255,255,255,0.75) 60%, #ffffff 100%)",
+        pointerEvents: "none",
+        zIndex: 20,
+      }}
+    />
     </section>
   );
 }

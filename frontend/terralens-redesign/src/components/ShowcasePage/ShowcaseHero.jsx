@@ -358,7 +358,7 @@ export default function ShowcaseHero() {
           bottom: 0,
           left: 0,
           width: "100%",
-          height: "220px",
+          height: "140px",
           background: theme.bottomFade,
           pointerEvents: "none",
           zIndex: 20,

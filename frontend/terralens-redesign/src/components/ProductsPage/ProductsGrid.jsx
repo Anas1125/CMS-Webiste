@@ -594,20 +594,6 @@ export default function ProductGrid() {
 
       </div>
 
-      <div
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          width: "100%",
-          height: "220px",
-          background:
-            "linear-gradient(to bottom, transparent 0%, rgba(5,5,5,0.3) 35%, rgba(5,5,5,0.8) 70%, #050505 90%, #ffffff 100%)",
-          pointerEvents: "none",
-          zIndex: 20,
-        }}
-      />
-
     </section>
   );
 }

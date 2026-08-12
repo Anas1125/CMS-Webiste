@@ -9,7 +9,9 @@ router = APIRouter()
 
 @router.get("/")
 def get_services(db: Session = Depends(get_db)):
-    return db.query(models.Service).all()
+    return db.query(models.Service)\
+        .order_by(models.Service.created_at.desc())\
+        .all()
 
 @router.get("/{slug}")
 def get_service_by_slug(

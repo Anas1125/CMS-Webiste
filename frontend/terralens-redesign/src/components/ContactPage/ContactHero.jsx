@@ -32,32 +32,40 @@ export default function ContactHero() {
   const hasVideo = Boolean(backgroundVideo);
 
   /* =======================================================
-     THEME — white section when there's no video, the
-     original dark/video theme when there is
+     THEME
      ======================================================= */
 
   const theme = {
-    sectionBg: hasVideo ? "#050505" : "#ffffff",
-    label: hasVideo ? "#38bdf8" : "#0ea5e9",
-    heading: hasVideo ? "#ffffff" : "#0f172a",
-    body: hasVideo ? "#d1d5db" : "#475569",
-    gridLine: hasVideo
-      ? "rgba(255,255,255,.2)"
-      : "rgba(15,23,42,0.07)",
+    sectionBg: "#ffffff",
+
+    // Blue accent
+    label: "#0ea5e9",
+
+    // Main heading
+    heading: "#ffffff",
+
+    // Main paragraph
+    body: "#ffffff",
+
+    gridLine: "rgba(15,23,42,0.07)",
+
+    // Transparent glass card
     cardBg: hasVideo
-      ? "rgba(17,17,19,0.12)"
-      : "rgba(255,255,255,0.5)",
-    cardBorder: hasVideo
-      ? "1px solid rgba(255,255,255,0.15)"
-      : "1px solid rgba(15,23,42,0.10)",
-    cardShadow: hasVideo
-      ? "0 20px 80px -20px rgba(14,165,233,0.15)"
-      : "0 20px 60px rgba(15,23,42,0.08)",
-    cardHeading: hasVideo ? "#ffffff" : "#0f172a",
-    cardBody: hasVideo ? "#d1d5db" : "#475569",
-    bottomFade: hasVideo
-      ? "linear-gradient(to bottom, transparent 0%, rgba(5,5,5,0.3) 35%, rgba(5,5,5,0.8) 70%, #050505 90%, #ffffff 100%)"
-      : "linear-gradient(to bottom, rgba(255,255,255,0), #ffffff)",
+      ? "rgba(17,17,19,0.05)"
+      : "rgba(255,255,255,0.05)",
+
+    cardBorder: "1px solid rgba(15,23,42,0.10)",
+
+    cardShadow: "0 20px 60px rgba(15,23,42,0.08)",
+
+    // Card heading black
+    cardHeading: "#0f172a",
+
+    // Card details white
+    cardBody: "#ffffff",
+
+    bottomFade:
+      "linear-gradient(to bottom, rgba(255,255,255,0), #ffffff)",
   };
 
   const scrollToContact = () => {
@@ -128,9 +136,6 @@ export default function ContactHero() {
 
       {/* =====================================================
           WHITE READABILITY OVERLAY
-
-          Only rendered when there's a video underneath it —
-          otherwise it just washed out the white background.
       ===================================================== */}
 
       {hasVideo && (
@@ -200,7 +205,6 @@ export default function ContactHero() {
           gap-16
         "
       >
-
         {/* =================================================
             LEFT COLUMN
         ================================================= */}
@@ -212,7 +216,6 @@ export default function ContactHero() {
             xl:col-start-2
           "
         >
-
           <motion.p
             initial={{
               opacity: 0,
@@ -259,7 +262,10 @@ export default function ContactHero() {
           >
             {settings?.contact_title || "Let's Build Something Great"}
 
-            <span className="block" style={{ color: theme.label }}>
+            <span
+              className="block"
+              style={{ color: theme.label }}
+            >
               Something Great
             </span>
           </motion.h1>
@@ -283,7 +289,7 @@ export default function ContactHero() {
             style={{ color: theme.body }}
           >
             {settings?.contact_subtitle ||
-            "Whether you need GIS solutions, enterprise software, AI integration or consulting services, our team is ready to help turn your ideas into reality."}
+              "Whether you need GIS solutions, enterprise software, AI integration or consulting services, our team is ready to help turn your ideas into reality."}
           </motion.p>
 
           <motion.button
@@ -323,7 +329,6 @@ export default function ContactHero() {
               size={20}
             />
           </motion.button>
-
         </div>
 
         {/* =================================================
@@ -363,9 +368,7 @@ export default function ContactHero() {
             padding: "40px",
           }}
         >
-
           <div className="space-y-8">
-
             {contactItems.map((item) => {
               const Icon = item.icon;
 
@@ -374,7 +377,6 @@ export default function ContactHero() {
                   key={item.title}
                   className="flex items-center gap-5"
                 >
-
                   <div
                     className="
                       w-16
@@ -396,28 +398,28 @@ export default function ContactHero() {
                   </div>
 
                   <div>
-
                     <h3
                       className="font-bold text-xl"
-                      style={{ color: theme.cardHeading }}
+                      style={{
+                        color: theme.cardHeading,
+                      }}
                     >
                       {item.title}
                     </h3>
 
-                    <p style={{ color: theme.cardBody }}>
+                    <p
+                      style={{
+                        color: theme.cardBody,
+                      }}
+                    >
                       {item.value}
                     </p>
-
                   </div>
-
                 </div>
               );
             })}
-
           </div>
-
         </motion.div>
-
       </div>
 
       {/* Bottom Video Fade */}
@@ -434,7 +436,6 @@ export default function ContactHero() {
           zIndex: 20,
         }}
       />
-
     </section>
   );
 }

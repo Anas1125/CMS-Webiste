@@ -34,42 +34,39 @@ export default function ServicesHero() {
   const hasVideo = Boolean(backgroundVideo);
 
   /* =======================================================
-     THEME — white section when there's no video, the
-     original dark/video theme when there is
+     THEME
      ======================================================= */
 
   const theme = {
-    sectionBg: hasVideo ? "#050505" : "#ffffff",
-    label: hasVideo ? "#38bdf8" : "#0ea5e9",
-    heading: hasVideo ? "#ffffff" : "#0f172a",
-    body: hasVideo ? "#d1d5db" : "#475569",
-    gridLine: hasVideo
-      ? "rgba(255,255,255,.2)"
-      : "rgba(15,23,42,0.07)",
-    contactBg: hasVideo
-      ? "rgba(255,255,255,0.05)"
-      : "rgba(15,23,42,0.03)",
-    contactBorder: hasVideo
-      ? "rgba(255,255,255,0.2)"
-      : "rgba(15,23,42,0.3)",
-    contactText: hasVideo ? "#ffffff" : "#0f172a",
-    contactHoverClass: hasVideo
-      ? "hover:border-sky-400/50 hover:bg-sky-500/10 hover:text-sky-400 hover:-translate-y-0.5 group"
-      : "hover:border-sky-500/50 hover:bg-sky-500/5 hover:text-sky-600 hover:-translate-y-0.5 group",
+    sectionBg: "#ffffff",
+    label: "#0ea5e9",
+
+    // Main heading WHITE
+    heading: "#ffffff",
+
+    body: "#475569",
+    gridLine: "rgba(15,23,42,0.07)",
+
+    contactBg: "rgba(15,23,42,0.03)",
+    contactBorder: "1px solid rgba(15,23,42,0.3)",
+    contactText: "#0f172a",
+    contactHoverClass:
+      "hover:border-sky-500/50 hover:bg-sky-500/5 hover:text-sky-600 hover:-translate-y-0.5 group",
+
+    // Transparent card
     cardBg: hasVideo
-      ? "rgba(17,17,19,0.12)"
-      : "rgba(255,255,255,0.5)",
-    cardBorder: hasVideo
-      ? "1px solid rgba(255,255,255,0.15)"
-      : "1px solid rgba(15,23,42,0.10)",
-    cardShadow: hasVideo
-      ? "0 20px 80px -20px rgba(14,165,233,0.15)"
-      : "0 20px 60px rgba(15,23,42,0.08)",
-    cardHeading: hasVideo ? "#ffffff" : "#0f172a",
-    cardBody: hasVideo ? "#d1d5db" : "#475569",
-    bottomFade: hasVideo
-      ? "linear-gradient(to bottom, transparent 0%, rgba(5,5,5,0.3) 35%, rgba(5,5,5,0.8) 70%, #050505 90%, #ffffff 100%)"
-      : "linear-gradient(to bottom, rgba(255,255,255,0), #ffffff)",
+      ? "rgba(17,17,19,0.05)"
+      : "rgba(255,255,255,0.05)",
+
+    cardBorder: "1px solid rgba(15,23,42,0.10)",
+    cardShadow: "0 20px 60px rgba(15,23,42,0.08)",
+
+    // Card text WHITE
+    cardHeading: "#0f172a",
+    cardBody: "#ffffff",
+
+    bottomFade:
+      "linear-gradient(to bottom, rgba(255,255,255,0), #ffffff)",
   };
 
   const scrollToServices = () => {
@@ -92,8 +89,9 @@ export default function ServicesHero() {
   };
 
   return (
-    <section className="w-full"
-      style={{ 
+    <section
+      className="w-full"
+      style={{
         position: "relative",
         overflow: "hidden",
         backgroundColor: theme.sectionBg,
@@ -135,10 +133,6 @@ export default function ServicesHero() {
 
       {/* =========================================================
           VIDEO OVERLAY
-
-          Light wash so the video reads through clearly, rather
-          than a dark tint — only rendered when there's actually
-          a video underneath it.
       ========================================================= */}
 
       {hasVideo && (
@@ -272,6 +266,8 @@ export default function ServicesHero() {
             OUR SERVICES
           </motion.p>
 
+          {/* MAIN HEADING */}
+
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -308,7 +304,7 @@ export default function ServicesHero() {
               maxWidth: "38rem",
               fontSize: "1rem",
               lineHeight: "1.7",
-              color: theme.body,
+              color: "#ffffff",
             }}
           >
             We deliver end-to-end GIS, remote sensing,
@@ -405,9 +401,8 @@ export default function ServicesHero() {
             width: "100%",
             borderRadius: "2.5rem",
             backgroundColor: theme.cardBg,
-            backdropFilter: "blur(4px)",
-            WebkitBackdropFilter:
-              "blur(4px)",
+            backdropFilter: "blur(2px)",
+            WebkitBackdropFilter: "blur(2px)",
             border: theme.cardBorder,
             boxShadow: theme.cardShadow,
             overflow: "hidden",
