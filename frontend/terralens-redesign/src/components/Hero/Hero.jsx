@@ -1,24 +1,35 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
-import Button from "../ui/Button";
 import LiquidGlassButton from "../ui/LiquidGlassButton";
 
 import { getSettings } from "../../api/settings";
 import { getMedia } from "../../api/media";
 
+
 function Hero() {
   const navigate = useNavigate();
 
-  const [currentVideo, setCurrentVideo] = useState(0);
-  const [videos, setVideos] = useState([]);
-  const [settings, setSettings] = useState(null);
+  const [currentVideo, setCurrentVideo] =
+    useState(0);
 
-  // =====================================================
-  // LOAD HERO VIDEOS
-  // =====================================================
+  const [videos, setVideos] =
+    useState([]);
+
+  const [settings, setSettings] =
+    useState(null);
+
+
+  /*
+  =====================================================
+  LOAD HERO VIDEOS
+  =====================================================
+  */
 
   useEffect(() => {
     const loadHeroVideos = async () => {
@@ -26,33 +37,52 @@ function Hero() {
         const data = await getMedia();
 
         const heroVideos = data.filter((file) => {
-          const filename = file.filename?.toLowerCase() || "";
+          const filename =
+            file.filename?.toLowerCase() || "";
 
           const isVideo =
-            file.mime_type?.toLowerCase().startsWith("video/") ||
-            /\.(mp4|webm|mov|avi|mkv)$/i.test(filename);
+            file.mime_type
+              ?.toLowerCase()
+              .startsWith("video/") ||
+            /\.(mp4|webm|mov|avi|mkv)$/i.test(
+              filename
+            );
 
-          return file.folder === "hero" && isVideo;
+          return (
+            file.folder === "hero" &&
+            isVideo
+          );
         });
 
-        const sortedVideos = heroVideos.sort((a, b) =>
-          a.filename.localeCompare(b.filename, undefined, {
-            numeric: true,
-          })
-        );
+        const sortedVideos =
+          heroVideos.sort((a, b) =>
+            a.filename.localeCompare(
+              b.filename,
+              undefined,
+              {
+                numeric: true,
+              }
+            )
+          );
 
         setVideos(sortedVideos);
       } catch (error) {
-        console.error("Failed to load hero videos:", error);
+        console.error(
+          "Failed to load hero videos:",
+          error
+        );
       }
     };
 
     loadHeroVideos();
   }, []);
 
-  // =====================================================
-  // LOAD SETTINGS
-  // =====================================================
+
+  /*
+  =====================================================
+  LOAD SETTINGS
+  =====================================================
+  */
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -61,19 +91,27 @@ function Hero() {
 
         setSettings(data);
       } catch (error) {
-        console.error("Failed to load homepage settings:", error);
+        console.error(
+          "Failed to load homepage settings:",
+          error
+        );
       }
     };
 
     loadSettings();
   }, []);
 
-  // =====================================================
-  // VIDEO URL
-  // =====================================================
+
+  /*
+  =====================================================
+  VIDEO URL
+  =====================================================
+  */
 
   const getVideoUrl = (path) => {
-    if (!path) return null;
+    if (!path) {
+      return null;
+    }
 
     if (path.startsWith("http")) {
       return path;
@@ -82,9 +120,12 @@ function Hero() {
     return `${import.meta.env.VITE_API_URL}${path}`;
   };
 
-  // =====================================================
-  // LETTER-BY-LETTER 3D REVEAL
-  // =====================================================
+
+  /*
+  =====================================================
+  LETTER-BY-LETTER 3D REVEAL
+  =====================================================
+  */
 
   const letterReveal = {
     hidden: {
@@ -114,9 +155,12 @@ function Hero() {
     }),
   };
 
-  // =====================================================
-  // AUTOMATIC VIDEO CHANGE
-  // =====================================================
+
+  /*
+  =====================================================
+  AUTOMATIC VIDEO CHANGE
+  =====================================================
+  */
 
   useEffect(() => {
     if (videos.length <= 1) {
@@ -124,7 +168,10 @@ function Hero() {
     }
 
     const interval = setInterval(() => {
-      setCurrentVideo((prev) => (prev + 1) % videos.length);
+      setCurrentVideo(
+        (prev) =>
+          (prev + 1) % videos.length
+      );
     }, 6000);
 
     return () => {
@@ -132,9 +179,12 @@ function Hero() {
     };
   }, [videos.length]);
 
-  // =====================================================
-  // RESET INDEX
-  // =====================================================
+
+  /*
+  =====================================================
+  RESET INDEX
+  =====================================================
+  */
 
   useEffect(() => {
     if (
@@ -145,42 +195,66 @@ function Hero() {
     }
   }, [videos.length, currentVideo]);
 
-  // =====================================================
-  // NEXT VIDEO
-  // =====================================================
+
+  /*
+  =====================================================
+  NEXT VIDEO
+  =====================================================
+  */
 
   const nextVideo = () => {
-    if (videos.length === 0) return;
+    if (videos.length === 0) {
+      return;
+    }
 
-    setCurrentVideo((prev) => (prev + 1) % videos.length);
-  };
-
-  // =====================================================
-  // PREVIOUS VIDEO
-  // =====================================================
-
-  const prevVideo = () => {
-    if (videos.length === 0) return;
-
-    setCurrentVideo((prev) =>
-      prev === 0 ? videos.length - 1 : prev - 1
+    setCurrentVideo(
+      (prev) =>
+        (prev + 1) % videos.length
     );
   };
 
-  // =====================================================
-  // CURRENT VIDEO
-  // =====================================================
+
+  /*
+  =====================================================
+  PREVIOUS VIDEO
+  =====================================================
+  */
+
+  const prevVideo = () => {
+    if (videos.length === 0) {
+      return;
+    }
+
+    setCurrentVideo((prev) =>
+      prev === 0
+        ? videos.length - 1
+        : prev - 1
+    );
+  };
+
+
+  /*
+  =====================================================
+  CURRENT VIDEO
+  =====================================================
+  */
 
   const currentVideoUrl =
     videos.length > 0
-      ? getVideoUrl(videos[currentVideo]?.path)
+      ? getVideoUrl(
+          videos[currentVideo]?.path
+        )
       : null;
 
-  const hasVideo = Boolean(currentVideoUrl);
+  const hasVideo =
+    Boolean(currentVideoUrl);
 
-  // =====================================================
-  // THEME
-  // =====================================================
+
+  /*
+  =====================================================
+  THEME
+  =====================================================
+  */
 
   const theme = {
     labelClass: hasVideo
@@ -200,9 +274,12 @@ function Hero() {
       : "text-slate-600",
   };
 
-  // =====================================================
-  // HERO
-  // =====================================================
+
+  /*
+  =====================================================
+  HERO
+  =====================================================
+  */
 
   return (
     <section
@@ -214,31 +291,40 @@ function Hero() {
         bg-white
       "
     >
+
       {/* =================================================
           BACKGROUND VIDEOS
-          ================================================= */}
+      ================================================= */}
 
       {currentVideoUrl ? (
-        <AnimatePresence initial={false}>
+        <AnimatePresence
+          initial={false}
+          mode="sync"
+        >
           <motion.video
             key={currentVideoUrl}
             autoPlay
             muted
             playsInline
             preload="auto"
+
             initial={{
               opacity: 0,
             }}
+
             animate={{
               opacity: 1,
             }}
+
             exit={{
               opacity: 0,
             }}
+
             transition={{
               duration: 1.5,
               ease: "easeInOut",
             }}
+
             className="
               absolute
               inset-0
@@ -247,8 +333,12 @@ function Hero() {
               w-full
               object-cover
             "
+
             onError={(error) => {
-              console.error("Hero video failed:", error);
+              console.error(
+                "Hero video failed:",
+                error
+              );
             }}
           >
             <source
@@ -267,9 +357,10 @@ function Hero() {
         />
       )}
 
+
       {/* =================================================
           LIGHT READABILITY OVERLAY
-          ================================================= */}
+      ================================================= */}
 
       {hasVideo && (
         <div
@@ -282,9 +373,10 @@ function Hero() {
         />
       )}
 
+
       {/* =================================================
           SUBTLE DEPTH OVERLAY
-          ================================================= */}
+      ================================================= */}
 
       {hasVideo && (
         <div
@@ -301,9 +393,10 @@ function Hero() {
         />
       )}
 
+
       {/* =================================================
           BOTTOM GRADIENT
-          ================================================= */}
+      ================================================= */}
 
       <div
         className="
@@ -319,9 +412,10 @@ function Hero() {
         "
       />
 
+
       {/* =================================================
           LEFT ARROW
-          ================================================= */}
+      ================================================= */}
 
       {videos.length > 1 && (
         <div
@@ -329,7 +423,8 @@ function Hero() {
             position: "absolute",
             top: "50%",
             left: "2rem",
-            transform: "translateY(-50%)",
+            transform:
+              "translateY(-50%)",
             zIndex: 20,
           }}
         >
@@ -345,9 +440,10 @@ function Hero() {
         </div>
       )}
 
+
       {/* =================================================
           RIGHT ARROW
-          ================================================= */}
+      ================================================= */}
 
       {videos.length > 1 && (
         <div
@@ -355,7 +451,8 @@ function Hero() {
             position: "absolute",
             top: "50%",
             right: "2rem",
-            transform: "translateY(-50%)",
+            transform:
+              "translateY(-50%)",
             zIndex: 20,
           }}
         >
@@ -371,9 +468,10 @@ function Hero() {
         </div>
       )}
 
+
       {/* =================================================
           CONTENT
-          ================================================= */}
+      ================================================= */}
 
       <div
         className="
@@ -393,15 +491,21 @@ function Hero() {
           "
           style={{
             perspective: "1000px",
-            perspectiveOrigin: "50% 50%",
+            perspectiveOrigin:
+              "50% 50%",
           }}
         >
+
           {/* =================================================
               COMPANY NAME
-              ================================================= */}
+          ================================================= */}
 
           <div className="mb-6">
             <motion.p
+              key={`company-${
+                settings?.company_name ||
+                "TerraLens Innovations"
+              }`}
               className={`
                 text-sm
                 font-medium
@@ -410,41 +514,60 @@ function Hero() {
                 ${theme.labelClass}
               `}
               style={{
-                transformStyle: "preserve-3d",
+                transformStyle:
+                  "preserve-3d",
               }}
             >
-              {(settings?.company_name ||
-                "TerraLens Innovations")
+              {(
+                settings?.company_name ||
+                "TerraLens Innovations"
+              )
                 .split("")
-                .map((letter, index) => (
-                  <motion.span
-                    key={`${letter}-${index}`}
-                    custom={0.35 + index * 0.08}
-                    variants={letterReveal}
-                    initial="hidden"
-                    animate="visible"
-                    className="
-                      inline-block
-                      will-change-transform
-                    "
-                    style={{
-                      transformStyle: "preserve-3d",
-                      whiteSpace:
-                        letter === " " ? "pre" : "normal",
-                    }}
-                  >
-                    {letter}
-                  </motion.span>
-                ))}
+                .map(
+                  (letter, index) => (
+                    <motion.span
+                      key={`${letter}-${index}`}
+                      custom={
+                        0.05 +
+                        index * 0.035
+                      }
+                      variants={
+                        letterReveal
+                      }
+                      initial="hidden"
+                      animate="visible"
+                      className="
+                        inline-block
+                        will-change-transform
+                      "
+                      style={{
+                        transformStyle:
+                          "preserve-3d",
+
+                        whiteSpace:
+                          letter === " "
+                            ? "pre"
+                            : "normal",
+                      }}
+                    >
+                      {letter}
+                    </motion.span>
+                  )
+                )}
             </motion.p>
           </div>
 
+
           {/* =================================================
               TITLE
-              ================================================= */}
+          ================================================= */}
 
           <div>
             <motion.h1
+              key={`title-${
+                settings?.hero_title ||
+                "TerraLens Homepage"
+              }`}
               className={`
                 text-6xl
                 font-bold
@@ -454,42 +577,63 @@ function Hero() {
                 ${theme.headingClass}
               `}
               style={{
-                textShadow: theme.headingShadow,
-                transformStyle: "preserve-3d",
+                textShadow:
+                  theme.headingShadow,
+
+                transformStyle:
+                  "preserve-3d",
               }}
             >
-              {(settings?.hero_title ||
-                "TerraLens Homepage")
+              {(
+                settings?.hero_title ||
+                "TerraLens Homepage"
+              )
                 .split("")
-                .map((letter, index) => (
-                  <motion.span
-                    key={`${letter}-${index}`}
-                    custom={0.35 + index * 0.045}
-                    variants={letterReveal}
-                    initial="hidden"
-                    animate="visible"
-                    className="
-                      inline-block
-                      will-change-transform
-                    "
-                    style={{
-                      transformStyle: "preserve-3d",
-                      whiteSpace:
-                        letter === " " ? "pre" : "normal",
-                    }}
-                  >
-                    {letter}
-                  </motion.span>
-                ))}
+                .map(
+                  (letter, index) => (
+                    <motion.span
+                      key={`${letter}-${index}`}
+                      custom={
+                        0.35 +
+                        index * 0.045
+                      }
+                      variants={
+                        letterReveal
+                      }
+                      initial="hidden"
+                      animate="visible"
+                      className="
+                        inline-block
+                        will-change-transform
+                      "
+                      style={{
+                        transformStyle:
+                          "preserve-3d",
+
+                        whiteSpace:
+                          letter === " "
+                            ? "pre"
+                            : "normal",
+                      }}
+                    >
+                      {letter}
+                    </motion.span>
+                  )
+                )}
             </motion.h1>
           </div>
 
+
           {/* =================================================
               SUBTITLE
-              ================================================= */}
+          ================================================= */}
 
           <div className="mt-8">
             <motion.p
+              key={`subtitle-${
+                settings?.hero_subtitle ||
+                "Hello From Terralens"
+              }`}
               className={`
                 mx-auto
                 max-w-3xl
@@ -498,38 +642,53 @@ function Hero() {
                 ${theme.subtitleClass}
               `}
               style={{
-                transformStyle: "preserve-3d",
+                transformStyle:
+                  "preserve-3d",
               }}
             >
-              {(settings?.hero_subtitle ||
-                "Hello From Terralens")
+              {(
+                settings?.hero_subtitle ||
+                "Hello From Terralens"
+              )
                 .split("")
-                .map((letter, index) => (
-                  <motion.span
-                    key={`${letter}-${index}`}
-                    custom={1.15 + index * 0.025}
-                    variants={letterReveal}
-                    initial="hidden"
-                    animate="visible"
-                    className="
-                      inline-block
-                      will-change-transform
-                    "
-                    style={{
-                      transformStyle: "preserve-3d",
-                      whiteSpace:
-                        letter === " " ? "pre" : "normal",
-                    }}
-                  >
-                    {letter}
-                  </motion.span>
-                ))}
+                .map(
+                  (letter, index) => (
+                    <motion.span
+                      key={`${letter}-${index}`}
+                      custom={
+                        1.15 +
+                        index * 0.025
+                      }
+                      variants={
+                        letterReveal
+                      }
+                      initial="hidden"
+                      animate="visible"
+                      className="
+                        inline-block
+                        will-change-transform
+                      "
+                      style={{
+                        transformStyle:
+                          "preserve-3d",
+
+                        whiteSpace:
+                          letter === " "
+                            ? "pre"
+                            : "normal",
+                      }}
+                    >
+                      {letter}
+                    </motion.span>
+                  )
+                )}
             </motion.p>
           </div>
 
+
           {/* =================================================
               BUTTONS
-              ================================================= */}
+          ================================================= */}
 
           <div
             className="
@@ -539,10 +698,13 @@ function Hero() {
               gap-6
             "
           >
-            {/* EXPLORE SOLUTIONS */}
 
             <LiquidGlassButton
-              tone={hasVideo ? "dark" : "light"}
+              tone={
+                hasVideo
+                  ? "dark"
+                  : "light"
+              }
               variant="primary"
               onClick={() =>
                 navigate(
@@ -555,22 +717,30 @@ function Hero() {
                 "Explore Solutions"}
             </LiquidGlassButton>
 
-            {/* VIEW PROJECTS */}
 
             <LiquidGlassButton
-              tone={hasVideo ? "dark" : "light"}
+              tone={
+                hasVideo
+                  ? "dark"
+                  : "light"
+              }
               variant="secondary"
-              onClick={() => navigate("/showcase")}
+              onClick={() =>
+                navigate("/showcase")
+              }
             >
               View Projects
             </LiquidGlassButton>
+
           </div>
+
         </div>
       </div>
 
+
       {/* =================================================
           NAVIGATION DOTS
-          ================================================= */}
+      ================================================= */}
 
       {videos.length > 1 && (
         <div
@@ -584,30 +754,39 @@ function Hero() {
             gap-3
           "
         >
-          {videos.map((video, index) => (
-            <button
-              key={video.path}
-              onClick={() => setCurrentVideo(index)}
-              aria-label={`Go to video ${index + 1}`}
-              className={`
-                cursor-pointer
-                rounded-full
-                transition-all
-                duration-500
-                ${
-                  currentVideo === index
-                    ? "h-2.5 w-8 bg-white shadow-[0_0_12px_rgba(255,255,255,0.5)]"
-                    : "h-2.5 w-2.5 bg-white/40 hover:bg-white/70"
+          {videos.map(
+            (video, index) => (
+              <button
+                key={video.path}
+                type="button"
+                onClick={() =>
+                  setCurrentVideo(index)
                 }
-              `}
-            />
-          ))}
+                aria-label={`Go to video ${
+                  index + 1
+                }`}
+                className={`
+                  cursor-pointer
+                  rounded-full
+                  transition-all
+                  duration-500
+
+                  ${
+                    currentVideo === index
+                      ? "h-2.5 w-8 bg-white shadow-[0_0_12px_rgba(255,255,255,0.5)]"
+                      : "h-2.5 w-2.5 bg-white/40 hover:bg-white/70"
+                  }
+                `}
+              />
+            )
+          )}
         </div>
       )}
 
+
       {/* =================================================
           SCROLL INDICATOR
-          ================================================= */}
+      ================================================= */}
 
       <motion.div
         animate={{
@@ -649,6 +828,7 @@ function Hero() {
           />
         </div>
       </motion.div>
+
     </section>
   );
 }
