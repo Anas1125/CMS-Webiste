@@ -15,7 +15,7 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
 
 pwd_context = CryptContext(
@@ -75,7 +75,8 @@ def get_current_admin(
 
         return username
 
-    except Exception:
+    except Exception as e:
+        print("JWT ERROR:", repr(e))
         raise HTTPException(
             status_code=401,
             detail="Invalid or expired authentication token",

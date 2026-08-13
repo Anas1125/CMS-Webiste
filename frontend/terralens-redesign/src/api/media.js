@@ -1,33 +1,27 @@
 import api from "./client";
 
+export const getMedia = async () => {
+  const response = await api.get("/media/");
+  return response.data;
+};
+
 export const uploadFile = async (folder, file) => {
   const formData = new FormData();
 
   formData.append("file", file);
 
-  const { data } = await api.post(
+  const response = await api.post(
     `/media/upload/${folder}`,
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
+    formData
   );
 
-  return data;
+  return response.data;
 };
 
-export const getMedia = async () => {
-  const { data } = await api.get("/media/");
-  return data;
-};
-
-export const deleteMedia = async (
-  folder,
-  filename
-) => {
-  return api.delete(
+export const deleteMedia = async (folder, filename) => {
+  const response = await api.delete(
     `/media/${folder}/${filename}`
   );
+
+  return response.data;
 };

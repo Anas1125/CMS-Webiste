@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Lock, User, Eye, EyeOff } from "lucide-react";
 import { login } from "../../api/admin";
+import { scheduleTokenLogout } from "../../api/client";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -20,6 +21,8 @@ export default function Login() {
         "adminToken",
         data.access_token
       );
+
+      scheduleTokenLogout();
 
       navigate("/admin/dashboard");
     } catch (err) {

@@ -308,8 +308,8 @@ export default function ProductsHero() {
             justify-center
             rounded-full
             bg-sky-500
-            px-10
-            py-5
+            px-5
+            py-4
             text-lg
             font-bold
             text-white

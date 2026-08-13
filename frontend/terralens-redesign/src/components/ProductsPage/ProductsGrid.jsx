@@ -100,7 +100,7 @@ export default function ProductGrid() {
             w-full
             max-w-7xl
             grid-cols-1
-            gap-10
+            gap-8
             lg:grid-cols-2
           "
         >
@@ -133,7 +133,7 @@ export default function ProductGrid() {
                 flex
                 flex-col
                 overflow-hidden
-                rounded-[2.5rem]
+                rounded-[2rem]
                 border
                 border-slate-200
                 bg-white
@@ -152,7 +152,7 @@ export default function ProductGrid() {
               <div
                 className="
                   relative
-                  h-[280px]
+                  h-[240px]
                   w-full
                   shrink-0
                   overflow-hidden
@@ -196,7 +196,7 @@ export default function ProductGrid() {
                     absolute
                     inset-x-0
                     bottom-0
-                    h-32
+                    h-28
                     bg-gradient-to-t
                     from-white
                     via-white/40
@@ -217,9 +217,9 @@ export default function ProductGrid() {
                   w-full
                   flex-1
                   flex-col
-                  p-8
-                  md:p-10
-                  lg:p-12
+                  p-7
+                  md:p-8
+                  lg:p-9
                 "
               >
 
@@ -227,7 +227,7 @@ export default function ProductGrid() {
 
                 <p
                   className="
-                    mb-4
+                    mb-3
                     text-xs
                     font-bold
                     uppercase
@@ -243,8 +243,8 @@ export default function ProductGrid() {
 
                 <h2
                   className="
-                    mb-3
-                    text-3xl
+                    mb-2
+                    text-2xl
                     font-extrabold
                     leading-tight
                     tracking-tight
@@ -252,7 +252,7 @@ export default function ProductGrid() {
                     transition-colors
                     duration-300
                     group-hover:text-sky-500
-                    md:text-4xl
+                    md:text-3xl
                   "
                 >
                   {product.name}
@@ -263,7 +263,7 @@ export default function ProductGrid() {
 
                 <h3
                   className="
-                    mb-6
+                    mb-4
                     text-lg
                     font-semibold
                     text-slate-600
@@ -277,11 +277,11 @@ export default function ProductGrid() {
 
                 <p
                   className="
-                    mb-8
+                    mb-6
                     text-base
                     leading-7
                     text-slate-500
-                    md:text-lg
+                    md:text-base
                   "
                 >
                   {product.description}
@@ -294,11 +294,10 @@ export default function ProductGrid() {
 
                 <div
                   className="
-                    mb-10
+                    mb-7
                     flex
-                    flex-1
                     flex-col
-                    gap-4
+                    gap-3
                   "
                 >
 
@@ -319,7 +318,7 @@ export default function ProductGrid() {
                     >
 
                       <CheckCircle2
-                        size={20}
+                        size={19}
                         className="
                           mt-1
                           shrink-0
@@ -331,9 +330,10 @@ export default function ProductGrid() {
                         className="
                           flex-1
                           break-words
-                          text-base
+                          text-sm
                           leading-6
                           text-slate-600
+                          md:text-base
                         "
                       >
                         {feature}
@@ -356,7 +356,7 @@ export default function ProductGrid() {
                     w-full
                     border-t
                     border-slate-200
-                    pt-6
+                    pt-5
                   "
                 >
 
@@ -586,6 +586,7 @@ export default function ProductGrid() {
                 }}
                 className="group-hover:translate-x-1.5"
               />
+
             </motion.button>
 
           </div>

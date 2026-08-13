@@ -17,7 +17,11 @@ router = APIRouter()
 def get_products(
     db: Session = Depends(get_db),
 ):
-    return db.query(models.Product).all()
+    return (
+        db.query(models.Product)
+        .order_by(models.Product.id.desc())
+        .all()
+    )
 
 
 # =====================================================
