@@ -248,19 +248,6 @@ function SmoothBackgroundVideo({ sources }) {
           pointerEvents: "none",
         }}
       />
-
-      {/* BOTTOM SCRIM */}
-
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "linear-gradient(180deg, rgba(2,6,23,0) 78%, rgba(2,6,23,0.3) 100%)",
-          zIndex: 3,
-          pointerEvents: "none",
-        }}
-      />
     </div>
   );
 }
@@ -380,9 +367,7 @@ export default function AboutHero() {
      ======================================================= */
 
   const theme = {
-    sectionBg: hasVideo
-      ? "#050505"
-      : "#ffffff",
+    sectionBg: "#ffffff",
 
     label: hasVideo
       ? "#38bdf8"
@@ -1006,7 +991,7 @@ export default function AboutHero() {
         style={{
           zIndex: 5,
           background:
-            "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.05) 45%, rgba(255,255,255,0.35) 75%, #ffffff 90%)",
+            "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.05) 45%, rgba(255,255,255,0.35) 75%, #ffffff 100%)",
         }}
       />
     </section>
