@@ -13,28 +13,29 @@ from ..security import get_current_admin
 
 router = APIRouter()
 
-
 UPLOAD_DIR = Path("uploads")
 
 
 # =====================================================
-# ADMIN ONLY — LIST MEDIA
+# PUBLIC — LIST MEDIA
 # =====================================================
 
 @router.get("/")
-def list_media(
-    admin: str = Depends(get_current_admin),
-):
+def list_media():
     files = []
+
+    if not UPLOAD_DIR.exists():
+        return files
 
     for folder in UPLOAD_DIR.iterdir():
         if folder.is_dir():
             for file in folder.iterdir():
-                files.append({
-                    "folder": folder.name,
-                    "filename": file.name,
-                    "path": f"/uploads/{folder.name}/{file.name}",
-                })
+                if file.is_file():
+                    files.append({
+                        "folder": folder.name,
+                        "filename": file.name,
+                        "path": f"/uploads/{folder.name}/{file.name}",
+                    })
 
     return files
 
