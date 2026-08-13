@@ -49,7 +49,7 @@ export default function ContactHero() {
 
     gridLine: "rgba(15,23,42,0.07)",
 
-    // Transparent glass card
+    // Transparent glass card — UNCHANGED
     cardBg: hasVideo
       ? "rgba(17,17,19,0.05)"
       : "rgba(255,255,255,0.05)",
@@ -58,14 +58,14 @@ export default function ContactHero() {
 
     cardShadow: "0 20px 60px rgba(15,23,42,0.08)",
 
-    // Card heading black
+    // Card heading black — UNCHANGED
     cardHeading: "#0f172a",
 
-    // Card details white
+    // Card details white — UNCHANGED
     cardBody: "#ffffff",
 
     bottomFade:
-      "linear-gradient(to bottom, rgba(255,255,255,0), #ffffff)",
+      "linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.25))",
   };
 
   const scrollToContact = () => {
@@ -123,7 +123,7 @@ export default function ContactHero() {
             width: "100%",
             height: "100%",
             objectFit: "cover",
-            opacity: 0.92,
+            opacity: 1,
             zIndex: 0,
           }}
         >
@@ -135,7 +135,7 @@ export default function ContactHero() {
       )}
 
       {/* =====================================================
-          WHITE READABILITY OVERLAY
+          DARK READABILITY OVERLAY
       ===================================================== */}
 
       {hasVideo && (
@@ -144,7 +144,7 @@ export default function ContactHero() {
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(rgba(255,255,255,0.08), rgba(255,255,255,0.16))",
+              "linear-gradient(rgba(15,23,42,0.10), rgba(15,23,42,0.18))",
             zIndex: 1,
             pointerEvents: "none",
           }}
@@ -152,21 +152,17 @@ export default function ContactHero() {
       )}
 
       {/* =====================================================
-          WHITE GLOW
+          SUBTLE LIGHTING
       ===================================================== */}
 
       <div
-        className="absolute inset-0 overflow-hidden pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
         style={{
           zIndex: 2,
+          background:
+            "radial-gradient(circle at 30% 35%, rgba(255,255,255,0.06), transparent 45%)",
         }}
-      >
-        <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-white/[0.08] blur-[170px]" />
-
-        <div className="absolute bottom-0 left-0 h-72 w-72 rounded-full bg-white/[0.05] blur-[130px]" />
-
-        <div className="absolute top-20 right-[-10%] h-96 w-96 rounded-full bg-white/[0.07] blur-[150px]" />
-      </div>
+      />
 
       {/* =====================================================
           GRID
@@ -333,6 +329,7 @@ export default function ContactHero() {
 
         {/* =================================================
             RIGHT COLUMN — GLASS CARD
+            KEPT UNCHANGED
         ================================================= */}
 
         <motion.div
@@ -355,7 +352,7 @@ export default function ContactHero() {
           style={{
             borderRadius: "2.5rem",
 
-            /* GLASS */
+            /* GLASS — UNCHANGED */
             backgroundColor: theme.cardBg,
 
             backdropFilter: "blur(4px)",
@@ -422,16 +419,19 @@ export default function ContactHero() {
         </motion.div>
       </div>
 
-      {/* Bottom Video Fade */}
+      {/* =====================================================
+          SOFT BOTTOM FADE
+      ===================================================== */}
+
       <div
         style={{
           position: "absolute",
           bottom: 0,
           left: 0,
           width: "100%",
-          height: "180px",
+          height: "100px",
           background:
-            "linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 35%, rgba(255,255,255,0.6) 75%, #ffffff 100%)",
+            "linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.08) 55%, rgba(255,255,255,0.25) 100%)",
           pointerEvents: "none",
           zIndex: 20,
         }}

@@ -26,8 +26,7 @@ export default function ShowcaseHero() {
   const hasVideo = Boolean(backgroundVideo);
 
   /* =======================================================
-     THEME — white section when there's no video, the
-     original dark/video theme when there is
+     THEME
      ======================================================= */
 
   const theme = {
@@ -35,11 +34,13 @@ export default function ShowcaseHero() {
     label: hasVideo ? "#38bdf8" : "#0ea5e9",
     heading: hasVideo ? "#ffffff" : "#0f172a",
     body: hasVideo ? "#d1d5db" : "#475569",
+
     gridLine: hasVideo
       ? "rgba(255,255,255,.2)"
       : "rgba(15,23,42,0.07)",
+
     bottomFade: hasVideo
-      ? "linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 35%, rgba(255,255,255,0.6) 75%, #ffffff 100%)"
+      ? "linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.08) 55%, rgba(255,255,255,0.25) 100%)"
       : "linear-gradient(to bottom, rgba(255,255,255,0), #ffffff)",
   };
 
@@ -84,7 +85,7 @@ export default function ShowcaseHero() {
             height: "100%",
             objectFit: "cover",
             objectPosition: "center",
-            opacity: 0.92,
+            opacity: 1,
             zIndex: 0,
           }}
         >
@@ -96,15 +97,7 @@ export default function ShowcaseHero() {
       )}
 
       {/* =====================================================
-          READABILITY SCRIM
-
-          Was a flat white wash over the whole video — brightening
-          it worked against the white heading text (less contrast,
-          not more) and milked out the footage everywhere, not just
-          behind the copy. This is a dark, centered vignette instead:
-          it only darkens where the text actually sits, and leaves
-          the edges of the frame clear so the video reads at full
-          strength.
+          DARK READABILITY OVERLAY
       ===================================================== */}
 
       {hasVideo && (
@@ -113,7 +106,7 @@ export default function ShowcaseHero() {
             position: "absolute",
             inset: 0,
             background:
-              "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(2,6,23,0.45) 0%, rgba(2,6,23,0.2) 45%, rgba(2,6,23,0) 75%)",
+              "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(2,6,23,0.45) 0%, rgba(2,6,23,0.20) 45%, rgba(2,6,23,0) 75%)",
             zIndex: 1,
             pointerEvents: "none",
           }}
@@ -122,11 +115,7 @@ export default function ShowcaseHero() {
 
       {/* =====================================================
           WHITE GLOW
-
-          Only for the plain (no-video) white section now — on the
-          video path this was a third layer of white haze stacked
-          on top of the overlay above, compounding the washed-out
-          look.
+          Only for the plain white section
       ===================================================== */}
 
       {!hasVideo && (
@@ -349,7 +338,7 @@ export default function ShowcaseHero() {
       </div>
 
       {/* =====================================================
-          BOTTOM VIDEO FADE
+          SOFT BOTTOM VIDEO FADE
       ===================================================== */}
 
       <div
@@ -358,7 +347,7 @@ export default function ShowcaseHero() {
           bottom: 0,
           left: 0,
           width: "100%",
-          height: "140px",
+          height: "100px",
           background: theme.bottomFade,
           pointerEvents: "none",
           zIndex: 20,

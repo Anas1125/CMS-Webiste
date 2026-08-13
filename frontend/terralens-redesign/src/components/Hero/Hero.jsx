@@ -11,7 +11,6 @@ import LiquidGlassButton from "../ui/LiquidGlassButton";
 import { getSettings } from "../../api/settings";
 import { getMedia } from "../../api/media";
 
-
 function Hero() {
   const navigate = useNavigate();
 
@@ -23,7 +22,6 @@ function Hero() {
 
   const [settings, setSettings] =
     useState(null);
-
 
   /*
   =====================================================
@@ -77,7 +75,6 @@ function Hero() {
     loadHeroVideos();
   }, []);
 
-
   /*
   =====================================================
   LOAD SETTINGS
@@ -101,7 +98,6 @@ function Hero() {
     loadSettings();
   }, []);
 
-
   /*
   =====================================================
   VIDEO URL
@@ -119,7 +115,6 @@ function Hero() {
 
     return `${import.meta.env.VITE_API_URL}${path}`;
   };
-
 
   /*
   =====================================================
@@ -155,7 +150,6 @@ function Hero() {
     }),
   };
 
-
   /*
   =====================================================
   AUTOMATIC VIDEO CHANGE
@@ -179,7 +173,6 @@ function Hero() {
     };
   }, [videos.length]);
 
-
   /*
   =====================================================
   RESET INDEX
@@ -194,7 +187,6 @@ function Hero() {
       setCurrentVideo(0);
     }
   }, [videos.length, currentVideo]);
-
 
   /*
   =====================================================
@@ -212,7 +204,6 @@ function Hero() {
         (prev + 1) % videos.length
     );
   };
-
 
   /*
   =====================================================
@@ -232,7 +223,6 @@ function Hero() {
     );
   };
 
-
   /*
   =====================================================
   CURRENT VIDEO
@@ -248,7 +238,6 @@ function Hero() {
 
   const hasVideo =
     Boolean(currentVideoUrl);
-
 
   /*
   =====================================================
@@ -273,7 +262,6 @@ function Hero() {
       ? "text-gray-100"
       : "text-slate-600",
   };
-
 
   /*
   =====================================================
@@ -357,22 +345,25 @@ function Hero() {
         />
       )}
 
-
       {/* =================================================
-          LIGHT READABILITY OVERLAY
+          DARK READABILITY OVERLAY
+          Keeps video rich instead of washing it out
       ================================================= */}
 
       {hasVideo && (
         <div
           className="
+            pointer-events-none
             absolute
             inset-0
             z-[1]
-            bg-black/[0.05]
           "
+          style={{
+            background:
+              "radial-gradient(ellipse 75% 70% at 50% 50%, rgba(2,6,23,0.28) 0%, rgba(2,6,23,0.12) 45%, rgba(2,6,23,0) 75%)",
+          }}
         />
       )}
-
 
       {/* =================================================
           SUBTLE DEPTH OVERLAY
@@ -385,17 +376,16 @@ function Hero() {
             absolute
             inset-0
             z-[2]
-            bg-gradient-to-b
-            from-black/[0.10]
-            via-transparent
-            to-black/[0.15]
           "
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(0,0,0,0.12) 0%, transparent 30%, transparent 75%, rgba(0,0,0,0.12) 100%)",
+          }}
         />
       )}
 
-
       {/* =================================================
-          BOTTOM GRADIENT
+          SOFT BOTTOM FADE
       ================================================= */}
 
       <div
@@ -405,13 +395,14 @@ function Hero() {
           inset-x-0
           bottom-0
           z-[3]
-          h-10
-          bg-gradient-to-b
-          from-transparent
-          to-white
         "
+        style={{
+          height: "100px",
+          background: hasVideo
+            ? "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.08) 55%, rgba(255,255,255,0.25) 100%)"
+            : "linear-gradient(to bottom, transparent, #ffffff)",
+        }}
       />
-
 
       {/* =================================================
           LEFT ARROW
@@ -440,7 +431,6 @@ function Hero() {
         </div>
       )}
 
-
       {/* =================================================
           RIGHT ARROW
       ================================================= */}
@@ -467,7 +457,6 @@ function Hero() {
           </LiquidGlassButton>
         </div>
       )}
-
 
       {/* =================================================
           CONTENT
@@ -557,7 +546,6 @@ function Hero() {
             </motion.p>
           </div>
 
-
           {/* =================================================
               TITLE
           ================================================= */}
@@ -623,7 +611,6 @@ function Hero() {
             </motion.h1>
           </div>
 
-
           {/* =================================================
               SUBTITLE
           ================================================= */}
@@ -685,7 +672,6 @@ function Hero() {
             </motion.p>
           </div>
 
-
           {/* =================================================
               BUTTONS
           ================================================= */}
@@ -698,7 +684,6 @@ function Hero() {
               gap-6
             "
           >
-
             <LiquidGlassButton
               tone={
                 hasVideo
@@ -717,7 +702,6 @@ function Hero() {
                 "Explore Solutions"}
             </LiquidGlassButton>
 
-
             <LiquidGlassButton
               tone={
                 hasVideo
@@ -731,12 +715,9 @@ function Hero() {
             >
               View Projects
             </LiquidGlassButton>
-
           </div>
-
         </div>
       </div>
-
 
       {/* =================================================
           NAVIGATION DOTS
@@ -783,7 +764,6 @@ function Hero() {
         </div>
       )}
 
-
       {/* =================================================
           SCROLL INDICATOR
       ================================================= */}
@@ -828,7 +808,6 @@ function Hero() {
           />
         </div>
       </motion.div>
-
     </section>
   );
 }

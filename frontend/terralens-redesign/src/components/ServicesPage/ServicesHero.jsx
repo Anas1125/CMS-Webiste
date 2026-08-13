@@ -35,13 +35,13 @@ export default function ServicesHero() {
 
   /* =======================================================
      THEME
-     ======================================================= */
+  ======================================================= */
 
   const theme = {
     sectionBg: "#ffffff",
     label: "#0ea5e9",
 
-    // Main heading WHITE
+    // Main heading WHITE — unchanged
     heading: "#ffffff",
 
     body: "#475569",
@@ -53,7 +53,7 @@ export default function ServicesHero() {
     contactHoverClass:
       "hover:border-sky-500/50 hover:bg-sky-500/5 hover:text-sky-600 hover:-translate-y-0.5 group",
 
-    // Transparent card
+    // Transparent card — unchanged
     cardBg: hasVideo
       ? "rgba(17,17,19,0.05)"
       : "rgba(255,255,255,0.05)",
@@ -61,12 +61,12 @@ export default function ServicesHero() {
     cardBorder: "1px solid rgba(15,23,42,0.10)",
     cardShadow: "0 20px 60px rgba(15,23,42,0.08)",
 
-    // Card text WHITE
+    // Card text — unchanged
     cardHeading: "#0f172a",
     cardBody: "#ffffff",
 
     bottomFade:
-      "linear-gradient(to bottom, rgba(255,255,255,0), #ffffff)",
+      "linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.25))",
   };
 
   const scrollToServices = () => {
@@ -120,7 +120,7 @@ export default function ServicesHero() {
             height: "100%",
             objectFit: "cover",
             objectPosition: "center",
-            opacity: 0.92,
+            opacity: 1,
             zIndex: 0,
           }}
         >
@@ -132,7 +132,7 @@ export default function ServicesHero() {
       )}
 
       {/* =========================================================
-          VIDEO OVERLAY
+          DARK READABILITY OVERLAY
       ========================================================= */}
 
       {hasVideo && (
@@ -141,7 +141,7 @@ export default function ServicesHero() {
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(rgba(255,255,255,.08), rgba(255,255,255,.16))",
+              "radial-gradient(ellipse 70% 60% at 35% 50%, rgba(2,6,23,0.45) 0%, rgba(2,6,23,0.20) 45%, rgba(2,6,23,0) 75%)",
             zIndex: 1,
             pointerEvents: "none",
           }}
@@ -150,57 +150,60 @@ export default function ServicesHero() {
 
       {/* =========================================================
           BACKGROUND GLOWS
+          Only used when there is NO video
       ========================================================= */}
 
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          overflow: "hidden",
-          pointerEvents: "none",
-          zIndex: 2,
-        }}
-      >
+      {!hasVideo && (
         <div
           style={{
             position: "absolute",
-            left: "50%",
-            top: 0,
-            height: "500px",
-            width: "500px",
-            transform: "translateX(-50%)",
-            borderRadius: "9999px",
-            backgroundColor: "rgba(255,255,255,0.08)",
-            filter: "blur(140px)",
+            inset: 0,
+            overflow: "hidden",
+            pointerEvents: "none",
+            zIndex: 2,
           }}
-        />
+        >
+          <div
+            style={{
+              position: "absolute",
+              left: "50%",
+              top: 0,
+              height: "500px",
+              width: "500px",
+              transform: "translateX(-50%)",
+              borderRadius: "9999px",
+              backgroundColor: "rgba(255,255,255,0.08)",
+              filter: "blur(140px)",
+            }}
+          />
 
-        <div
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            height: "288px",
-            width: "288px",
-            borderRadius: "9999px",
-            backgroundColor: "rgba(255,255,255,0.05)",
-            filter: "blur(120px)",
-          }}
-        />
+          <div
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              height: "288px",
+              width: "288px",
+              borderRadius: "9999px",
+              backgroundColor: "rgba(255,255,255,0.05)",
+              filter: "blur(120px)",
+            }}
+          />
 
-        <div
-          style={{
-            position: "absolute",
-            top: "80px",
-            right: "-10%",
-            height: "384px",
-            width: "384px",
-            borderRadius: "9999px",
-            backgroundColor: "rgba(255,255,255,0.07)",
-            filter: "blur(140px)",
-          }}
-        />
-      </div>
+          <div
+            style={{
+              position: "absolute",
+              top: "80px",
+              right: "-10%",
+              height: "384px",
+              width: "384px",
+              borderRadius: "9999px",
+              backgroundColor: "rgba(255,255,255,0.07)",
+              filter: "blur(140px)",
+            }}
+          />
+        </div>
+      )}
 
       {/* =========================================================
           GRID PATTERN
@@ -387,6 +390,7 @@ export default function ServicesHero() {
 
         {/* =====================================================
             RIGHT COLUMN — GLASS CARD
+            KEPT UNCHANGED
         ===================================================== */}
 
         <motion.div
@@ -584,15 +588,16 @@ export default function ServicesHero() {
       </div>
 
       {/* =========================================================
-          BOTTOM VIDEO FADE
+          SOFT BOTTOM VIDEO FADE
       ========================================================= */}
 
       <div
-        className="absolute bottom-0 left-0 w-full h-72 pointer-events-none"
+        className="absolute bottom-0 left-0 w-full pointer-events-none"
         style={{
-          zIndex: 5,
+          height: "100px",
+          zIndex: 20,
           background:
-            "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.05) 45%, rgba(255,255,255,0.35) 75%, #ffffff 100%)",
+            "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.08) 55%, rgba(255,255,255,0.25) 100%)",
         }}
       />
     </section>

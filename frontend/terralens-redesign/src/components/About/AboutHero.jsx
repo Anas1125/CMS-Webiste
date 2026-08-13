@@ -236,7 +236,7 @@ function SmoothBackgroundVideo({ sources }) {
         }}
       />
 
-      {/* READABILITY SCRIM */}
+      {/* DARK READABILITY SCRIM */}
 
       <div
         style={{
@@ -401,6 +401,7 @@ export default function AboutHero() {
       ? "hover:border-sky-400/50 hover:bg-sky-500/10 hover:text-sky-400 hover:-translate-y-0.5 group"
       : "hover:border-sky-500/50 hover:bg-sky-500/5 hover:text-sky-600 hover:-translate-y-0.5 group",
 
+    // RIGHT CARD — UNCHANGED
     cardBg: hasVideo
       ? "rgba(17,17,19,0.12)"
       : "rgba(255,255,255,0.5)",
@@ -463,7 +464,7 @@ export default function AboutHero() {
     >
       {/* =================================================
           VIDEO
-          ================================================= */}
+      ================================================= */}
 
       {hasVideo && (
         <SmoothBackgroundVideo
@@ -473,7 +474,8 @@ export default function AboutHero() {
 
       {/* =================================================
           WHITE ATMOSPHERIC GLOW
-          ================================================= */}
+          Only for non-video version
+      ================================================= */}
 
       {!hasVideo && (
         <div
@@ -516,7 +518,7 @@ export default function AboutHero() {
 
       {/* =================================================
           VERY LIGHT GRID
-          ================================================= */}
+      ================================================= */}
 
       <div
         style={{
@@ -532,7 +534,7 @@ export default function AboutHero() {
 
       {/* =================================================
           MAIN CONTENT
-          ================================================= */}
+      ================================================= */}
 
       <div
         style={{
@@ -552,7 +554,7 @@ export default function AboutHero() {
       >
         {/* =================================================
             LEFT SIDE
-            ================================================= */}
+        ================================================= */}
 
         <div
           style={{
@@ -627,7 +629,7 @@ export default function AboutHero() {
 
           {/* =================================================
               BUTTONS
-              ================================================= */}
+          ================================================= */}
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -726,7 +728,8 @@ export default function AboutHero() {
 
         {/* =================================================
             RIGHT GLASS CARD
-            ================================================= */}
+            KEPT UNCHANGED
+        ================================================= */}
 
         <motion.div
           initial={{ opacity: 0, x: 30 }}
@@ -977,7 +980,9 @@ export default function AboutHero() {
         </motion.div>
       </div>
 
-      {/* FINAL WHITE FADE */}
+      {/* =================================================
+          SOFT BOTTOM FADE
+      ================================================= */}
 
       <div
         className="
@@ -985,13 +990,14 @@ export default function AboutHero() {
           bottom-0
           left-0
           w-full
-          h-72
           pointer-events-none
         "
         style={{
-          zIndex: 5,
-          background:
-            "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.05) 45%, rgba(255,255,255,0.35) 75%, #ffffff 100%)",
+          height: "100px",
+          zIndex: 20,
+          background: hasVideo
+            ? "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.08) 55%, rgba(255,255,255,0.25) 100%)"
+            : "linear-gradient(to bottom, transparent, #ffffff)",
         }}
       />
     </section>

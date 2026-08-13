@@ -128,7 +128,7 @@ export default function ProductsHero() {
       )}
 
       {/* =====================================================
-          SUBTLE VIDEO COLOR OVERLAY
+          DARK READABILITY OVERLAY
       ===================================================== */}
 
       {hasVideo && (
@@ -136,7 +136,7 @@ export default function ProductsHero() {
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "linear-gradient(rgba(255,255,255,.08), rgba(255,255,255,.16))",
+              "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(2,6,23,0.45) 0%, rgba(2,6,23,0.20) 45%, rgba(2,6,23,0) 75%)",
             zIndex: 1,
           }}
         />
@@ -144,20 +144,23 @@ export default function ProductsHero() {
 
       {/* =====================================================
           BACKGROUND GLOW
+          Only used when there is NO video
       ===================================================== */}
 
-      <div
-        className="absolute inset-0 overflow-hidden pointer-events-none"
-        style={{
-          zIndex: 2,
-        }}
-      >
-        <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-white/[0.08] blur-[170px]" />
+      {!hasVideo && (
+        <div
+          className="absolute inset-0 overflow-hidden pointer-events-none"
+          style={{
+            zIndex: 2,
+          }}
+        >
+          <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-white/[0.08] blur-[170px]" />
 
-        <div className="absolute bottom-0 left-0 h-80 w-80 rounded-full bg-white/[0.05] blur-[140px]" />
+          <div className="absolute bottom-0 left-0 h-80 w-80 rounded-full bg-white/[0.05] blur-[140px]" />
 
-        <div className="absolute top-20 right-[-10%] h-96 w-96 rounded-full bg-white/[0.07] blur-[170px]" />
-      </div>
+          <div className="absolute top-20 right-[-10%] h-96 w-96 rounded-full bg-white/[0.07] blur-[170px]" />
+        </div>
+      )}
 
       {/* =====================================================
           GRID PATTERN
@@ -336,22 +339,22 @@ export default function ProductsHero() {
       </div>
 
       {/* =====================================================
-          BOTTOM FADE
+          SOFT BOTTOM FADE
       ===================================================== */}
 
       <div
-      style={{
-        position: "absolute",
-        left: 0,
-        right: 0,
-        bottom: 0,
-        height: "80px",
-        background:
-          "linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 25%, rgba(255,255,255,0.75) 60%, #ffffff 100%)",
-        pointerEvents: "none",
-        zIndex: 20,
-      }}
-    />
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: "100px",
+          background:
+            "linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.08) 55%, rgba(255,255,255,0.25) 100%)",
+          pointerEvents: "none",
+          zIndex: 20,
+        }}
+      />
     </section>
   );
 }
