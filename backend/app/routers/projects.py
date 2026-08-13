@@ -3,10 +3,12 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from .. import models, schemas
+from ..security import get_current_admin
 
 router = APIRouter()
 
 
+# PUBLIC
 @router.get("/")
 def get_projects(db: Session = Depends(get_db)):
     return (
@@ -16,6 +18,7 @@ def get_projects(db: Session = Depends(get_db)):
     )
 
 
+# PUBLIC
 @router.get("/{project_id}")
 def get_project(
     project_id: int,
@@ -36,10 +39,12 @@ def get_project(
     return project
 
 
+# ADMIN ONLY
 @router.post("/")
 def create_project(
     project: schemas.ProjectCreate,
     db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
 ):
     new_project = models.Project(
         category=project.category,
@@ -66,11 +71,13 @@ def create_project(
     return new_project
 
 
+# ADMIN ONLY
 @router.put("/{project_id}")
 def update_project(
     project_id: int,
     project: schemas.ProjectCreate,
     db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
 ):
     existing = (
         db.query(models.Project)
@@ -106,10 +113,12 @@ def update_project(
     return existing
 
 
+# ADMIN ONLY
 @router.delete("/{project_id}")
 def delete_project(
     project_id: int,
     db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
 ):
     existing = (
         db.query(models.Project)

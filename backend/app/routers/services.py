@@ -3,44 +3,70 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from .. import models, schemas
+from ..security import get_current_admin
+
 
 router = APIRouter()
 
 
+# =====================================================
+# PUBLIC — GET ALL SERVICES
+# =====================================================
+
 @router.get("/")
-def get_services(db: Session = Depends(get_db)):
-    return db.query(models.Service)\
-        .order_by(models.Service.created_at.desc())\
+def get_services(
+    db: Session = Depends(get_db),
+):
+    return (
+        db.query(models.Service)
+        .order_by(
+            models.Service.created_at.desc()
+        )
         .all()
+    )
+
+
+# =====================================================
+# PUBLIC — GET SERVICE BY SLUG
+# =====================================================
 
 @router.get("/{slug}")
 def get_service_by_slug(
     slug: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     service = (
         db.query(models.Service)
-        .filter(models.Service.slug == slug)
+        .filter(
+            models.Service.slug == slug
+        )
         .first()
     )
 
     if not service:
         raise HTTPException(
             status_code=404,
-            detail="Service not found"
+            detail="Service not found",
         )
 
     return service
 
 
+# =====================================================
+# ADMIN ONLY — CREATE SERVICE
+# =====================================================
+
 @router.post("/")
 def create_service(
     service: schemas.ServiceCreate,
     db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
 ):
     existing = (
         db.query(models.Service)
-        .filter(models.Service.slug == service.slug)
+        .filter(
+            models.Service.slug == service.slug
+        )
         .first()
     )
 
@@ -66,15 +92,22 @@ def create_service(
     return new_service
 
 
+# =====================================================
+# ADMIN ONLY — UPDATE SERVICE
+# =====================================================
+
 @router.put("/{service_id}")
 def update_service(
     service_id: int,
     service: schemas.ServiceCreate,
     db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
 ):
     existing = (
         db.query(models.Service)
-        .filter(models.Service.id == service_id)
+        .filter(
+            models.Service.id == service_id
+        )
         .first()
     )
 
@@ -97,14 +130,21 @@ def update_service(
     return existing
 
 
+# =====================================================
+# ADMIN ONLY — DELETE SERVICE
+# =====================================================
+
 @router.delete("/{service_id}")
 def delete_service(
     service_id: int,
     db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
 ):
     existing = (
         db.query(models.Service)
-        .filter(models.Service.id == service_id)
+        .filter(
+            models.Service.id == service_id
+        )
         .first()
     )
 

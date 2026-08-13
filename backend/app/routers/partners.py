@@ -3,14 +3,24 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from .. import models, schemas
+from ..security import get_current_admin
+
 
 router = APIRouter()
 
 
-@router.post("/", response_model=schemas.PartnerResponse)
+# =====================================================
+# ADMIN ONLY — CREATE PARTNER
+# =====================================================
+
+@router.post(
+    "/",
+    response_model=schemas.PartnerResponse,
+)
 def create_partner(
     partner: schemas.PartnerCreate,
     db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
 ):
     new_partner = models.Partner(
         name=partner.name,
@@ -26,21 +36,37 @@ def create_partner(
     return new_partner
 
 
-@router.get("/", response_model=list[schemas.PartnerResponse])
+# =====================================================
+# PUBLIC — GET ALL PARTNERS
+# =====================================================
+
+@router.get(
+    "/",
+    response_model=list[schemas.PartnerResponse],
+)
 def get_partners(
     db: Session = Depends(get_db),
 ):
     return db.query(models.Partner).all()
 
 
-@router.get("/{partner_id}", response_model=schemas.PartnerResponse)
+# =====================================================
+# PUBLIC — GET SINGLE PARTNER
+# =====================================================
+
+@router.get(
+    "/{partner_id}",
+    response_model=schemas.PartnerResponse,
+)
 def get_partner(
     partner_id: int,
     db: Session = Depends(get_db),
 ):
     partner = (
         db.query(models.Partner)
-        .filter(models.Partner.id == partner_id)
+        .filter(
+            models.Partner.id == partner_id
+        )
         .first()
     )
 
@@ -53,15 +79,25 @@ def get_partner(
     return partner
 
 
-@router.put("/{partner_id}", response_model=schemas.PartnerResponse)
+# =====================================================
+# ADMIN ONLY — UPDATE PARTNER
+# =====================================================
+
+@router.put(
+    "/{partner_id}",
+    response_model=schemas.PartnerResponse,
+)
 def update_partner(
     partner_id: int,
     partner: schemas.PartnerCreate,
     db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
 ):
     existing_partner = (
         db.query(models.Partner)
-        .filter(models.Partner.id == partner_id)
+        .filter(
+            models.Partner.id == partner_id
+        )
         .first()
     )
 
@@ -82,14 +118,23 @@ def update_partner(
     return existing_partner
 
 
-@router.delete("/{partner_id}")
+# =====================================================
+# ADMIN ONLY — DELETE PARTNER
+# =====================================================
+
+@router.delete(
+    "/{partner_id}"
+)
 def delete_partner(
     partner_id: int,
     db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
 ):
     partner = (
         db.query(models.Partner)
-        .filter(models.Partner.id == partner_id)
+        .filter(
+            models.Partner.id == partner_id
+        )
         .first()
     )
 

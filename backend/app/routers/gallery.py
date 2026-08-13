@@ -3,18 +3,32 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from .. import models, schemas
+from ..security import get_current_admin
+
 
 router = APIRouter()
 
 
+# =====================================================
+# PUBLIC — GET ALL GALLERY ITEMS
+# =====================================================
+
 @router.get("/")
-def get_gallery(db: Session = Depends(get_db)):
+def get_gallery(
+    db: Session = Depends(get_db),
+):
     return (
         db.query(models.Gallery)
-        .order_by(models.Gallery.created_at.desc())
+        .order_by(
+            models.Gallery.created_at.desc()
+        )
         .all()
     )
 
+
+# =====================================================
+# PUBLIC — GET SINGLE GALLERY ITEM
+# =====================================================
 
 @router.get("/{gallery_id}")
 def get_gallery_item(
@@ -23,7 +37,9 @@ def get_gallery_item(
 ):
     gallery_item = (
         db.query(models.Gallery)
-        .filter(models.Gallery.id == gallery_id)
+        .filter(
+            models.Gallery.id == gallery_id
+        )
         .first()
     )
 
@@ -36,10 +52,15 @@ def get_gallery_item(
     return gallery_item
 
 
+# =====================================================
+# ADMIN ONLY — CREATE GALLERY ITEM
+# =====================================================
+
 @router.post("/")
 def create_gallery_item(
     gallery: schemas.GalleryCreate,
     db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
 ):
     new_gallery = models.Gallery(
         title=gallery.title,
@@ -55,15 +76,22 @@ def create_gallery_item(
     return new_gallery
 
 
+# =====================================================
+# ADMIN ONLY — UPDATE GALLERY ITEM
+# =====================================================
+
 @router.put("/{gallery_id}")
 def update_gallery_item(
     gallery_id: int,
     gallery: schemas.GalleryCreate,
     db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
 ):
     existing = (
         db.query(models.Gallery)
-        .filter(models.Gallery.id == gallery_id)
+        .filter(
+            models.Gallery.id == gallery_id
+        )
         .first()
     )
 
@@ -84,14 +112,21 @@ def update_gallery_item(
     return existing
 
 
+# =====================================================
+# ADMIN ONLY — DELETE GALLERY ITEM
+# =====================================================
+
 @router.delete("/{gallery_id}")
 def delete_gallery_item(
     gallery_id: int,
     db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
 ):
     existing = (
         db.query(models.Gallery)
-        .filter(models.Gallery.id == gallery_id)
+        .filter(
+            models.Gallery.id == gallery_id
+        )
         .first()
     )
 

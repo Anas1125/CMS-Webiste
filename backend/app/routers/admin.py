@@ -3,13 +3,20 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from .. import models, schemas
-from ..security import verify_password, create_access_token
+from ..security import (
+    verify_password,
+    create_access_token,
+    get_current_admin,
+)
 
 router = APIRouter()
 
 
 @router.get("/stats")
-def get_stats(db: Session = Depends(get_db)):
+def get_stats(
+    db: Session = Depends(get_db),
+    current_admin: str = Depends(get_current_admin),
+):
     total_jobs = db.query(models.Job).count()
     total_contacts = db.query(models.Contact).count()
 

@@ -3,25 +3,31 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from .. import models, schemas
+from ..security import get_current_admin
+
 
 router = APIRouter()
 
 
 # =====================================================
-# GET ALL BLOGS
+# PUBLIC — GET ALL BLOGS
 # =====================================================
 
 @router.get("/")
-def get_blogs(db: Session = Depends(get_db)):
+def get_blogs(
+    db: Session = Depends(get_db),
+):
     return (
         db.query(models.Blog)
-        .order_by(models.Blog.created_at.desc())
+        .order_by(
+            models.Blog.created_at.desc()
+        )
         .all()
     )
 
 
 # =====================================================
-# GET SINGLE BLOG
+# PUBLIC — GET SINGLE BLOG
 # =====================================================
 
 @router.get("/{blog_id}")
@@ -31,7 +37,9 @@ def get_blog(
 ):
     blog = (
         db.query(models.Blog)
-        .filter(models.Blog.id == blog_id)
+        .filter(
+            models.Blog.id == blog_id
+        )
         .first()
     )
 
@@ -45,13 +53,14 @@ def get_blog(
 
 
 # =====================================================
-# CREATE BLOG
+# ADMIN ONLY — CREATE BLOG
 # =====================================================
 
 @router.post("/")
 def create_blog(
     blog: schemas.BlogCreate,
     db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
 ):
     new_blog = models.Blog(
         category=blog.category,
@@ -73,7 +82,7 @@ def create_blog(
 
 
 # =====================================================
-# UPDATE BLOG
+# ADMIN ONLY — UPDATE BLOG
 # =====================================================
 
 @router.put("/{blog_id}")
@@ -81,10 +90,13 @@ def update_blog(
     blog_id: int,
     blog: schemas.BlogCreate,
     db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
 ):
     existing = (
         db.query(models.Blog)
-        .filter(models.Blog.id == blog_id)
+        .filter(
+            models.Blog.id == blog_id
+        )
         .first()
     )
 
@@ -111,17 +123,20 @@ def update_blog(
 
 
 # =====================================================
-# DELETE BLOG
+# ADMIN ONLY — DELETE BLOG
 # =====================================================
 
 @router.delete("/{blog_id}")
 def delete_blog(
     blog_id: int,
     db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
 ):
     existing = (
         db.query(models.Blog)
-        .filter(models.Blog.id == blog_id)
+        .filter(
+            models.Blog.id == blog_id
+        )
         .first()
     )
 

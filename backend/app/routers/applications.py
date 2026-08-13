@@ -13,8 +13,11 @@ import uuid
 
 from ..database import get_db
 from .. import models, schemas
+from ..security import get_current_admin
+
 
 router = APIRouter()
+
 
 UPLOAD_DIR = Path("uploads/applications")
 
@@ -26,9 +29,13 @@ ALLOWED_EXTENSIONS = {
 }
 
 
+# =========================================================
+# PUBLIC — SUBMIT JOB APPLICATION
+# =========================================================
+
 @router.post(
     "/",
-    response_model=schemas.ApplicationResponse
+    response_model=schemas.ApplicationResponse,
 )
 async def create_application(
     job_id: int = Form(...),
@@ -54,9 +61,14 @@ async def create_application(
 
     resume_path = None
 
-    # Handle resume upload
+    # =====================================================
+    # HANDLE RESUME UPLOAD
+    # =====================================================
+
     if resume:
-        extension = Path(resume.filename).suffix.lower()
+        extension = Path(
+            resume.filename
+        ).suffix.lower()
 
         if extension not in ALLOWED_EXTENSIONS:
             raise HTTPException(
@@ -69,7 +81,7 @@ async def create_application(
             exist_ok=True,
         )
 
-        # Give the file a unique name
+        # Generate unique filename
         filename = (
             f"{uuid.uuid4().hex}{extension}"
         )
@@ -82,9 +94,14 @@ async def create_application(
                 buffer,
             )
 
-        resume_path = f"/uploads/applications/{filename}"
+        resume_path = (
+            f"/uploads/applications/{filename}"
+        )
 
-    # Create application
+    # =====================================================
+    # CREATE APPLICATION
+    # =====================================================
+
     new_application = models.Application(
         job_id=job_id,
         full_name=full_name,
@@ -101,12 +118,17 @@ async def create_application(
     return new_application
 
 
+# =========================================================
+# ADMIN ONLY — GET ALL APPLICATIONS
+# =========================================================
+
 @router.get(
     "/",
-    response_model=list[schemas.ApplicationResponse]
+    response_model=list[schemas.ApplicationResponse],
 )
 def get_applications(
     db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
 ):
     return (
         db.query(models.Application)
@@ -117,13 +139,18 @@ def get_applications(
     )
 
 
+# =========================================================
+# ADMIN ONLY — GET SINGLE APPLICATION
+# =========================================================
+
 @router.get(
     "/{application_id}",
-    response_model=schemas.ApplicationResponse
+    response_model=schemas.ApplicationResponse,
 )
 def get_application(
     application_id: int,
     db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
 ):
     application = (
         db.query(models.Application)
@@ -142,10 +169,17 @@ def get_application(
     return application
 
 
-@router.delete("/{application_id}")
+# =========================================================
+# ADMIN ONLY — DELETE APPLICATION
+# =========================================================
+
+@router.delete(
+    "/{application_id}"
+)
 def delete_application(
     application_id: int,
     db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
 ):
     application = (
         db.query(models.Application)
@@ -161,7 +195,10 @@ def delete_application(
             detail="Application not found",
         )
 
-    # Delete uploaded resume if it exists
+    # =====================================================
+    # DELETE UPLOADED RESUME
+    # =====================================================
+
     if application.resume:
         file_path = Path(
             application.resume.lstrip("/")
@@ -169,6 +206,10 @@ def delete_application(
 
         if file_path.exists():
             file_path.unlink()
+
+    # =====================================================
+    # DELETE DATABASE RECORD
+    # =====================================================
 
     db.delete(application)
     db.commit()

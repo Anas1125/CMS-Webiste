@@ -245,19 +245,31 @@ function AdminRoutes() {
 }
 
 
-function App() {
-  return (
-    <BrowserRouter>
+function AppContent() {
+  const location = useLocation();
 
+  const isAdminRoute = location.pathname.startsWith("/admin");
+
+  return (
+    <>
       <ScrollToTop />
 
-      <PublicRoutes />
-
-      <AdminRoutes />
-
-    </BrowserRouter>
+      {isAdminRoute ? (
+        <AdminRoutes />
+      ) : (
+        <PublicRoutes />
+      )}
+    </>
   );
 }
 
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
+  );
+}
 
 export default App;

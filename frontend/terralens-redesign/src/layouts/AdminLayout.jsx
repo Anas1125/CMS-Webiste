@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { getSettings } from "../api/settings";
 import {
@@ -12,6 +12,7 @@ import {
   FileText,
   Mail,
   Handshake,
+  LogOut,
 } from "lucide-react";
 
 const menu = [
@@ -97,6 +98,16 @@ const menu = [
 ];
 
 export default function AdminLayout() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken");
+
+    navigate("/admin/login", {
+      replace: true,
+    });
+  };
+
   useEffect(() => {
     const loadFavicon = async () => {
       try {
@@ -154,6 +165,8 @@ export default function AdminLayout() {
           borderRight: "1px solid #e2e8f0",
           padding: "32px 24px",
           zIndex: 100,
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         <h1
@@ -167,75 +180,121 @@ export default function AdminLayout() {
           TerraLens CMS
         </h1>
 
+        {/* Navigation */}
+
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: "28px",
+            flex: 1,
+            minHeight: 0,
           }}
         >
-          {menu.map((section) => (
-            <div key={section.title}>
-              <p
-                style={{
-                  color: "#94a3b8",
-                  fontSize: "12px",
-                  textTransform: "uppercase",
-                  letterSpacing: "2px",
-                  marginBottom: "12px",
-                  fontWeight: "600",
-                }}
-              >
-                {section.title}
-              </p>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "28px",
+              overflowY: "auto",
+              paddingRight: "4px",
+            }}
+          >
+            {menu.map((section) => (
+              <div key={section.title}>
+                <p
+                  style={{
+                    color: "#94a3b8",
+                    fontSize: "12px",
+                    textTransform: "uppercase",
+                    letterSpacing: "2px",
+                    marginBottom: "12px",
+                    fontWeight: "600",
+                  }}
+                >
+                  {section.title}
+                </p>
 
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "8px",
-                }}
-              >
-                {section.items.map((item) => {
-                  const Icon = item.icon;
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "8px",
+                  }}
+                >
+                  {section.items.map((item) => {
+                    const Icon = item.icon;
 
-                  return (
-                    <NavLink
-                      key={item.path}
-                      to={item.path}
-                      style={({ isActive }) => ({
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "12px",
-                        padding: "14px 18px",
-                        borderRadius: "12px",
-                        textDecoration: "none",
+                    return (
+                      <NavLink
+                        key={item.path}
+                        to={item.path}
+                        style={({ isActive }) => ({
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                          padding: "14px 18px",
+                          borderRadius: "12px",
+                          textDecoration: "none",
 
-                        color: isActive
-                          ? "#0284c7"
-                          : "#475569",
+                          color: isActive
+                            ? "#0284c7"
+                            : "#475569",
 
-                        background: isActive
-                          ? "#e0f2fe"
-                          : "transparent",
+                          background: isActive
+                            ? "#e0f2fe"
+                            : "transparent",
 
-                        transition: ".3s",
-                        fontWeight: 500,
+                          transition: ".3s",
+                          fontWeight: 500,
 
-                        border: isActive
-                          ? "1px solid #bae6fd"
-                          : "1px solid transparent",
-                      })}
-                    >
-                      <Icon size={18} />
+                          border: isActive
+                            ? "1px solid #bae6fd"
+                            : "1px solid transparent",
+                        })}
+                      >
+                        <Icon size={18} />
 
-                      {item.name}
-                    </NavLink>
-                  );
-                })}
+                        {item.name}
+                      </NavLink>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          {/* Logout Button */}
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            style={{
+              marginTop: "20px",
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              width: "100%",
+              padding: "14px 18px",
+              borderRadius: "12px",
+              border: "1px solid #fecaca",
+              background: "#fef2f2",
+              color: "#dc2626",
+              cursor: "pointer",
+              fontSize: "14px",
+              fontWeight: 500,
+              transition: ".3s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "#fee2e2";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "#fef2f2";
+            }}
+          >
+            <LogOut size={18} />
+
+            Logout
+          </button>
         </div>
       </aside>
 

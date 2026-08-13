@@ -3,21 +3,37 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from .. import models, schemas
+from ..security import get_current_admin
+
 
 router = APIRouter()
 
 
-@router.post("/", response_model=schemas.JobResponse)
-def create_job(job: schemas.JobCreate, db: Session = Depends(get_db)):
-    
-    existing_job = db.query(models.Job).filter(
-        models.Job.title == job.title,
-        models.Job.location == job.location
-    ).first()
+# =====================================================
+# ADMIN ONLY — CREATE JOB
+# =====================================================
+
+@router.post(
+    "/",
+    response_model=schemas.JobResponse,
+)
+def create_job(
+    job: schemas.JobCreate,
+    db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
+):
+    existing_job = (
+        db.query(models.Job)
+        .filter(
+            models.Job.title == job.title,
+            models.Job.location == job.location,
+        )
+        .first()
+    )
 
     if existing_job:
         return existing_job
-    
+
     new_job = models.Job(
         title=job.title,
         department=job.department,
@@ -34,19 +50,39 @@ def create_job(job: schemas.JobCreate, db: Session = Depends(get_db)):
     return new_job
 
 
-@router.get("/", response_model=list[schemas.JobResponse])
-def get_jobs(db: Session = Depends(get_db)):
+# =====================================================
+# PUBLIC — GET ALL JOBS
+# =====================================================
+
+@router.get(
+    "/",
+    response_model=list[schemas.JobResponse],
+)
+def get_jobs(
+    db: Session = Depends(get_db),
+):
     return db.query(models.Job).all()
 
-@router.put("/{job_id}", response_model=schemas.JobResponse)
+
+# =====================================================
+# ADMIN ONLY — UPDATE JOB
+# =====================================================
+
+@router.put(
+    "/{job_id}",
+    response_model=schemas.JobResponse,
+)
 def update_job(
     job_id: int,
     job: schemas.JobCreate,
     db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
 ):
     existing_job = (
         db.query(models.Job)
-        .filter(models.Job.id == job_id)
+        .filter(
+            models.Job.id == job_id
+        )
         .first()
     )
 
@@ -68,14 +104,24 @@ def update_job(
 
     return existing_job
 
-@router.delete("/{job_id}")
+
+# =====================================================
+# ADMIN ONLY — DELETE JOB
+# =====================================================
+
+@router.delete(
+    "/{job_id}"
+)
 def delete_job(
     job_id: int,
     db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
 ):
     job = (
         db.query(models.Job)
-        .filter(models.Job.id == job_id)
+        .filter(
+            models.Job.id == job_id
+        )
         .first()
     )
 

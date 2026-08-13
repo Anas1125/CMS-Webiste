@@ -5,16 +5,22 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from .. import models, schemas
+from ..security import get_current_admin
+
 
 router = APIRouter()
 
 
+# =====================================================
+# PUBLIC — GET WEBSITE SETTINGS
+# =====================================================
+
 @router.get(
     "/",
-    response_model=schemas.SiteSettingsResponse
+    response_model=schemas.SiteSettingsResponse,
 )
 def get_settings(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     settings = (
         db.query(models.SiteSettings)
@@ -36,20 +42,24 @@ def get_settings(
             )
         except (json.JSONDecodeError, TypeError):
             settings.about_videos = []
-
     else:
         settings.about_videos = []
 
     return settings
 
 
+# =====================================================
+# ADMIN ONLY — UPDATE WEBSITE SETTINGS
+# =====================================================
+
 @router.put(
     "/",
-    response_model=schemas.SiteSettingsResponse
+    response_model=schemas.SiteSettingsResponse,
 )
 def update_settings(
     data: schemas.SiteSettingsUpdate,
     db: Session = Depends(get_db),
+    admin: str = Depends(get_current_admin),
 ):
     received = data.model_dump(
         exclude_unset=True
@@ -57,14 +67,14 @@ def update_settings(
 
     print(
         "SETTINGS RECEIVED:",
-        received
+        received,
     )
 
     # Convert about_videos list → JSON string
     if "about_videos" in received:
         print(
             "ABOUT VIDEOS RECEIVED:",
-            received["about_videos"]
+            received["about_videos"],
         )
 
         received["about_videos"] = json.dumps(
@@ -88,7 +98,7 @@ def update_settings(
         setattr(
             settings,
             key,
-            value
+            value,
         )
 
     db.commit()
@@ -98,7 +108,7 @@ def update_settings(
     response_data = {
         column.name: getattr(
             settings,
-            column.name
+            column.name,
         )
         for column in
         models.SiteSettings.__table__.columns
@@ -116,7 +126,7 @@ def update_settings(
 
     print(
         "ABOUT VIDEOS SAVED:",
-        response_data["about_videos"]
+        response_data["about_videos"],
     )
 
     return response_data

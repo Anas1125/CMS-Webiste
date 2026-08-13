@@ -1,15 +1,30 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import (
+    APIRouter,
+    UploadFile,
+    File,
+    Depends,
+    HTTPException,
+)
 from pathlib import Path
 import shutil
 
+from ..security import get_current_admin
+
+
 router = APIRouter()
+
 
 UPLOAD_DIR = Path("uploads")
 
-from fastapi import HTTPException
+
+# =====================================================
+# ADMIN ONLY — LIST MEDIA
+# =====================================================
 
 @router.get("/")
-def list_media():
+def list_media(
+    admin: str = Depends(get_current_admin),
+):
     files = []
 
     for folder in UPLOAD_DIR.iterdir():
@@ -18,43 +33,63 @@ def list_media():
                 files.append({
                     "folder": folder.name,
                     "filename": file.name,
-                    "path": f"/uploads/{folder.name}/{file.name}"
+                    "path": f"/uploads/{folder.name}/{file.name}",
                 })
 
     return files
 
-@router.delete("/{folder}/{filename}")
-def delete_media(folder: str, filename: str):
 
+# =====================================================
+# ADMIN ONLY — DELETE MEDIA
+# =====================================================
+
+@router.delete("/{folder}/{filename}")
+def delete_media(
+    folder: str,
+    filename: str,
+    admin: str = Depends(get_current_admin),
+):
     file_path = UPLOAD_DIR / folder / filename
 
     if not file_path.exists():
         raise HTTPException(
             status_code=404,
-            detail="File not found"
+            detail="File not found",
         )
 
     file_path.unlink()
 
     return {
-        "message": "Deleted successfully"
+        "message": "Deleted successfully",
     }
 
+
+# =====================================================
+# ADMIN ONLY — UPLOAD MEDIA
+# =====================================================
 
 @router.post("/upload/{folder}")
 async def upload_file(
     folder: str,
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    admin: str = Depends(get_current_admin),
 ):
     folder_path = UPLOAD_DIR / folder
-    folder_path.mkdir(parents=True, exist_ok=True)
+
+    folder_path.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
 
     destination = folder_path / file.filename
 
     with destination.open("wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+        shutil.copyfileobj(
+            file.file,
+            buffer,
+        )
 
     return {
         "filename": file.filename,
-        "path": f"/uploads/{folder}/{file.filename}"
+        "path": f"/uploads/{folder}/{file.filename}",
     }

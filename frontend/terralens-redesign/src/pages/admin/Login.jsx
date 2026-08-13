@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Lock, User } from "lucide-react";
+import { Lock, User, Eye, EyeOff } from "lucide-react";
 import { login } from "../../api/admin";
 
 export default function Login() {
@@ -8,6 +8,7 @@ export default function Login() {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -143,12 +144,10 @@ export default function Login() {
           />
 
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="Password"
             value={password}
-            onChange={(e) =>
-              setPassword(e.target.value)
-            }
+            onChange={(e) => setPassword(e.target.value)}
             className="
               w-full
               rounded-xl
@@ -156,7 +155,7 @@ export default function Login() {
               border
               border-slate-200
               pl-12
-              pr-4
+              pr-12
               py-4
               text-slate-900
               placeholder-slate-400
@@ -167,6 +166,27 @@ export default function Login() {
               transition
             "
           />
+
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="
+              absolute
+              right-4
+              top-1/2
+              -translate-y-1/2
+              text-slate-400
+              hover:text-slate-600
+              transition
+            "
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? (
+              <EyeOff size={20} />
+            ) : (
+              <Eye size={20} />
+            )}
+          </button>
         </div>
 
         {/* Login Button */}
