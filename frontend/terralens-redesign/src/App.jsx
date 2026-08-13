@@ -5,11 +5,6 @@ import {
   useLocation,
 } from "react-router-dom";
 
-import {
-  AnimatePresence,
-  motion,
-} from "framer-motion";
-
 import ScrollToTop from "./components/ScrollToTop";
 
 import MainLayout from "./layouts/MainLayout";
@@ -39,127 +34,66 @@ import Partners from "./pages/admin/Partners";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 
 
+// =====================================================
+// PUBLIC ROUTES
+// =====================================================
+
 function PublicRoutes() {
-  const location = useLocation();
-
-  /*
-  =========================================================
-  IS THE DESTINATION HOME?
-  =========================================================
-  */
-
-  const goingHome = location.pathname === "/";
-
-
-  /*
-  =========================================================
-  PAGE VARIANTS
-
-  custom = goingHome
-
-  When goingHome === true:
-  - old page stays visible
-  - new Home appears immediately
-  - NO white fade
-
-  When goingHome === false:
-  - old page fades out
-  - new page fades in
-  =========================================================
-  */
-
-  const pageVariants = {
-    initial: (isHome) => ({
-      opacity: isHome ? 1 : 0,
-    }),
-
-    animate: {
-      opacity: 1,
-    },
-
-    exit: (isHome) => ({
-      opacity: isHome ? 1 : 0,
-    }),
-  };
-
-
   return (
-    <AnimatePresence
-      initial={false}
-      mode="sync"
-      custom={goingHome}
-    >
-      <motion.div
-        key={location.pathname}
-        custom={goingHome}
-        variants={pageVariants}
-        initial="initial"
-        animate="animate"
-        exit="exit"
-        transition={{
-          duration: 0.6,
-          ease: "easeInOut",
-        }}
-        style={{
-          width: "100%",
-        }}
-      >
-        <Routes location={location}>
+    <Routes>
 
-          {/* =========================
-              PUBLIC WEBSITE
-          ========================= */}
+      <Route element={<MainLayout />}>
 
-          <Route element={<MainLayout />}>
+        <Route
+          path="/"
+          element={<Home />}
+        />
 
-            <Route
-              path="/"
-              element={<Home />}
-            />
+        <Route
+          path="/about"
+          element={<About />}
+        />
 
-            <Route
-              path="/about"
-              element={<About />}
-            />
+        <Route
+          path="/services"
+          element={<Services />}
+        />
 
-            <Route
-              path="/services"
-              element={<Services />}
-            />
+        <Route
+          path="/services/:slug"
+          element={<ServiceDetails />}
+        />
 
-            <Route
-              path="/services/:slug"
-              element={<ServiceDetails />}
-            />
+        <Route
+          path="/products"
+          element={<Products />}
+        />
 
-            <Route
-              path="/products"
-              element={<Products />}
-            />
+        <Route
+          path="/showcase"
+          element={<Showcase />}
+        />
 
-            <Route
-              path="/showcase"
-              element={<Showcase />}
-            />
+        <Route
+          path="/careers"
+          element={<Careers />}
+        />
 
-            <Route
-              path="/careers"
-              element={<Careers />}
-            />
+        <Route
+          path="/contact"
+          element={<Contact />}
+        />
 
-            <Route
-              path="/contact"
-              element={<Contact />}
-            />
+      </Route>
 
-          </Route>
-
-        </Routes>
-      </motion.div>
-    </AnimatePresence>
+    </Routes>
   );
 }
 
+
+// =====================================================
+// ADMIN ROUTES
+// =====================================================
 
 function AdminRoutes() {
   return (
@@ -187,11 +121,6 @@ function AdminRoutes() {
           </ProtectedRoute>
         }
       >
-
-        <Route
-          path="partners"
-          element={<Partners />}
-        />
 
         <Route
           path="dashboard"
@@ -238,6 +167,11 @@ function AdminRoutes() {
           element={<Media />}
         />
 
+        <Route
+          path="partners"
+          element={<Partners />}
+        />
+
       </Route>
 
     </Routes>
@@ -245,10 +179,15 @@ function AdminRoutes() {
 }
 
 
+// =====================================================
+// APP CONTENT
+// =====================================================
+
 function AppContent() {
   const location = useLocation();
 
-  const isAdminRoute = location.pathname.startsWith("/admin");
+  const isAdminRoute =
+    location.pathname.startsWith("/admin");
 
   return (
     <>
@@ -263,6 +202,10 @@ function AppContent() {
   );
 }
 
+
+// =====================================================
+// APP
+// =====================================================
 
 function App() {
   return (
