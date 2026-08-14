@@ -19,8 +19,10 @@ export default function ShowcaseHero() {
     loadSettings();
   }, []);
 
-  const backgroundVideo = settings?.showcase_video
-    ? `${import.meta.env.VITE_API_URL}${settings.showcase_video}`
+  const backgroundVideo = settings?.services_video
+    ? settings.services_video.startsWith("http")
+      ? settings.services_video
+      : `${import.meta.env.VITE_API_URL}${settings.showcase_video}`
     : null;
 
   const hasVideo = Boolean(backgroundVideo);
@@ -30,8 +32,8 @@ export default function ShowcaseHero() {
      ======================================================= */
 
   const theme = {
-    sectionBg: hasVideo ? "#050505" : "#ffffff",
-    label: hasVideo ? "#38bdf8" : "#0ea5e9",
+    sectionBg: "#ffffff",
+    label: "#0ea5e9",
     heading: hasVideo ? "#ffffff" : "#0f172a",
     body: hasVideo ? "#d1d5db" : "#475569",
 

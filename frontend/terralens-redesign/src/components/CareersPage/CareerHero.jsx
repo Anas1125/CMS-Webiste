@@ -25,8 +25,10 @@ export default function CareerHero() {
     loadSettings();
   }, []);
 
-  const backgroundVideo = settings?.careers_video
-    ? `${import.meta.env.VITE_API_URL}${settings.careers_video}`
+  const backgroundVideo = settings?.services_video
+    ? settings.services_video.startsWith("http")
+      ? settings.services_video
+      : `${import.meta.env.VITE_API_URL}${settings.careers_video}`
     : null;
 
   const hasVideo = Boolean(backgroundVideo);
