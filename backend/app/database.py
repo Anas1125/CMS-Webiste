@@ -1,12 +1,30 @@
+import os
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
+from dotenv import load_dotenv
 
-DATABASE_URL = "sqlite:///./terralens.db"
+load_dotenv()
+
+
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "sqlite:///./terralens.db",
+)
+
+if DATABASE_URL.startswith("postgresql://"):
+    connect_args = {}
+else:
+    connect_args = {
+        "check_same_thread": False,
+    }
+
 
 engine = create_engine(
     DATABASE_URL,
-    connect_args={"check_same_thread": False},
+    connect_args=connect_args,
 )
+
 
 SessionLocal = sessionmaker(
     autocommit=False,
@@ -14,7 +32,9 @@ SessionLocal = sessionmaker(
     bind=engine,
 )
 
+
 Base = declarative_base()
+
 
 def get_db():
     db = SessionLocal()
