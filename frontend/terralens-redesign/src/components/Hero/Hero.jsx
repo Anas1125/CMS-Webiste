@@ -30,73 +30,33 @@ function Hero() {
   */
 
   useEffect(() => {
-    const loadHeroVideos = async () => {
-      try {
-        const data = await getMedia();
+      const loadHeroVideo = async () => {
+        try {
+          const data = await getSettings();
 
-        const heroVideos = data.filter((file) => {
-          const filename =
-            file.filename?.toLowerCase() || "";
+          setSettings(data);
 
-          const isVideo =
-            file.mime_type
-              ?.toLowerCase()
-              .startsWith("video/") ||
-            /\.(mp4|webm|mov|avi|mkv)$/i.test(
-              filename
-            );
-
-          return (
-            file.folder === "hero" &&
-            isVideo
-          );
-        });
-
-        const sortedVideos =
-          heroVideos.sort((a, b) =>
-            a.filename.localeCompare(
-              b.filename,
-              undefined,
+          if (data?.hero_video) {
+            setVideos([
               {
-                numeric: true,
-              }
-            )
+                folder: "hero",
+                filename: data.hero_video.split("/").pop(),
+                path: data.hero_video,
+              },
+            ]);
+          } else {
+            setVideos([]);
+          }
+        } catch (error) {
+          console.error(
+            "Failed to load homepage settings:",
+            error
           );
+        }
+      };
 
-        setVideos(sortedVideos);
-      } catch (error) {
-        console.error(
-          "Failed to load hero videos:",
-          error
-        );
-      }
-    };
-
-    loadHeroVideos();
-  }, []);
-
-  /*
-  =====================================================
-  LOAD SETTINGS
-  =====================================================
-  */
-
-  useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        const data = await getSettings();
-
-        setSettings(data);
-      } catch (error) {
-        console.error(
-          "Failed to load homepage settings:",
-          error
-        );
-      }
-    };
-
-    loadSettings();
-  }, []);
+      loadHeroVideo();
+    }, []);
 
   /*
   =====================================================
