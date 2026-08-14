@@ -252,6 +252,7 @@ function Hero() {
           <motion.video
             key={currentVideoUrl}
             autoPlay
+            loop
             muted
             playsInline
             preload="auto"
