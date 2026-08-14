@@ -25,9 +25,9 @@ export default function ContactHero() {
     loadSettings();
   }, []);
 
-  const backgroundVideo = settings?.services_video
-    ? settings.services_video.startsWith("http")
-      ? settings.services_video
+  const backgroundVideo = settings?.contact_video
+    ? settings.contact_video.startsWith("http")
+      ? settings.contact_video
       : `${import.meta.env.VITE_API_URL}${settings.contact_video}`
     : null;
 
