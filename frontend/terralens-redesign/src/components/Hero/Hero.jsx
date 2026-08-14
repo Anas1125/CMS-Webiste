@@ -30,33 +30,73 @@ function Hero() {
   */
 
   useEffect(() => {
-      const loadHeroVideo = async () => {
-        try {
-          const data = await getSettings();
+    const loadHeroVideos = async () => {
+      try {
+        const data = await getMedia();
 
-          setSettings(data);
+        const heroVideos = data.filter((file) => {
+          const filename =
+            file.filename?.toLowerCase() || "";
 
-          if (data?.hero_video) {
-            setVideos([
-              {
-                folder: "hero",
-                filename: data.hero_video.split("/").pop(),
-                path: data.hero_video,
-              },
-            ]);
-          } else {
-            setVideos([]);
-          }
-        } catch (error) {
-          console.error(
-            "Failed to load homepage settings:",
-            error
+          const isVideo =
+            file.mime_type
+              ?.toLowerCase()
+              .startsWith("video/") ||
+            /\.(mp4|webm|mov|avi|mkv)$/i.test(
+              filename
+            );
+
+          return (
+            file.folder === "hero" &&
+            isVideo
           );
-        }
-      };
+        });
 
-      loadHeroVideo();
-    }, []);
+        const sortedVideos =
+          heroVideos.sort((a, b) =>
+            a.filename.localeCompare(
+              b.filename,
+              undefined,
+              {
+                numeric: true,
+              }
+            )
+          );
+
+        setVideos(sortedVideos);
+      } catch (error) {
+        console.error(
+          "Failed to load hero videos:",
+          error
+        );
+      }
+    };
+
+    loadHeroVideos();
+  }, []);
+
+  /*
+  =====================================================
+  LOAD SETTINGS
+  =====================================================
+  */
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const data = await getSettings();
+
+        setSettings(data);
+      } catch (error) {
+        console.error(
+          "Failed to load homepage settings:",
+          error
+        );
+      }
+    };
+
+    loadSettings();
+  }, []);
 
   /*
   =====================================================
@@ -252,7 +292,6 @@ function Hero() {
           <motion.video
             key={currentVideoUrl}
             autoPlay
-            loop
             muted
             playsInline
             preload="auto"
