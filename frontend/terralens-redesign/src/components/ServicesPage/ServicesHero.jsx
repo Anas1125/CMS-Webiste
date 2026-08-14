@@ -41,10 +41,10 @@ export default function ServicesHero() {
     sectionBg: "#ffffff",
     label: "#0ea5e9",
 
-    // Main heading WHITE — unchanged
-    heading: "#ffffff",
+    // Main heading: white with video, black without video
+    heading: hasVideo ? "#ffffff" : "#0f172a",
 
-    body: "#475569",
+    body: hasVideo ? "#ffffff" : "#475569",
     gridLine: "rgba(15,23,42,0.07)",
 
     contactBg: "rgba(15,23,42,0.03)",
@@ -61,9 +61,11 @@ export default function ServicesHero() {
     cardBorder: "1px solid rgba(15,23,42,0.10)",
     cardShadow: "0 20px 60px rgba(15,23,42,0.08)",
 
-    // Card text — unchanged
+    // Card heading always black
     cardHeading: "#0f172a",
-    cardBody: "#ffffff",
+
+    // Card paragraph: white with video, dark without video
+    cardBody: hasVideo ? "#ffffff" : "#475569",
 
     bottomFade:
       "linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.25))",
@@ -307,7 +309,7 @@ export default function ServicesHero() {
               maxWidth: "38rem",
               fontSize: "1rem",
               lineHeight: "1.7",
-              color: "#ffffff",
+              color: theme.body,
             }}
           >
             We deliver end-to-end GIS, remote sensing,
@@ -390,7 +392,6 @@ export default function ServicesHero() {
 
         {/* =====================================================
             RIGHT COLUMN — GLASS CARD
-            KEPT UNCHANGED
         ===================================================== */}
 
         <motion.div

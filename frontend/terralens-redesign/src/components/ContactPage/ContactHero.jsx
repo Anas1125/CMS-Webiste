@@ -41,11 +41,11 @@ export default function ContactHero() {
     // Blue accent
     label: "#0ea5e9",
 
-    // Main heading
-    heading: "#ffffff",
+    // Main heading: white with video, black without video
+    heading: hasVideo ? "#ffffff" : "#0f172a",
 
-    // Main paragraph
-    body: "#ffffff",
+    // Main paragraph: white with video, dark without video
+    body: hasVideo ? "#ffffff" : "#475569",
 
     gridLine: "rgba(15,23,42,0.07)",
 
@@ -58,11 +58,11 @@ export default function ContactHero() {
 
     cardShadow: "0 20px 60px rgba(15,23,42,0.08)",
 
-    // Card heading black — UNCHANGED
+    // Card heading always black
     cardHeading: "#0f172a",
 
-    // Card details white — UNCHANGED
-    cardBody: "#ffffff",
+    // Card details: white with video, dark without video
+    cardBody: hasVideo ? "#ffffff" : "#475569",
 
     bottomFade:
       "linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.25))",
